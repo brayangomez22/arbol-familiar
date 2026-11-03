@@ -128,7 +128,7 @@ function branchAnchorOf(index: FamilyIndex, id: PersonId): PersonId {
 }
 
 /** The partner whose branch a union grows from: its first blood partner. */
-function unionAnchorOf(index: FamilyIndex, union: Union): PersonId | undefined {
+export function unionAnchorOf(index: FamilyIndex, union: Union): PersonId | undefined {
   return union.partners.find((partnerId) => isBlood(index, partnerId));
 }
 

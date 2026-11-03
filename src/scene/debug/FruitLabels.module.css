@@ -1,0 +1,18 @@
+.layer {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.label {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  font-size: 11px;
+  white-space: nowrap;
+  user-select: none;
+  will-change: transform;
+}
