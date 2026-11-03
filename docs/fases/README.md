@@ -20,3 +20,4 @@ Cada fase deja el sitio **funcionando y desplegable**. No empieces una fase sin 
 2. Pega el **prompt** del final del archivo de la fase.
 3. Pídele primero un plan (o usa el modo plan). Revísalo y luego deja que implemente.
 4. Verifica los criterios de terminado tú mismo en el navegador. Haz commit.
+5. Si al cerrar la fase queda algo pendiente que no es de esta fase, anótalo en la sección **"Pendientes heredados de fases anteriores"** del archivo de la fase donde se va a resolver (créala si no existe), indicando de qué fase viene. Al empezar una fase, revisa esa sección y trátala como parte del alcance.

@@ -35,6 +35,13 @@ Que funcione bien en el celular del abuelo y que se vea profesional en el portaf
 
 - Vercel, Netlify o GitHub Pages. CI con GitHub Actions: lint, test, validate:family y build en cada push.
 
+## Pendientes heredados de fases anteriores
+
+Cada fase anota aquí lo que detectó y le corresponde a esta. Inclúyelos en la auditoría inicial.
+
+- **(Fase 0) Bundle principal de ~1,1 MB (312 KB gzip)**, casi todo three + R3F + drei; Vite avisa "chunks larger than 500 kB". Medir con un analizador del bundle y separar lo que no se necesita en el primer render (vendor chunk para three, lazy para mapa/visor/postprocessing).
+- **(Fase 0) Aviso en consola `THREE.Clock: This module has been deprecated. Please use THREE.Timer instead.`** Viene de R3F 9.8.2 con three 0.187, no de nuestro código. Revisar si una versión nueva de R3F lo corrige; si no, documentarlo como conocido.
+
 ## Criterios de terminado
 
 - [ ] Lighthouse: Performance ≥ 80 en celular y Accesibilidad ≥ 95.
