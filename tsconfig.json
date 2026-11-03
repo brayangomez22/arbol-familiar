@@ -1,0 +1,6 @@
+{
+  "files": [],
+  "references": [{ "path": "./tsconfig.app.json" }, { "path": "./tsconfig.node.json" }],
+  // Read by tsx when running scripts/, which import src/ through the @/ alias.
+  "compilerOptions": { "paths": { "@/*": ["./src/*"] } }
+}

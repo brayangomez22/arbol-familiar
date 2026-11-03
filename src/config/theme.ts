@@ -1,0 +1,45 @@
+export interface SkyPalette {
+  readonly top: string;
+  readonly horizon: string;
+}
+
+export interface Palette {
+  readonly sky: SkyPalette;
+  readonly trunk: string;
+  readonly trunkShadow: string;
+  readonly leaves: readonly string[];
+  readonly fruits: readonly string[];
+  readonly deceasedFruit: string;
+  readonly ground: string;
+  readonly ink: string;
+  readonly paper: string;
+}
+
+export const dayPalette: Palette = {
+  sky: { top: '#c9dbe3', horizon: '#f6dcc4' },
+  trunk: '#8a5a3c',
+  trunkShadow: '#5e3b27',
+  leaves: ['#8fa883', '#7d9471', '#a3b18a', '#6f7f5a'],
+  fruits: ['#c8664a', '#d9a441', '#8e4a63', '#3f7f7a', '#b9774e'],
+  deceasedFruit: '#d8b45a',
+  ground: '#cdbb93',
+  ink: '#3b2a20',
+  paper: '#fbf4e8',
+};
+
+export const nightPalette: Palette = {
+  sky: { top: '#1c1f4a', horizon: '#3b3470' },
+  trunk: '#4a3a4f',
+  trunkShadow: '#2a2135',
+  leaves: ['#3e5a5a', '#35504d', '#4a6461', '#2c4441'],
+  fruits: ['#ffb070', '#ffd27a', '#e59ab8', '#8fd6c8', '#f2a26b'],
+  deceasedFruit: '#ffd98a',
+  ground: '#2b2a45',
+  ink: '#f3ead9',
+  paper: '#24224a',
+};
+
+export const fonts = {
+  display: "'Fraunces Variable', 'Georgia', serif",
+  body: "'Inter Variable', system-ui, sans-serif",
+} as const;

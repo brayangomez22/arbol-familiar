@@ -1,0 +1,228 @@
+{
+  "meta": {
+    "title": "Familia Gómez",
+    "rootUnionId": "u-jose-rosa",
+    "updatedAt": "2026-11-03"
+  },
+  "places": {
+    "medellin": {
+      "name": "Medellín",
+      "region": "Antioquia",
+      "country": "Colombia",
+      "lat": 6.2442,
+      "lng": -75.5812
+    },
+    "manizales": {
+      "name": "Manizales",
+      "region": "Caldas",
+      "country": "Colombia",
+      "lat": 5.0703,
+      "lng": -75.5138
+    },
+    "cali": {
+      "name": "Cali",
+      "region": "Valle del Cauca",
+      "country": "Colombia",
+      "lat": 3.4516,
+      "lng": -76.532
+    },
+    "bogota": {
+      "name": "Bogotá",
+      "region": "Cundinamarca",
+      "country": "Colombia",
+      "lat": 4.711,
+      "lng": -74.0721
+    },
+    "madrid": {
+      "name": "Madrid",
+      "country": "España",
+      "lat": 40.4168,
+      "lng": -3.7038
+    }
+  },
+  "people": [
+    {
+      "id": "jose-gomez",
+      "firstName": "José",
+      "lastName": "Gómez",
+      "nickname": "Don José",
+      "birth": { "date": "1938-05-12", "placeId": "manizales" },
+      "death": { "date": "2015", "placeId": "medellin" },
+      "bio": "Arriero de joven, cruzó la cordillera con mulas cargadas de café. Luego abrió una tienda en Medellín donde todos los vecinos tenían cuenta fiada."
+    },
+    {
+      "id": "rosa-manco",
+      "firstName": "Rosa",
+      "lastName": "Manco",
+      "birth": { "date": "1941-09", "placeId": "medellin" },
+      "bio": "Costurera y contadora de historias. Su arroz con leche sigue siendo la receta oficial de cada diciembre."
+    },
+    {
+      "id": "carlos-gomez",
+      "firstName": "Carlos",
+      "lastName": "Gómez",
+      "birth": { "date": "1963-02-20", "placeId": "medellin" }
+    },
+    {
+      "id": "marta-restrepo",
+      "firstName": "Marta",
+      "lastName": "Restrepo",
+      "birth": { "date": "1964-07-08", "placeId": "manizales" }
+    },
+    {
+      "id": "lucia-gomez",
+      "firstName": "Lucía",
+      "lastName": "Gómez",
+      "birth": { "date": "1965-11-03", "placeId": "medellin" },
+      "bio": "Maestra de primaria durante treinta años."
+    },
+    {
+      "id": "pedro-alvarez",
+      "firstName": "Pedro",
+      "lastName": "Álvarez",
+      "birth": { "date": "1962-06", "placeId": "cali" }
+    },
+    {
+      "id": "jorge-gomez",
+      "firstName": "Jorge",
+      "lastName": "Gómez",
+      "nickname": "el Mono",
+      "birth": { "date": "1968", "placeId": "medellin" }
+    },
+    {
+      "id": "elena-vargas",
+      "firstName": "Elena",
+      "lastName": "Vargas",
+      "birth": { "date": "1970-01-15", "placeId": "bogota" }
+    },
+    {
+      "id": "patricia-ruiz",
+      "firstName": "Patricia",
+      "lastName": "Ruiz",
+      "birth": { "date": "1974-04-22", "placeId": "bogota" }
+    },
+    {
+      "id": "andres-gomez",
+      "firstName": "Andrés",
+      "lastName": "Gómez",
+      "birth": { "date": "1988-07-14", "placeId": "medellin" }
+    },
+    {
+      "id": "laura-mejia",
+      "firstName": "Laura",
+      "lastName": "Mejía",
+      "birth": { "date": "1989-12-01", "placeId": "medellin" }
+    },
+    {
+      "id": "camila-gomez",
+      "firstName": "Camila",
+      "lastName": "Gómez",
+      "birth": { "date": "1991-11", "placeId": "medellin" },
+      "bio": "Arquitecta. Vive en Madrid desde 2018."
+    },
+    {
+      "id": "diego-alvarez",
+      "firstName": "Diego",
+      "lastName": "Álvarez",
+      "birth": { "date": "1990-12-01", "placeId": "cali" }
+    },
+    {
+      "id": "valentina-rios",
+      "firstName": "Valentina",
+      "lastName": "Ríos",
+      "birth": { "date": "1992-03-09", "placeId": "cali" }
+    },
+    {
+      "id": "ana-alvarez",
+      "firstName": "Ana",
+      "lastName": "Álvarez",
+      "birth": { "date": "2003-03-03", "placeId": "cali" }
+    },
+    {
+      "id": "mateo-gomez",
+      "firstName": "Mateo",
+      "lastName": "Gómez",
+      "birth": { "date": "1995-04-02", "placeId": "bogota" }
+    },
+    {
+      "id": "daniela-ospina",
+      "firstName": "Daniela",
+      "lastName": "Ospina",
+      "birth": { "date": "1996", "placeId": "bogota" }
+    },
+    {
+      "id": "sofia-gomez",
+      "firstName": "Sofía",
+      "lastName": "Gómez",
+      "birth": { "date": "2004-08-30", "placeId": "bogota" }
+    },
+    {
+      "id": "tomas-gomez",
+      "firstName": "Tomás",
+      "lastName": "Gómez",
+      "birth": { "date": "2016-06-18", "placeId": "medellin" }
+    },
+    {
+      "id": "emma-gomez",
+      "firstName": "Emma",
+      "lastName": "Gómez",
+      "birth": { "date": "2019-05", "placeId": "medellin" }
+    },
+    {
+      "id": "lucas-alvarez",
+      "firstName": "Lucas",
+      "lastName": "Álvarez",
+      "birth": { "date": "2021", "placeId": "cali" }
+    }
+  ],
+  "unions": [
+    {
+      "id": "u-jose-rosa",
+      "partners": ["jose-gomez", "rosa-manco"],
+      "children": ["carlos-gomez", "lucia-gomez", "jorge-gomez"],
+      "since": "1962"
+    },
+    {
+      "id": "u-carlos-marta",
+      "partners": ["carlos-gomez", "marta-restrepo"],
+      "children": ["andres-gomez", "camila-gomez"],
+      "since": "1987-06"
+    },
+    {
+      "id": "u-lucia-pedro",
+      "partners": ["lucia-gomez", "pedro-alvarez"],
+      "children": ["diego-alvarez", "ana-alvarez"],
+      "since": "1989"
+    },
+    {
+      "id": "u-jorge-elena",
+      "partners": ["jorge-gomez", "elena-vargas"],
+      "children": ["mateo-gomez"],
+      "since": "1993"
+    },
+    {
+      "id": "u-jorge-patricia",
+      "partners": ["jorge-gomez", "patricia-ruiz"],
+      "children": ["sofia-gomez"],
+      "since": "2002"
+    },
+    {
+      "id": "u-andres-laura",
+      "partners": ["andres-gomez", "laura-mejia"],
+      "children": ["tomas-gomez", "emma-gomez"],
+      "since": "2014-09-20"
+    },
+    {
+      "id": "u-diego-valentina",
+      "partners": ["diego-alvarez", "valentina-rios"],
+      "children": ["lucas-alvarez"],
+      "since": "2019"
+    },
+    {
+      "id": "u-mateo-daniela",
+      "partners": ["mateo-gomez", "daniela-ospina"],
+      "children": [],
+      "since": "2025"
+    }
+  ]
+}
