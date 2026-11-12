@@ -7,6 +7,7 @@ import type { TreeLayout } from '@/layout/types';
 import { useAppStore } from '@/state/store';
 import { CanvasControls } from './camera/CanvasControls';
 import { CanvasCursor } from './camera/CanvasCursor';
+import { Effects } from './effects/Effects';
 import { Scenery } from './environment/Scenery';
 import { Tree } from './tree/Tree';
 
@@ -24,7 +25,9 @@ export function Experience({ layout, labels }: ExperienceProps) {
   return (
     <Canvas
       dpr={[...quality.dpr]}
-      gl={{ antialias: quality.antialias }}
+      // Opaque: the sky covers every pixel, and partial alpha on leaf edges must never let the
+      // page show through.
+      gl={{ antialias: quality.antialias, alpha: false }}
       // No tone mapping: the theme's colors are the illustration's colors, exactly.
       flat
       camera={{
@@ -43,6 +46,7 @@ export function Experience({ layout, labels }: ExperienceProps) {
       <Tree layout={layout} labels={labels} />
       <CanvasControls bounds={layout.bounds} />
       <CanvasCursor />
+      <Effects />
     </Canvas>
   );
 }

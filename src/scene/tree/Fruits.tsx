@@ -1,5 +1,5 @@
 import { useEffect, useMemo } from 'react';
-import { PlaneGeometry } from 'three';
+import { MeshBasicMaterial, PlaneGeometry } from 'three';
 import { FRUIT_LABEL, FRUIT_MESH } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
 import type { PersonId } from '@/domain/types';
@@ -8,6 +8,7 @@ import { HaloMaterial } from '../materials/HaloMaterial';
 import { ToonMaterial } from '../materials/ToonMaterial';
 import { Fruit, type FruitResources } from './Fruit';
 import { fruitColorIndex } from './fruitColor';
+import { labelAlignments } from './labelAlignment';
 import { buildLanternBody, buildLanternCap } from './fruitGeometry';
 
 interface FruitsProps {
@@ -32,6 +33,12 @@ export function Fruits({ fruits, branches, labels }: FruitsProps) {
         opacity: FRUIT_MESH.haloOpacity,
         depthOffset: FRUIT_MESH.haloDepthOffset,
       }),
+      // Names are captions over the picture: always readable, never hidden behind a branch.
+      labelMaterial: new MeshBasicMaterial({
+        depthTest: false,
+        depthWrite: false,
+        transparent: true,
+      }),
     }),
     [],
   );
@@ -43,10 +50,12 @@ export function Fruits({ fruits, branches, labels }: FruitsProps) {
       for (const material of shared.bodyMaterials) material.dispose();
       shared.capMaterial.dispose();
       shared.haloMaterial.dispose();
+      shared.labelMaterial.dispose();
     },
     [shared],
   );
 
+  const alignments = useMemo(() => labelAlignments(fruits), [fruits]);
   const generationOf = useMemo(
     () => new Map(branches.map((branch) => [branch.id, branch.generation])),
     [branches],
@@ -62,6 +71,7 @@ export function Fruits({ fruits, branches, labels }: FruitsProps) {
       capMaterial: shared.capMaterial,
       haloGeometry: shared.halo,
       haloMaterial: shared.haloMaterial,
+      labelMaterial: shared.labelMaterial,
     };
     return (
       <Fruit
@@ -69,6 +79,7 @@ export function Fruits({ fruits, branches, labels }: FruitsProps) {
         fruit={fruit}
         resources={resources}
         label={labels.get(fruit.personId) ?? ''}
+        labelAlign={alignments.get(fruit.personId) ?? 'center'}
         alwaysLabeled={
           (generationOf.get(fruit.anchorBranchId) ?? 0) <= FRUIT_LABEL.alwaysVisibleGenerations
         }

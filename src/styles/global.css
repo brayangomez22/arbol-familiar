@@ -13,6 +13,17 @@ body,
   overflow: hidden;
 }
 
+:root {
+  /* Shared by every paper card and button of the overlay. Colors derive from theme.ts. */
+  --color-card: color-mix(in srgb, var(--color-paper) 88%, transparent);
+  --color-ink-soft: color-mix(in srgb, var(--color-ink) 70%, var(--color-paper));
+  --border-card: 1px solid color-mix(in srgb, var(--color-ink) 10%, transparent);
+  --radius-card: 14px;
+  --shadow-soft:
+    0 1px 2px color-mix(in srgb, var(--color-ink) 10%, transparent),
+    0 8px 24px color-mix(in srgb, var(--color-ink) 14%, transparent);
+}
+
 body {
   background: var(--color-sky-horizon);
   color: var(--color-ink);

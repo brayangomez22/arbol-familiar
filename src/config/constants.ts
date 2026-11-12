@@ -256,6 +256,13 @@ export const FRUIT_LABEL = {
   lineHeight: 1.05,
   /** Space between the bottom of the fruit and the top of its name. */
   gap: 0.3,
+  /**
+   * A couple's names run away from each other, each starting this far (in fruit radii) past its
+   * own fruit's center toward the partner.
+   */
+  pairInset: 0.55,
+  /** Drawn after everything else, on top. */
+  renderOrder: 10,
   outlineWidth: 0.05,
   outlineOpacity: 0.85,
   /** Names of generations up to this one are always shown, however far the camera is. */
@@ -447,6 +454,32 @@ export const SKY = {
   /** Bottom of the gradient (horizon color) and where it reaches the top color. */
   gradientStart: 0.15,
   gradientEnd: 1,
+} as const;
+
+/** Finishing passes; which ones run depends on quality.ts. */
+export const POSTPROCESSING = {
+  bloom: {
+    /**
+     * Day: above the paper-white of clouds and label outlines, so only real highlights glow a
+     * little. Night (phase 6) turns it up for the lanterns.
+     */
+    intensity: 0.2,
+    threshold: 0.95,
+    smoothing: 0.2,
+    radius: 0.6,
+  },
+  paper: {
+    fiberScale: 3,
+    fiberStrength: 0.06,
+    washScale: 260,
+    washStrength: 0.035,
+    grainStrength: 0.025,
+    tint: 0.12,
+    /** Distance from the center (in screen heights) where the vignette starts and is full. */
+    vignetteStart: 0.45,
+    vignetteEnd: 1.05,
+    vignetteStrength: 0.35,
+  },
 } as const;
 
 /** Developer view at ?debug=layout. */

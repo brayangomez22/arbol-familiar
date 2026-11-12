@@ -8,6 +8,7 @@ import type { FruitPlacement } from '@/layout/types';
 import { useAppStore } from '@/state/store';
 import { damp } from '../damp';
 import { FruitLabel } from './FruitLabel';
+import type { LabelAlign } from './labelAlignment';
 
 /** Geometries and materials shared by every fruit (owned and disposed by Fruits). */
 export interface FruitResources {
@@ -17,12 +18,14 @@ export interface FruitResources {
   readonly capMaterial: Material;
   readonly haloGeometry: BufferGeometry;
   readonly haloMaterial: Material;
+  readonly labelMaterial: Material;
 }
 
 interface FruitProps {
   readonly fruit: FruitPlacement;
   readonly resources: FruitResources;
   readonly label: string;
+  readonly labelAlign: LabelAlign;
   readonly alwaysLabeled: boolean;
 }
 
@@ -30,7 +33,7 @@ interface FruitProps {
 const ignoreRaycast = () => null;
 
 /** One person as a hanging lantern: hover grows it, a click (not a drag) selects it. */
-export function Fruit({ fruit, resources, label, alwaysLabeled }: FruitProps) {
+export function Fruit({ fruit, resources, label, labelAlign, alwaysLabeled }: FruitProps) {
   const { personId, position, size } = fruit;
   const lantern = useRef<Group>(null);
   const highlighted = useAppStore(
@@ -93,6 +96,9 @@ export function Fruit({ fruit, resources, label, alwaysLabeled }: FruitProps) {
         <FruitLabel
           text={label}
           offsetY={size * FRUIT_MESH.bottom * FRUIT_MESH.highlightScale + FRUIT_LABEL.gap}
+          align={labelAlign}
+          insetX={size * FRUIT_LABEL.pairInset}
+          material={resources.labelMaterial}
           alwaysVisible={alwaysLabeled}
           highlighted={highlighted}
         />

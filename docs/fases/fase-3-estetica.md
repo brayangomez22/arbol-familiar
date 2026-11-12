@@ -22,6 +22,17 @@ Que deje de parecer 3D genérico y se vea como una **ilustración viva**. Ver `d
 - **(Fase 2) El horizonte corta el árbol por la mitad.** El suelo provisional es un plano plano en y = 0 y la cámara mira a la altura del centro del árbol, así que la línea del suelo cruza la copa. La colina del alcance de esta fase debería resolverlo (o un cielo que se funda con el suelo).
 - **(Fase 2) Nombres que se pisan.** Un injerto cuelga a `graftDistance` de su fruto de sangre y, con el zoom cerca, sus nombres se superponen (p. ej. Jorge Gómez y Patricia Ruiz). Revisarlo al rediseñar frutos y etiquetas: desplazar el nombre del injerto o juntar los dos nombres de la pareja.
 
+### Estado (fase 3)
+
+- **Horizonte:** resuelto. El árbol está en la cima de una colina que cae por detrás; la copa queda contra el cielo.
+- **Nombres que se pisan:** resuelto. Los nombres de una pareja corren en sentidos opuestos (`scene/tree/labelAlignment.ts`) y se dibujan encima de ramas y hojas.
+
+## Pendientes para fases siguientes
+
+- **(Fase 3) Rendimiento en GPU integrada.** En un Intel integrado (dpr 1,5) se midieron ~41–52 fps en alta y ~54 en baja, con otra pestaña renderizando la misma escena en paralelo, así que la medición está contaminada. El MSAA del composer se reemplazó por SMAA (de ~30 a ~50 fps). Falta medir con una sola pestaña y sobre `pnpm build && pnpm preview`, y bajar de calidad automáticamente con `PerformanceMonitor` (ver `arquitectura.md`).
+- **(Fase 3) Nombres lejanos.** Con la cámara alejada, los nombres de las generaciones 0–1 quedan pequeños y el grano del papel los afina. Revisar al rediseñar el LOD de etiquetas.
+- **(Fase 3) Paleta de noche.** `nightPalette` ya tiene todos los colores nuevos, pero la escena todavía usa siempre `dayPalette`; el cambio día/noche y el bloom fuerte son de la fase 6.
+
 ## Criterios de terminado
 
 - [ ] Una captura del árbol podría pasar por una ilustración.

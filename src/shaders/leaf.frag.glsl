@@ -24,9 +24,8 @@ void main() {
   float halfWidth = 0.5 * mix(oval, 1.0 - vUv.y, uTaper);
   float across = abs(vUv.x - 0.5);
   float edge = across / max(halfWidth, 1e-4);
-  float edgeWidth = fwidth(edge);
-  float alpha = 1.0 - smoothstep(1.0 - edgeWidth, 1.0, edge);
-  if (alpha < 0.01) discard;
+  // A hard cut: SMAA smooths it afterward. Alpha to coverage would dither without MSAA.
+  if (edge > 1.0) discard;
 
   vec3 normal = normalize(vShadeNormal);
   vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
@@ -38,6 +37,6 @@ void main() {
   color = mix(color, uEdgeColor, smoothstep(uEdgeStart, 1.0, edge) * uEdgeMix);
   color += toonRim(normal, viewDirection, lit);
 
-  gl_FragColor = vec4(color, alpha);
+  gl_FragColor = vec4(color, 1.0);
   #include <colorspace_fragment>
 }

@@ -30,6 +30,8 @@ export interface Palette {
   /** Glow of the sun (or moon) in the sky. */
   readonly sunGlow: string;
   readonly pollen: string;
+  /** The vignette multiplies the corners by this color. */
+  readonly vignette: string;
 }
 
 export const dayPalette: Palette = {
@@ -53,6 +55,7 @@ export const dayPalette: Palette = {
   cloudShade: '#efd6cc',
   sunGlow: '#fff1cf',
   pollen: '#fff4cf',
+  vignette: '#c9a98c',
 };
 
 export const nightPalette: Palette = {
@@ -76,6 +79,7 @@ export const nightPalette: Palette = {
   cloudShade: '#2c2c5c',
   sunGlow: '#c9c4ff',
   pollen: '#ffe6a3',
+  vignette: '#0b0a20',
 };
 
 export const fonts = {

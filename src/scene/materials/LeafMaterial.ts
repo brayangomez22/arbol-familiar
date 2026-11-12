@@ -10,8 +10,8 @@ export type LeafShape = { readonly [K in keyof typeof LEAF_MESH]: number };
 
 /**
  * Toon leaves (or blades) for an InstancedMesh: each instance brings its color (instanceColor) and
- * the normal it is lit by (aShadeNormal). The outline is cut in the shader, with alpha to coverage
- * so the edges stay smooth under MSAA without sorting.
+ * the normal it is lit by (aShadeNormal). The outline is cut in the shader as a hard edge, so no
+ * sorting is needed; the SMAA pass smooths it.
  */
 export class LeafMaterial extends ShaderMaterial {
   constructor(palette: Palette, shape: LeafShape) {
@@ -19,7 +19,6 @@ export class LeafMaterial extends ShaderMaterial {
       vertexShader,
       fragmentShader: withToonShading(fragmentShader),
       side: DoubleSide,
-      alphaToCoverage: true,
       uniforms: {
         ...toonUniforms(palette),
         uShadeTint: { value: new Color(palette.shade) },
