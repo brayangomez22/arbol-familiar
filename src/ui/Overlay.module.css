@@ -1,0 +1,14 @@
+/* The UI waits for the intro and then fades in with the scene's own curve. */
+.overlay {
+  opacity: 1;
+  transition: opacity var(--duration-ui-fade) var(--ease-out);
+}
+
+.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.hidden * {
+  pointer-events: none;
+}

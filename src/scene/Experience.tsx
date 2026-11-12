@@ -1,5 +1,6 @@
 import { Canvas } from '@react-three/fiber';
-import { CAMERA } from '@/config/constants';
+import { cssEase } from '@/animation/easings';
+import { CAMERA, TIMING } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
 import { dayPalette } from '@/config/theme';
 import type { PersonId } from '@/domain/types';
@@ -21,6 +22,8 @@ interface ExperienceProps {
 export function Experience({ layout, labels }: ExperienceProps) {
   const qualityTier = useAppStore((state) => state.qualityTier);
   const selectPerson = useAppStore((state) => state.selectPerson);
+  // Hidden until the intro decides whether to play: without it, the tree simply fades in.
+  const decided = useAppStore((state) => state.introPhase !== 'pending');
   const quality = QUALITY[qualityTier];
 
   return (
@@ -29,6 +32,10 @@ export function Experience({ layout, labels }: ExperienceProps) {
       // Opaque: the sky covers every pixel, and partial alpha on leaf edges must never let the
       // page show through.
       gl={{ antialias: quality.antialias, alpha: false }}
+      style={{
+        opacity: decided ? 1 : 0,
+        transition: `opacity ${TIMING.reducedMotionIntroDuration}s ${cssEase('out')}`,
+      }}
       // No tone mapping: the theme's colors are the illustration's colors, exactly.
       flat
       camera={{

@@ -1,8 +1,9 @@
 import { Color, DoubleSide, ShaderMaterial } from 'three';
-import { WIND, type LEAF_MESH } from '@/config/constants';
+import { INTRO, WIND, type LEAF_MESH } from '@/config/constants';
 import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/leaf.frag.glsl?raw';
 import vertexShader from '@/shaders/leaf.vert.glsl?raw';
+import { growthUniforms, withGrowth } from '../intro/growthUniforms';
 import { focusUniforms, withFocus } from '../selection/focusUniforms';
 import { windUniforms, withWind } from '../wind/windUniforms';
 import { toonUniforms, withToonShading } from './toonUniforms';
@@ -16,15 +17,28 @@ export type LeafShape = { readonly [K in keyof typeof LEAF_MESH]: number };
  * sorting is needed; the SMAA pass smooths it.
  */
 export class LeafMaterial extends ShaderMaterial {
-  /** `focus`: steps back with the rest of the tree when someone is selected (leaves, not grass). */
-  constructor(palette: Palette, shape: LeafShape, { focus = false }: { focus?: boolean } = {}) {
+  /**
+   * Leaves, not grass: `focus` steps back with the rest of the tree when someone is selected, and
+   * `growth` unfolds each leaf in the intro (the geometry must carry `aGrowAt` per instance).
+   */
+  constructor(
+    palette: Palette,
+    shape: LeafShape,
+    { focus = false, growth = false }: { focus?: boolean; growth?: boolean } = {},
+  ) {
     super({
-      vertexShader: withWind(vertexShader),
+      vertexShader: withGrowth(withWind(vertexShader)),
       fragmentShader: withFocus(withToonShading(fragmentShader)),
       side: DoubleSide,
-      defines: focus ? { USE_FOCUS: '' } : {},
+      defines: {
+        ...(focus ? { USE_FOCUS: '' } : {}),
+        ...(growth ? { USE_GROWTH: '' } : {}),
+      },
       uniforms: {
         ...windUniforms,
+        ...growthUniforms,
+        uLeafUnfold: { value: INTRO.leaves.unfold },
+        uLeafOvershoot: { value: INTRO.leaves.overshoot },
         ...focusUniforms,
         ...toonUniforms(palette),
         uShadeTint: { value: new Color(palette.shade) },

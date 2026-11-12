@@ -1,8 +1,9 @@
 import { useEffect, useMemo } from 'react';
 import { MeshBasicMaterial, PlaneGeometry } from 'three';
-import { FRUIT_LABEL, FRUIT_MESH, WIND } from '@/config/constants';
+import { FRUIT_LABEL, FRUIT_MESH, INTRO, WIND } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
 import type { PersonId } from '@/domain/types';
+import type { GrowthSchedule } from '@/layout/growth';
 import { swayWeight, type TreeReach } from '@/layout/reach';
 import type { BranchSegment, FruitPlacement } from '@/layout/types';
 import { HaloMaterial } from '../materials/HaloMaterial';
@@ -18,10 +19,12 @@ interface FruitsProps {
   readonly branches: readonly BranchSegment[];
   readonly labels: ReadonlyMap<PersonId, string>;
   readonly reach: TreeReach;
+  /** Fruits pop when the growth reaches their branch tip. */
+  readonly schedule: GrowthSchedule;
 }
 
 /** All the people. Geometries are shared, and there is one material per theme fruit color. */
-export function Fruits({ fruits, branches, labels, reach }: FruitsProps) {
+export function Fruits({ fruits, branches, labels, reach, schedule }: FruitsProps) {
   const shared = useMemo(
     () => ({
       body: buildLanternBody(),
@@ -112,6 +115,10 @@ export function Fruits({ fruits, branches, labels, reach }: FruitsProps) {
         labelAlign={alignments.get(fruit.personId) ?? 'center'}
         swayAnchor={source.swayAnchor}
         swayWeight={source.swayWeight}
+        bornAt={
+          schedule.atFraction(fruit.anchorBranchId, 1) +
+          (fruit.kind === 'graft' ? INTRO.fruit.graftDelay : INTRO.fruit.delay)
+        }
         alwaysLabeled={
           (generationOf.get(fruit.anchorBranchId) ?? 0) <= FRUIT_LABEL.alwaysVisibleGenerations
         }

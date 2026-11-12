@@ -258,7 +258,7 @@ export const FRUIT_MESH = {
 
 /** Specks of light that rise from a fruit when the pointer reaches it. */
 export const HOVER_SPARKS = {
-  perHover: 6,
+  perBurst: 6,
   /** Seconds between one speck of a burst and the next, so they don't all pop at once. */
   stagger: 0.07,
   /** Specks alive at once across all fruits; the oldest are reused first. */
@@ -631,6 +631,88 @@ export const SELECTION = {
   },
   /** With prefers-reduced-motion: no flight, the lineage simply fades in. */
   reducedMotionFade: 0.35,
+} as const;
+
+/** The opening: a seed falls, sprouts, and the tree grows generation by generation. Seconds. */
+export const INTRO = {
+  seed: {
+    /** Starts this far above the hilltop, just out of the opening view. */
+    startHeight: 11,
+    fallDuration: 1.7,
+    /** Side to side drift while falling: amplitude (world units) and how many swings. */
+    swayAmplitude: 0.9,
+    swayTurns: 2.5,
+    /** Most it tilts while swinging, in radians. */
+    swayTilt: 0.5,
+    /** Seed radius (world units); it sits on the ground, then sinks into it. */
+    size: 0.32,
+    sinkDuration: 0.5,
+  },
+  /** Pause between landing and the first shoot. */
+  sproutDelay: 0.15,
+  growth: {
+    /** Time from the shoot to the last branch tip, whatever the size of the family. */
+    duration: 4.4,
+    /** A child branch waits this long after the growth passes the point it sprouts from. */
+    generationPause: 0.25,
+    /**
+     * Seconds a ring takes to swell to full thickness after the tip passes it: long enough that a
+     * shoot comes out slim and thickens behind its tip, as wood does.
+     */
+    swell: 1.2,
+    /** Roots spread out over this long, starting with the shoot. */
+    rootDuration: 1.2,
+  },
+  fruit: {
+    /** A fruit pops this long after its branch reaches its tip; a partner's a little later. */
+    delay: 0.1,
+    graftDelay: 0.2,
+  },
+  leaves: {
+    /** After the growth passes its cluster, the leaves open from the center outward over this long. */
+    spread: 0.5,
+    /** Seconds a single leaf takes to unfold, and its overshoot (back easing). */
+    unfold: 0.45,
+    overshoot: 1.6,
+  },
+  camera: {
+    /** Opening view: close on the hilltop, looking at this height above it. */
+    startDistance: 24,
+    startLift: 3.5,
+    /** The camera starts pulling back to the whole tree this long after the seed lands. */
+    pullDelay: 0.3,
+    /** …and arrives this long before the growth ends. */
+    arriveEarly: 0.4,
+  },
+  /** Frames drawn after the shaders compile and before the intro starts, so it starts smooth. */
+  warmUpFrames: 2,
+  /** How long the UI takes to appear once the intro ends (or straight away, without one). */
+  uiFade: 0.8,
+  /** localStorage key that remembers the visitor has seen it. */
+  storageKey: 'arbol-familiar:intro-vista',
+} as const;
+
+/** The puff where the seed lands: same particles as the hover sparks, heavier and wider. */
+export const INTRO_DUST = {
+  perBurst: 14,
+  stagger: 0.01,
+  pool: 14,
+  minLife: 0.7,
+  maxLife: 1.3,
+  spread: 3.5,
+  // Above the grass, which would hide a puff at ground level.
+  startBelow: -0.3,
+  startAbove: 0.9,
+  startFront: 1,
+  rise: 0.8,
+  drift: 1.4,
+  wiggle: 0.05,
+  wiggleFrequency: 3,
+  size: 0.4,
+  endSize: 1.4,
+  opacity: 0.8,
+  fadeIn: 0.05,
+  fadeOutStart: 0.25,
 } as const;
 
 /** Seconds. */

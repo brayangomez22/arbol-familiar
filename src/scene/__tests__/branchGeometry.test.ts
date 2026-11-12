@@ -59,7 +59,11 @@ const other: BranchSegment = {
 };
 
 // Reach is height along this vertical branch; the weight is a tenth of it.
-const wood = { reachAt: (_: string, u: number) => u * 10, swayOf: (reach: number) => reach / 10 };
+const wood = {
+  reachAt: (_: string, u: number) => u * 10,
+  swayOf: (reach: number) => reach / 10,
+  growAt: (_: string, u: number) => 2 + u,
+};
 
 describe('buildBranchGeometry', () => {
   it('merges every segment into one indexed geometry', () => {
@@ -103,6 +107,24 @@ describe('buildBranchGeometry', () => {
     expect((first?.count ?? 0) + (second?.count ?? 0)).toBe(
       geometry.getAttribute('position').count,
     );
+  });
+});
+
+describe('growth attributes', () => {
+  it('gives every vertex the center of its ring and the moment it grows', () => {
+    const { geometry } = buildBranchGeometry([straight], wood);
+    const position = geometry.getAttribute('position');
+    const axis = geometry.getAttribute('aAxis');
+    const growAt = geometry.getAttribute('aGrowAt');
+    const tubeCount = buildTaperedTube(straight).getAttribute('position').count;
+    for (let i = 0; i < tubeCount; i++) {
+      // The branch is the y axis: each ring's center is (0, y, 0).
+      expect(axis.getX(i)).toBeCloseTo(0, 5);
+      expect(axis.getY(i)).toBeCloseTo(position.getY(i), 4);
+      expect(growAt.getX(i)).toBeCloseTo(2 + position.getY(i) / 10, 4);
+    }
+    // Knots grow with their end: the base at 2 s, the tip at 3 s.
+    expect(new Set(Array.from(growAt.array).slice(tubeCount))).toEqual(new Set([2, 3]));
   });
 });
 

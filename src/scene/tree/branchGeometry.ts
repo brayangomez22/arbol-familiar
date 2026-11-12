@@ -17,10 +17,12 @@ export interface WoodMeasure {
   /** Reach (world units) of the point at fraction `u` (0 = base, 1 = tip) of a segment's length. */
   readonly reachAt: (segmentId: string, u: number) => number;
   readonly swayOf: (reach: number) => number;
+  /** When the point at fraction `u` appears in the intro, in seconds of growth. */
+  readonly growAt: (segmentId: string, u: number) => number;
 }
 
-/** Roots and anything else that never moves nor carries sap. */
-const STILL: WoodMeasure = { reachAt: () => 0, swayOf: () => 0 };
+/** Wood that never moves, carries no sap and is there from the first moment of growth. */
+const STILL: WoodMeasure = { reachAt: () => 0, swayOf: () => 0, growAt: () => 0 };
 
 /** No lineage: the sap limit of every vertex is below any reach. */
 const OFF_LINEAGE = -1;
@@ -43,9 +45,10 @@ export interface BranchGeometry {
  * Tubes carry `bark = 1` and a `uv` whose x is arc length in world units, so the bark grooves keep
  * the same spacing on a long limb and a short twig. Knots carry `bark = 0` and stay smooth.
  *
- * Every vertex also carries its reach (`aReach`) and wind weight (`aSway`): per ring along a tube,
- * and those of its end for a knot, so a joint moves as one piece. `aSapLimit` starts off the
- * lineage; setSapLimits() lights a path.
+ * Every vertex also carries its reach (`aReach`), wind weight (`aSway`) and the moment it grows
+ * (`aGrowAt`): per ring along a tube, and those of its end for a knot, so a joint moves as one
+ * piece. `aAxis` is the center of its ring (or knot), which growth shrinks it toward.
+ * `aSapLimit` starts off the lineage; setSapLimits() lights a path.
  */
 export function buildBranchGeometry(
   segments: readonly BranchSegment[],
@@ -63,17 +66,17 @@ export function buildBranchGeometry(
     const ringSize = tube.parameters.radialSegments + 1;
     const vertexCount = tube.getAttribute('position').count;
     const tubeReach = new Float32Array(vertexCount);
+    const tubeGrowth = new Float32Array(vertexCount);
     for (let ring = 0; ring <= rings; ring++) {
-      tubeReach.fill(
-        wood.reachAt(segment.id, ring / rings),
-        ring * ringSize,
-        (ring + 1) * ringSize,
-      );
+      const from = ring * ringSize;
+      const to = (ring + 1) * ringSize;
+      tubeReach.fill(wood.reachAt(segment.id, ring / rings), from, to);
+      tubeGrowth.fill(wood.growAt(segment.id, ring / rings), from, to);
     }
-    withWood(tube, tubeReach, wood);
+    withWood(tube, tubeReach, tubeGrowth, wood);
     const ends = [
-      buildKnot(base, segment.radiusStart, detail, wood.reachAt(segment.id, 0), wood),
-      buildKnot(tip, segment.radiusEnd, detail, wood.reachAt(segment.id, 1), wood),
+      buildKnot(base, segment.radiusStart, detail, segment.id, 0, wood),
+      buildKnot(tip, segment.radiusEnd, detail, segment.id, 1, wood),
     ];
     const count =
       vertexCount + ends.reduce((sum, knot) => sum + knot.getAttribute('position').count, 0);
@@ -126,6 +129,7 @@ export function buildTaperedTube(
   // TubeGeometry lays out `tubular + 1` rings of `radial + 1` vertices at unit distance from the
   // arc-length point of the curve; pushing each ring out to its own radius gives the taper.
   const position = tube.getAttribute('position');
+  const axis = new Float32Array(position.count * 3);
   const center = new Vector3();
   const vertex = new Vector3();
   for (let ring = 0; ring <= tubular; ring++) {
@@ -136,8 +140,10 @@ export function buildTaperedTube(
       const index = ring * (radial + 1) + j;
       vertex.fromBufferAttribute(position, index).sub(center).multiplyScalar(radius).add(center);
       position.setXYZ(index, vertex.x, vertex.y, vertex.z);
+      axis.set([center.x, center.y, center.z], index * 3);
     }
   }
+  tube.setAttribute('aAxis', new BufferAttribute(axis, 3));
 
   const uv = tube.getAttribute('uv');
   const length = curve.getLength();
@@ -145,26 +151,38 @@ export function buildTaperedTube(
   return withBark(tube, 1);
 }
 
+/** A sphere at one end (`u` = 0 or 1) of a segment, which grows when that end does. */
 function buildKnot(
   center: Vec3,
   radius: number,
   detail: TreeMeshDetail,
-  reach = 0,
-  wood: WoodMeasure = STILL,
+  segmentId: string,
+  u: number,
+  wood: WoodMeasure,
 ): SphereGeometry {
   const width = radialSegments(radius, detail);
   const knot = new SphereGeometry(radius, width, Math.ceil(width / 2));
   knot.translate(center.x, center.y, center.z);
   const count = knot.getAttribute('position').count;
-  return withWood(withBark(knot, 0), new Float32Array(count).fill(reach), wood);
+  const axis = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) axis.set([center.x, center.y, center.z], i * 3);
+  knot.setAttribute('aAxis', new BufferAttribute(axis, 3));
+  return withWood(
+    withBark(knot, 0),
+    new Float32Array(count).fill(wood.reachAt(segmentId, u)),
+    new Float32Array(count).fill(wood.growAt(segmentId, u)),
+    wood,
+  );
 }
 
 function withWood<T extends BufferGeometry>(
   geometry: T,
   reach: Float32Array,
+  growAt: Float32Array,
   wood: WoodMeasure,
 ): T {
   geometry.setAttribute('aReach', new BufferAttribute(reach, 1));
+  geometry.setAttribute('aGrowAt', new BufferAttribute(growAt, 1));
   geometry.setAttribute('aSway', new BufferAttribute(reach.map(wood.swayOf), 1));
   geometry.setAttribute(
     'aSapLimit',

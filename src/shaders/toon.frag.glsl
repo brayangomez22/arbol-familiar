@@ -23,6 +23,9 @@ uniform float uSapShine;
 uniform float uSapShadeMix;
 uniform vec3 uSapColor;
 #endif
+#ifdef USE_GROWTH
+varying float vGrowthAge;
+#endif
 #ifdef USE_FOCUS
 /** 1 while this object is the selected person (set per draw on shared materials). */
 uniform float uFocused;
@@ -43,6 +46,9 @@ float barkGroove(vec2 uv) {
 }
 
 void main() {
+  #ifdef USE_GROWTH
+  if (vGrowthAge < 0.0) discard;
+  #endif
   vec3 normal = normalize(vWorldNormal);
   if (!gl_FrontFacing) normal = -normal;
   vec3 viewDirection = normalize(cameraPosition - vWorldPosition);

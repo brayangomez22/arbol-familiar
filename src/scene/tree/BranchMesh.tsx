@@ -17,13 +17,15 @@ export interface BranchMeshHandle {
 interface BranchMeshProps {
   readonly segments: readonly BranchSegment[];
   readonly color: string;
-  /** Reach and wind weight along the wood; without it the wood stays still and carries no sap. */
-  readonly wood?: WoodMeasure;
+  /** Reach, wind weight and growth time along the wood. */
+  readonly wood: WoodMeasure;
+  /** Can carry the selection's sap (the branches, not the roots). */
+  readonly sap?: boolean;
   readonly ref?: Ref<BranchMeshHandle>;
 }
 
 /** A set of branches (or roots) as one solid mesh of toon-shaded bark with an ink outline. */
-export function BranchMesh({ segments, color, wood, ref }: BranchMeshProps) {
+export function BranchMesh({ segments, color, wood, sap = false, ref }: BranchMeshProps) {
   const built = useMemo(() => buildBranchGeometry(segments, wood), [segments, wood]);
   const material = useMemo(
     () =>
@@ -33,9 +35,10 @@ export function BranchMesh({ segments, color, wood, ref }: BranchMeshProps) {
         bark: true,
         wind: true,
         focus: true,
-        sap: wood !== undefined,
+        sap,
+        growth: true,
       }),
-    [color, wood],
+    [color, sap],
   );
   const outline = useMemo(
     () =>
@@ -43,6 +46,7 @@ export function BranchMesh({ segments, color, wood, ref }: BranchMeshProps) {
         color: dayPalette.outline,
         thickness: TOON.outline.branchThickness,
         wind: true,
+        growth: true,
       }),
     [],
   );

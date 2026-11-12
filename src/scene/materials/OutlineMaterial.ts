@@ -1,6 +1,7 @@
 import { BackSide, Color, ShaderMaterial, Vector2, type ColorRepresentation } from 'three';
 import fragmentShader from '@/shaders/outline.frag.glsl?raw';
 import vertexShader from '@/shaders/outline.vert.glsl?raw';
+import { growthUniforms, withGrowth } from '../intro/growthUniforms';
 import { windUniforms, withWind } from '../wind/windUniforms';
 
 export interface OutlineMaterialOptions {
@@ -9,6 +10,8 @@ export interface OutlineMaterialOptions {
   readonly thickness: number;
   /** Follow the wind like a ToonMaterial with `wind`; the geometry must carry `aSway`. */
   readonly wind?: boolean;
+  /** Grow in the intro like a ToonMaterial with `growth`. */
+  readonly growth?: boolean;
 }
 
 /**
@@ -16,14 +19,18 @@ export interface OutlineMaterialOptions {
  * static copy of the geometry, which would come apart from the moving branch.
  */
 export class OutlineMaterial extends ShaderMaterial {
-  constructor({ color, thickness, wind = false }: OutlineMaterialOptions) {
+  constructor({ color, thickness, wind = false, growth = false }: OutlineMaterialOptions) {
     super({
-      vertexShader: withWind(vertexShader),
+      vertexShader: withGrowth(withWind(vertexShader)),
       fragmentShader,
       side: BackSide,
-      defines: wind ? { USE_WIND: '' } : {},
+      defines: {
+        ...(wind ? { USE_WIND: '' } : {}),
+        ...(growth ? { USE_GROWTH: '' } : {}),
+      },
       uniforms: {
         ...windUniforms,
+        ...growthUniforms,
         uColor: { value: new Color(color) },
         uThickness: { value: thickness },
         uResolution: { value: new Vector2(1, 1) },

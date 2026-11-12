@@ -1,8 +1,7 @@
-import { Color, ShaderMaterial } from 'three';
-import { HOVER_SPARKS } from '@/config/constants';
-import type { Palette } from '@/config/theme';
+import { Color, ShaderMaterial, type ColorRepresentation } from 'three';
 import fragmentShader from '@/shaders/spark.frag.glsl?raw';
 import vertexShader from '@/shaders/spark.vert.glsl?raw';
+import type { SparkConfig } from '../tree/sparkPool';
 import { pixelsPerUnit } from './pixelsPerUnit';
 
 /**
@@ -10,7 +9,7 @@ import { pixelsPerUnit } from './pixelsPerUnit';
  * vanish, while a warm gold reads as light against it (and still does on the night sky).
  */
 export class SparkMaterial extends ShaderMaterial {
-  constructor(palette: Palette) {
+  constructor(color: ColorRepresentation, config: SparkConfig) {
     super({
       vertexShader,
       fragmentShader,
@@ -18,16 +17,16 @@ export class SparkMaterial extends ShaderMaterial {
       depthWrite: false,
       uniforms: {
         uTime: { value: 0 },
-        uRise: { value: HOVER_SPARKS.rise },
-        uWiggle: { value: HOVER_SPARKS.wiggle },
-        uWiggleFrequency: { value: HOVER_SPARKS.wiggleFrequency },
-        uSize: { value: HOVER_SPARKS.size },
-        uEndSize: { value: HOVER_SPARKS.endSize },
-        uFadeIn: { value: HOVER_SPARKS.fadeIn },
-        uFadeOutStart: { value: HOVER_SPARKS.fadeOutStart },
+        uRise: { value: config.rise },
+        uWiggle: { value: config.wiggle },
+        uWiggleFrequency: { value: config.wiggleFrequency },
+        uSize: { value: config.size },
+        uEndSize: { value: config.endSize },
+        uFadeIn: { value: config.fadeIn },
+        uFadeOutStart: { value: config.fadeOutStart },
         uPixelsPerUnit: { value: 1 },
-        uColor: { value: new Color(palette.spark) },
-        uOpacity: { value: HOVER_SPARKS.opacity },
+        uColor: { value: new Color(color) },
+        uOpacity: { value: config.opacity },
       },
     });
   }

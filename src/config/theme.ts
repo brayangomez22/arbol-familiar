@@ -29,6 +29,8 @@ export interface Palette {
   readonly spark: string;
   /** Light that runs up the selected person's lineage. */
   readonly sap: string;
+  /** Puff of earth where the seed lands in the intro. */
+  readonly dust: string;
   readonly hill: string;
   readonly grass: readonly string[];
   readonly cloud: string;
@@ -58,6 +60,7 @@ export const dayPalette: Palette = {
   haloGlow: '#ffd27f',
   spark: '#f6be55',
   sap: '#ffd36e',
+  dust: '#a88a5c',
   hill: '#a7b07a',
   grass: ['#7f9358', '#6e824c', '#93a466', '#62753f'],
   cloud: '#fff8ee',
@@ -85,6 +88,7 @@ export const nightPalette: Palette = {
   haloGlow: '#ffc56e',
   spark: '#ffe08a',
   sap: '#ffe29a',
+  dust: '#5a5274',
   hill: '#2f3d4a',
   grass: ['#34484c', '#2c4044', '#3d5357', '#253a3d'],
   cloud: '#3e3f74',

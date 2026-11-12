@@ -10,6 +10,7 @@ import { damp } from '../damp';
 import type { HaloMaterial } from '../materials/HaloMaterial';
 import type { ToonMaterial } from '../materials/ToonMaterial';
 import { stepSpring, type SpringState } from '../spring';
+import { growthUniforms } from '../intro/growthUniforms';
 import { windSway } from '../wind/windField';
 import { windFrame } from '../wind/windUniforms';
 import { FruitLabel } from './FruitLabel';
@@ -35,6 +36,8 @@ interface FruitProps {
   /** Point whose wind sway the fruit follows (its branch tip), and that point's wind weight. */
   readonly swayAnchor: Vec3;
   readonly swayWeight: number;
+  /** Growth time (seconds) at which it pops in the intro. */
+  readonly bornAt: number;
 }
 
 // The halo is decoration: it must never catch the pointer meant for a fruit behind it.
@@ -52,6 +55,7 @@ export function Fruit({
   alwaysLabeled,
   swayAnchor,
   swayWeight,
+  bornAt,
 }: FruitProps) {
   const { personId, position, size } = fruit;
   const holder = useRef<Group>(null);
@@ -95,8 +99,15 @@ export function Fruit({
     holder.current.position.set(position.x, position.y, position.z).add(sway);
     // Pushed sideways, a hanging lantern swings its bottom downwind.
     current.rotation.z = sway.x * WIND.fruitTilt;
-    const target = size * (highlighted ? FRUIT_MESH.highlightScale : 1);
-    stepSpring(scale.current, target, FRUIT_MESH.scaleSpring, delta);
+    const born = growthUniforms.uGrowth.value >= bornAt;
+    const target = born ? size * (highlighted ? FRUIT_MESH.highlightScale : 1) : 0;
+    if (born) {
+      // The same spring as the hover: from nothing it overshoots a little, a small pop.
+      stepSpring(scale.current, target, FRUIT_MESH.scaleSpring, delta);
+    } else {
+      scale.current.value = 0;
+      scale.current.velocity = 0;
+    }
     current.scale.setScalar(scale.current.value);
     glow.current = damp(glow.current, highlighted ? 1 : 0, FRUIT_MESH.haloGlow.rate, delta);
   });
@@ -162,6 +173,7 @@ export function Fruit({
           material={resources.labelMaterial}
           alwaysVisible={alwaysLabeled}
           highlighted={highlighted}
+          bornAt={bornAt}
         />
       </Suspense>
     </group>

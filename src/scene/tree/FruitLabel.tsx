@@ -5,6 +5,7 @@ import { Vector3, type Group, type Material, type Object3D } from 'three';
 import { FRUIT_LABEL } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
 import { damp } from '../damp';
+import { growthUniforms } from '../intro/growthUniforms';
 import type { LabelAlign } from './labelAlignment';
 import { labelFontUrl } from './labelFont';
 
@@ -26,6 +27,8 @@ interface FruitLabelProps {
   readonly material: Material;
   readonly alwaysVisible: boolean;
   readonly highlighted: boolean;
+  /** Hidden until its fruit pops in the intro (growth time, seconds). */
+  readonly bornAt: number;
 }
 
 /** A name under its fruit, always facing the camera; fades out when the camera is far. */
@@ -37,25 +40,31 @@ export function FruitLabel({
   material,
   alwaysVisible,
   highlighted,
+  bornAt,
 }: FruitLabelProps) {
   const anchor = useRef<Group>(null);
   const label = useRef<FadingText>(null);
-  const opacity = useRef(alwaysVisible ? 1 : 0);
+  const opacity = useRef(alwaysVisible && growthUniforms.uGrowth.value >= bornAt ? 1 : 0);
   const worldPosition = useMemo(() => new Vector3(), []);
+  const drawn = useRef(false);
 
   useFrame(({ camera }, delta) => {
     const group = anchor.current;
     const mesh = label.current;
     if (!group || !mesh) return;
 
-    const target =
+    const visible =
       alwaysVisible || highlighted
         ? 1
         : distanceFade(camera.position.distanceTo(group.getWorldPosition(worldPosition)));
+    const target = growthUniforms.uGrowth.value >= bornAt ? visible : 0;
     opacity.current = damp(opacity.current, target, FRUIT_LABEL.fadeRate, delta);
     mesh.fillOpacity = opacity.current;
     mesh.outlineOpacity = opacity.current * FRUIT_LABEL.outlineOpacity;
-    mesh.visible = opacity.current > FRUIT_LABEL.minOpacity;
+    // Skips drawing hidden names, but only once each has been drawn once: a name first shown
+    // mid-intro would otherwise compile its shader then, a visible stutter.
+    if (drawn.current) mesh.visible = opacity.current > FRUIT_LABEL.minOpacity;
+    drawn.current = true;
   });
 
   return (

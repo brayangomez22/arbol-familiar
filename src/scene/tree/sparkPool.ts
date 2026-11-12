@@ -3,7 +3,8 @@ import type { HOVER_SPARKS } from '@/config/constants';
 import { createRandom } from '@/layout/random';
 import type { Vec3 } from '@/layout/types';
 
-export type SparkConfig = typeof HOVER_SPARKS;
+/** Shape of HOVER_SPARKS; INTRO_DUST uses the same particles with other numbers. */
+export type SparkConfig = { readonly [K in keyof typeof HOVER_SPARKS]: number };
 
 /** Birth time of a slot never used: so long ago that the shader sees it as dead. */
 const NEVER = -1e6;
@@ -35,18 +36,18 @@ export class SparkPool {
     this.geometry.setAttribute('aMotion', this.motions);
   }
 
-  /** A burst around a fruit centered at `center` with radius `fruitSize`, born at `time`. */
-  emit(seed: string, center: Vec3, fruitSize: number, time: number): void {
+  /** A burst around `center`, with offsets in units of `scale` (a fruit's radius), born at `time`. */
+  emit(seed: string, center: Vec3, scale: number, time: number): void {
     const { config } = this;
     const rng = createRandom(seed, 'sparks', String(this.bursts++));
-    for (let i = 0; i < config.perHover; i++) {
+    for (let i = 0; i < config.perBurst; i++) {
       const slot = this.next;
       this.next = (this.next + 1) % config.pool;
       this.origins.setXYZ(
         slot,
-        center.x + rng.signed() * config.spread * fruitSize,
-        center.y + rng.range(-config.startBelow, config.startAbove) * fruitSize,
-        center.z + config.startFront * fruitSize,
+        center.x + rng.signed() * config.spread * scale,
+        center.y + rng.range(-config.startBelow, config.startAbove) * scale,
+        center.z + config.startFront * scale,
       );
       this.births.setX(slot, time + i * config.stagger);
       this.motions.setXYZ(

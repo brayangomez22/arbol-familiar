@@ -3,6 +3,7 @@ import { SELECTION, TOON } from '@/config/constants';
 import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/toon.frag.glsl?raw';
 import vertexShader from '@/shaders/toon.vert.glsl?raw';
+import { growthUniforms, withGrowth } from '../intro/growthUniforms';
 import { focusUniforms, withFocus } from '../selection/focusUniforms';
 import { windUniforms, withWind } from '../wind/windUniforms';
 import { toonUniforms, withToonShading } from './toonUniforms';
@@ -26,6 +27,8 @@ export interface ToonMaterialOptions {
    * branchGeometry.ts) and JS drives the uniforms in `sap`.
    */
   readonly sap?: boolean;
+  /** Grows in the intro; the geometry must carry `aAxis` and `aGrowAt` (see branchGeometry.ts). */
+  readonly growth?: boolean;
 }
 
 /** The sap uniforms a selection animates. */
@@ -50,19 +53,22 @@ export class ToonMaterial extends ShaderMaterial {
     wind = false,
     focus = false,
     sap = false,
+    growth = false,
   }: ToonMaterialOptions) {
     const base = new Color(color);
     const sapUniforms: SapUniforms = { uSapFront: { value: 0 }, uSapIntensity: { value: 0 } };
     super({
-      vertexShader: withWind(vertexShader),
+      vertexShader: withGrowth(withWind(vertexShader)),
       fragmentShader: withFocus(withToonShading(fragmentShader)),
       defines: {
         ...(wind ? { USE_WIND: '' } : {}),
         ...(focus ? { USE_FOCUS: '' } : {}),
         ...(sap ? { USE_SAP: '' } : {}),
+        ...(growth ? { USE_GROWTH: '' } : {}),
       },
       uniforms: {
         ...windUniforms,
+        ...growthUniforms,
         ...focusUniforms,
         ...sapUniforms,
         uFocused: { value: 0 },

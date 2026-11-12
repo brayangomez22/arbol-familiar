@@ -12,13 +12,24 @@ varying float vReach;
 varying float vSapLimit;
 #endif
 
+#ifdef USE_GROWTH
+/** Point on the branch's axis this vertex belongs to, and when it appears (seconds). */
+attribute vec3 aAxis;
+attribute float aGrowAt;
+varying float vGrowthAge;
+#endif
+
 varying vec3 vWorldNormal;
 varying vec3 vWorldPosition;
 varying vec2 vUv;
 varying float vBark;
 
 void main() {
-  vec4 worldPosition = modelMatrix * vec4(position, 1.0);
+  vec3 grown = position;
+  #ifdef USE_GROWTH
+  grown = growWood(position, aAxis, aGrowAt, vGrowthAge);
+  #endif
+  vec4 worldPosition = modelMatrix * vec4(grown, 1.0);
   #ifdef USE_WIND
   // The field is sampled at the rest position, so the outline (outline.vert.glsl) moves identically.
   worldPosition.xyz += windSway(worldPosition.xyz, aSway);
