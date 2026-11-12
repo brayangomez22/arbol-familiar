@@ -52,14 +52,11 @@ Hecho y revisado en el navegador, un commit por bloque, en el orden pedido:
 
 Los cuatro criterios de terminado se verificaron. Durante la intro, el peor cuadro midió 38 ms (51 fps de media en dev sobre GPU integrada, igual que la escena sin intro).
 
-**Falta de esta fase:**
-
-- **Hojas que caen (4.5).** No estaba en el orden pedido. Queda por decidir si se hace aquí o junto a las hojas doradas de los fallecidos (fase 6).
+- **Hojas que caen (4.5):** `layout/fallingLeaves.ts` decide de qué grupo de hojas se suelta cada una, cuándo cae, cómo se balancea y gira, y dónde queda en el pasto, con semilla por slot y ciclo. `scene/tree/FallingLeaves.tsx` las dibuja en un `InstancedMesh` con el mismo `LeafMaterial`. Caen pocas a la vez (4 / 3 / 1 según la calidad, `fallingLeaves` en `quality.ts`), solo después de la intro y nunca con reduced-motion. Para la fase 6 (otoño y hojas doradas) basta con cambiar los colores, las esperas y la cantidad.
 
 ## Pendientes para fases siguientes
 
 - **(Fase 4) Clic real en un fruto sin probar.** La selección se probó disparando `selectPerson` en el store; los clics simulados no llegan porque camera-controls captura el puntero. Confirmar con un clic de verdad.
-- **(Fase 4) Test de rendimiento inestable.** `buildTreeLayout.test.ts` ("150-person family in under 50 ms") falla cuando la máquina está cargada (63–105 ms medidos, también en `main` sin cambios). Subir el margen o medir de otra forma.
 - **(Fase 4) Profundidad de campo solo en calidad alta.** Con desenfoque fuerte deja un halo tenue alrededor de los nombres, por eso `bokehScale` quedó en 1,5. Revisarlo con el bloom de noche (fase 6).
 - **(Fase 4) Panel de la persona (fase 5).** El vuelo deja a la persona centrada. Si la ficha se abre a un lado, desplazar el encuadre final en `SelectionDirector`.
 
