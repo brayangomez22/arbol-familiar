@@ -9,7 +9,7 @@ import {
   Vector3,
   type InstancedMesh,
 } from 'three';
-import { GRASS_MESH, SCENERY } from '@/config/constants';
+import { GRASS_MESH, SCENERY, WIND } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
 import { dayPalette } from '@/config/theme';
 import { placeGrass, type GrassBlade } from '@/layout/terrain';
@@ -66,10 +66,14 @@ function buildBladeGeometry(blades: readonly GrassBlade[]): PlaneGeometry {
   const geometry = new PlaneGeometry(GRASS_MESH.aspect, 1);
   geometry.translate(0, 1 / 2, 0);
   const normals = new Float32Array(blades.length * 3);
-  blades.forEach(({ shadeNormal }, i) => {
+  // Every blade sways alike; its yaw is a free random phase (unused while grass doesn't flutter).
+  const sway = new Float32Array(blades.length * 2);
+  blades.forEach(({ shadeNormal, yaw }, i) => {
     normals.set([shadeNormal.x, shadeNormal.y, shadeNormal.z], i * 3);
+    sway.set([WIND.grassWeight, yaw], i * 2);
   });
   geometry.setAttribute('aShadeNormal', new InstancedBufferAttribute(normals, 3));
+  geometry.setAttribute('aSway', new InstancedBufferAttribute(sway, 2));
   return geometry;
 }
 

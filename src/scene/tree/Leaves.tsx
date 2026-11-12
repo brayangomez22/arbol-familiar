@@ -8,10 +8,11 @@ import {
   Vector3,
   type InstancedMesh,
 } from 'three';
-import { LAYOUT, LEAF_MESH } from '@/config/constants';
+import { LAYOUT, LEAF_MESH, WIND } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
 import { dayPalette } from '@/config/theme';
 import { placeLeaves, type LeafInstance } from '@/layout/leafInstances';
+import { swayWeight, type TreeReach } from '@/layout/reach';
 import type { FruitPlacement, LeafCluster } from '@/layout/types';
 import { useAppStore } from '@/state/store';
 import { LeafMaterial } from '../materials/LeafMaterial';
@@ -19,16 +20,23 @@ import { LeafMaterial } from '../materials/LeafMaterial';
 interface LeavesProps {
   readonly clusters: readonly LeafCluster[];
   readonly fruits: readonly FruitPlacement[];
+  /** Gives each leaf the wind weight of the point its cluster grows from. */
+  readonly reach: TreeReach;
 }
 
 /** Every leaf of the tree in one instanced draw call. How many depends on the quality tier. */
-export function Leaves({ clusters, fruits }: LeavesProps) {
+export function Leaves({ clusters, fruits, reach }: LeavesProps) {
   const leavesPerCluster = useAppStore((state) => QUALITY[state.qualityTier].leavesPerCluster);
   const leaves = useMemo(
     () => placeLeaves(clusters, fruits, leavesPerCluster, dayPalette.leaves.length, LAYOUT.leaf),
     [clusters, fruits, leavesPerCluster],
   );
-  const geometry = useMemo(() => buildLeafGeometry(leaves), [leaves]);
+  const geometry = useMemo(() => {
+    const clusterWeights = clusters.map(({ branchId, branchT }) =>
+      swayWeight(reach.atParameter(branchId, branchT), reach.max, WIND.weightExponent),
+    );
+    return buildLeafGeometry(leaves, clusterWeights);
+  }, [leaves, clusters, reach]);
   const material = useMemo(() => new LeafMaterial(dayPalette, LEAF_MESH), []);
   useEffect(
     () => () => {
@@ -64,15 +72,24 @@ export function Leaves({ clusters, fruits }: LeavesProps) {
 
 const ignoreRaycast = () => null;
 
-/** A quad with its stem at the origin and its tip at +y, plus each leaf's shading normal. */
-function buildLeafGeometry(leaves: readonly LeafInstance[]): PlaneGeometry {
+/**
+ * A quad with its stem at the origin and its tip at +y, plus each leaf's shading normal and its
+ * wind weight and flutter phase (its random spin, so neighbors never flutter in step).
+ */
+function buildLeafGeometry(
+  leaves: readonly LeafInstance[],
+  clusterWeights: readonly number[],
+): PlaneGeometry {
   const geometry = new PlaneGeometry(LEAF_MESH.aspect, 1);
   geometry.translate(0, 1 / 2, 0);
   const normals = new Float32Array(leaves.length * 3);
-  leaves.forEach(({ shadeNormal }, i) => {
+  const sway = new Float32Array(leaves.length * 2);
+  leaves.forEach(({ shadeNormal, clusterIndex, spin }, i) => {
     normals.set([shadeNormal.x, shadeNormal.y, shadeNormal.z], i * 3);
+    sway.set([clusterWeights[clusterIndex] ?? 0, spin], i * 2);
   });
   geometry.setAttribute('aShadeNormal', new InstancedBufferAttribute(normals, 3));
+  geometry.setAttribute('aSway', new InstancedBufferAttribute(sway, 2));
   return geometry;
 }
 

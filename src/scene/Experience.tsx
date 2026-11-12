@@ -10,6 +10,7 @@ import { CanvasCursor } from './camera/CanvasCursor';
 import { Effects } from './effects/Effects';
 import { Scenery } from './environment/Scenery';
 import { Tree } from './tree/Tree';
+import { Wind } from './wind/Wind';
 
 interface ExperienceProps {
   readonly layout: TreeLayout;
@@ -42,6 +43,7 @@ export function Experience({ layout, labels }: ExperienceProps) {
       }}
     >
       <color attach="background" args={[dayPalette.sky.horizon]} />
+      <Wind />
       <Scenery layout={layout} />
       <Tree layout={layout} labels={labels} />
       <CanvasControls bounds={layout.bounds} />

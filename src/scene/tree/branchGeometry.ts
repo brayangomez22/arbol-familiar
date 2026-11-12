@@ -12,25 +12,42 @@ import type { BranchSegment, Vec3 } from '@/layout/types';
 
 export type TreeMeshDetail = typeof TREE_MESH;
 
+/** Wind weight of the point at fraction `u` (0 = base, 1 = tip) of a segment's length. */
+export type SwayAt = (segmentId: string, u: number) => number;
+
+const still: SwayAt = () => 0;
+
 /**
  * Every segment as a tapered tube, with a sphere at each end so joints and tips read as one smooth
  * piece of wood. Merged into a single geometry: one draw call for the whole tree.
  *
  * Tubes carry `bark = 1` and a `uv` whose x is arc length in world units, so the bark grooves keep
  * the same spacing on a long limb and a short twig. Knots carry `bark = 0` and stay smooth.
+ *
+ * Every vertex also carries `aSway`, its wind weight from `swayAt`: per ring along a tube, and the
+ * weight of its end for a knot, so a joint moves as one piece.
  */
 export function buildBranchGeometry(
   segments: readonly BranchSegment[],
+  swayAt: SwayAt = still,
   detail: TreeMeshDetail = TREE_MESH,
 ): BufferGeometry {
   const parts = segments.flatMap((segment) => {
     const base = segment.points[0];
     const tip = segment.points.at(-1);
     if (!base || !tip) return [];
+    const tube = buildTaperedTube(segment, detail);
+    const rings = tube.parameters.tubularSegments;
+    const ringSize = tube.parameters.radialSegments + 1;
+    const tubeSway = new Float32Array(tube.getAttribute('position').count);
+    for (let ring = 0; ring <= rings; ring++) {
+      tubeSway.fill(swayAt(segment.id, ring / rings), ring * ringSize, (ring + 1) * ringSize);
+    }
+    tube.setAttribute('aSway', new BufferAttribute(tubeSway, 1));
     return [
-      buildTaperedTube(segment, detail),
-      buildKnot(base, segment.radiusStart, detail),
-      buildKnot(tip, segment.radiusEnd, detail),
+      tube,
+      withSway(buildKnot(base, segment.radiusStart, detail), swayAt(segment.id, 0)),
+      withSway(buildKnot(tip, segment.radiusEnd, detail), swayAt(segment.id, 1)),
     ];
   });
   if (parts.length === 0) return new BufferGeometry();
@@ -86,6 +103,12 @@ function buildKnot(center: Vec3, radius: number, detail: TreeMeshDetail): Sphere
 function withBark<T extends BufferGeometry>(geometry: T, value: number): T {
   const count = geometry.getAttribute('position').count;
   geometry.setAttribute('bark', new BufferAttribute(new Float32Array(count).fill(value), 1));
+  return geometry;
+}
+
+function withSway<T extends BufferGeometry>(geometry: T, value: number): T {
+  const count = geometry.getAttribute('position').count;
+  geometry.setAttribute('aSway', new BufferAttribute(new Float32Array(count).fill(value), 1));
   return geometry;
 }
 

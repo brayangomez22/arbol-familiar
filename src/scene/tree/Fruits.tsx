@@ -1,9 +1,10 @@
 import { useEffect, useMemo } from 'react';
 import { MeshBasicMaterial, PlaneGeometry } from 'three';
-import { FRUIT_LABEL, FRUIT_MESH } from '@/config/constants';
+import { FRUIT_LABEL, FRUIT_MESH, WIND } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
 import type { PersonId } from '@/domain/types';
-import type { BranchSegment, FruitPlacement } from '@/layout/types';
+import { swayWeight, type TreeReach } from '@/layout/reach';
+import type { BranchSegment, FruitPlacement, Vec3 } from '@/layout/types';
 import { HaloMaterial } from '../materials/HaloMaterial';
 import { ToonMaterial } from '../materials/ToonMaterial';
 import { Fruit, type FruitResources } from './Fruit';
@@ -15,10 +16,17 @@ interface FruitsProps {
   readonly fruits: readonly FruitPlacement[];
   readonly branches: readonly BranchSegment[];
   readonly labels: ReadonlyMap<PersonId, string>;
+  readonly reach: TreeReach;
+}
+
+interface FruitSway {
+  /** The tip of the fruit's branch: the fruit moves with the wind exactly as that point does. */
+  readonly anchor: Vec3;
+  readonly weight: number;
 }
 
 /** All the people. Geometries are shared, and there is one material per theme fruit color. */
-export function Fruits({ fruits, branches, labels }: FruitsProps) {
+export function Fruits({ fruits, branches, labels, reach }: FruitsProps) {
   const shared = useMemo(
     () => ({
       body: buildLanternBody(),
@@ -60,10 +68,23 @@ export function Fruits({ fruits, branches, labels }: FruitsProps) {
     () => new Map(branches.map((branch) => [branch.id, branch.generation])),
     [branches],
   );
+  const swayOf = useMemo(
+    () =>
+      new Map(
+        branches.flatMap((branch): [string, FruitSway][] => {
+          const tip = branch.points.at(-1);
+          if (!tip) return [];
+          const weight = swayWeight(reach.atFraction(branch.id, 1), reach.max, WIND.weightExponent);
+          return [[branch.id, { anchor: tip, weight }]];
+        }),
+      ),
+    [branches, reach],
+  );
 
   return fruits.map((fruit) => {
     const bodyMaterial = shared.bodyMaterials[fruitColorIndex(fruit.personId, dayPalette)];
     if (!bodyMaterial) return null;
+    const sway = swayOf.get(fruit.anchorBranchId) ?? { anchor: fruit.position, weight: 0 };
     const resources: FruitResources = {
       bodyGeometry: shared.body,
       bodyMaterial,
@@ -80,6 +101,8 @@ export function Fruits({ fruits, branches, labels }: FruitsProps) {
         resources={resources}
         label={labels.get(fruit.personId) ?? ''}
         labelAlign={alignments.get(fruit.personId) ?? 'center'}
+        swayAnchor={sway.anchor}
+        swayWeight={sway.weight}
         alwaysLabeled={
           (generationOf.get(fruit.anchorBranchId) ?? 0) <= FRUIT_LABEL.alwaysVisibleGenerations
         }

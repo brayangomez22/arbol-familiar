@@ -1,12 +1,14 @@
 import { Outlines } from '@react-three/drei';
 import { useFrame, type ThreeEvent } from '@react-three/fiber';
-import { Suspense, useRef } from 'react';
-import type { BufferGeometry, Group, Material } from 'three';
-import { FRUIT_LABEL, FRUIT_MESH, NAVIGATION, TOON } from '@/config/constants';
+import { Suspense, useMemo, useRef } from 'react';
+import { Vector3, type BufferGeometry, type Group, type Material } from 'three';
+import { FRUIT_LABEL, FRUIT_MESH, NAVIGATION, TOON, WIND } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
-import type { FruitPlacement } from '@/layout/types';
+import type { FruitPlacement, Vec3 } from '@/layout/types';
 import { useAppStore } from '@/state/store';
 import { damp } from '../damp';
+import { windSway } from '../wind/windField';
+import { windFrame } from '../wind/windUniforms';
 import { FruitLabel } from './FruitLabel';
 import type { LabelAlign } from './labelAlignment';
 
@@ -27,15 +29,31 @@ interface FruitProps {
   readonly label: string;
   readonly labelAlign: LabelAlign;
   readonly alwaysLabeled: boolean;
+  /** Point whose wind sway the fruit follows (its branch tip), and that point's wind weight. */
+  readonly swayAnchor: Vec3;
+  readonly swayWeight: number;
 }
 
 // The halo is decoration: it must never catch the pointer meant for a fruit behind it.
 const ignoreRaycast = () => null;
 
-/** One person as a hanging lantern: hover grows it, a click (not a drag) selects it. */
-export function Fruit({ fruit, resources, label, labelAlign, alwaysLabeled }: FruitProps) {
+/**
+ * One person as a hanging lantern: hover grows it, a click (not a drag) selects it. It rides the
+ * wind with its branch tip, so its name and its click area move with it.
+ */
+export function Fruit({
+  fruit,
+  resources,
+  label,
+  labelAlign,
+  alwaysLabeled,
+  swayAnchor,
+  swayWeight,
+}: FruitProps) {
   const { personId, position, size } = fruit;
+  const holder = useRef<Group>(null);
   const lantern = useRef<Group>(null);
+  const sway = useMemo(() => new Vector3(), []);
   const highlighted = useAppStore(
     (state) => state.hoveredPersonId === personId || state.selectedPersonId === personId,
   );
@@ -44,7 +62,11 @@ export function Fruit({ fruit, resources, label, labelAlign, alwaysLabeled }: Fr
 
   useFrame((_, delta) => {
     const current = lantern.current;
-    if (!current) return;
+    if (!current || !holder.current) return;
+    windSway(swayAnchor, swayWeight, windFrame, sway);
+    holder.current.position.set(position.x, position.y, position.z).add(sway);
+    // Pushed sideways, a hanging lantern swings its bottom downwind.
+    current.rotation.z = sway.x * WIND.fruitTilt;
     const target = size * (highlighted ? FRUIT_MESH.highlightScale : 1);
     current.scale.setScalar(damp(current.scale.x, target, FRUIT_MESH.scaleRate, delta));
   });
@@ -64,7 +86,7 @@ export function Fruit({ fruit, resources, label, labelAlign, alwaysLabeled }: Fr
   };
 
   return (
-    <group position={[position.x, position.y, position.z]}>
+    <group ref={holder} position={[position.x, position.y, position.z]}>
       <group
         ref={lantern}
         scale={size}

@@ -29,6 +29,7 @@ export function placeLeafClusters(
 
     clusters.push({
       branchId: branch.id,
+      branchT: config.tipT,
       position: add(pointOnCurve(branch.points, config.tipT), vec3(0, config.lift, 0)),
       radius,
       density: density(config.tipDensity),
@@ -37,6 +38,7 @@ export function placeLeafClusters(
     if (node.children.length > 0) {
       clusters.push({
         branchId: branch.id,
+        branchT: config.innerT,
         position: add(pointOnCurve(branch.points, config.innerT), vec3(0, config.lift, 0)),
         radius: radius * config.innerRadiusScale,
         density: density(config.innerDensity),

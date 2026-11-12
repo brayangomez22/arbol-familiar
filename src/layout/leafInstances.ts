@@ -4,6 +4,8 @@ import type { FruitPlacement, LeafCluster, Vec3 } from './types';
 import { add, normalize, scale, vec3 } from './vec';
 
 export interface LeafInstance {
+  /** Index of the cluster it grew in. */
+  readonly clusterIndex: number;
   readonly position: Vec3;
   /** Unit normal of the leaf's own plane. */
   readonly facing: Vec3;
@@ -55,6 +57,7 @@ export function placeLeaves(
       );
       const facing = normalize(add(CAMERA_FACING, scale(direction, config.facingTilt)));
       leaves.push({
+        clusterIndex,
         position,
         facing,
         // Tips point away from the cluster's center, as leaves on the outside of a crown do.

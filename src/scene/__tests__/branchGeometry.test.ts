@@ -61,4 +61,26 @@ describe('buildBranchGeometry', () => {
     expect(double.index).not.toBeNull();
     expect(double.getAttribute('position').count).toBe(2 * single.getAttribute('position').count);
   });
+
+  it('gives every ring its wind weight and each knot the weight of its end', () => {
+    const geometry = buildBranchGeometry([straight], (_, u) => u);
+    const position = geometry.getAttribute('position');
+    const sway = geometry.getAttribute('aSway');
+    expect(sway.count).toBe(position.count);
+
+    // Along this vertical branch the weight is height / 10; knots sit at y = 0 and y = 10 with
+    // vertices above and below, so they are checked by their center instead.
+    const tube = buildTaperedTube(straight);
+    const tubeCount = tube.getAttribute('position').count;
+    for (let i = 0; i < tubeCount; i++) {
+      expect(sway.getX(i)).toBeCloseTo(position.getY(i) / 10, 5);
+    }
+    const values = new Set(Array.from(sway.array).slice(tubeCount));
+    expect(values).toEqual(new Set([0, 1]));
+  });
+
+  it('keeps branches still when no weights are given', () => {
+    const sway = buildBranchGeometry([straight]).getAttribute('aSway');
+    expect(Array.from(sway.array).every((value) => value === 0)).toBe(true);
+  });
 });

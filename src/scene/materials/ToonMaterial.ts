@@ -3,6 +3,7 @@ import { TOON } from '@/config/constants';
 import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/toon.frag.glsl?raw';
 import vertexShader from '@/shaders/toon.vert.glsl?raw';
+import { windUniforms, withWind } from '../wind/windUniforms';
 import { toonUniforms, withToonShading } from './toonUniforms';
 
 export interface ToonMaterialOptions {
@@ -15,6 +16,8 @@ export interface ToonMaterialOptions {
    * light up all over.
    */
   readonly rim?: boolean;
+  /** Sways with the shared wind; the geometry must carry an `aSway` weight per vertex. */
+  readonly wind?: boolean;
 }
 
 /**
@@ -23,12 +26,14 @@ export interface ToonMaterialOptions {
  * never depends on what else is in the scene.
  */
 export class ToonMaterial extends ShaderMaterial {
-  constructor({ color, palette, bark = false, rim = true }: ToonMaterialOptions) {
+  constructor({ color, palette, bark = false, rim = true, wind = false }: ToonMaterialOptions) {
     const base = new Color(color);
     super({
-      vertexShader,
+      vertexShader: withWind(vertexShader),
       fragmentShader: withToonShading(fragmentShader),
+      defines: wind ? { USE_WIND: '' } : {},
       uniforms: {
+        ...windUniforms,
         ...toonUniforms(palette),
         uBaseColor: { value: base },
         uShadeColor: { value: base.clone().lerp(new Color(palette.shade), TOON.shadeMix) },

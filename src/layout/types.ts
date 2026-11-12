@@ -41,6 +41,8 @@ export interface FruitPlacement {
 
 export interface LeafCluster {
   readonly branchId: string;
+  /** Curve parameter (as in pointOnCurve) of the point on the branch the cluster grows from. */
+  readonly branchT: number;
   readonly position: Vec3;
   readonly radius: number;
   /** 0–1: how full the cluster is. */

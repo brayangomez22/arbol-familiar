@@ -293,6 +293,10 @@ export const LEAF_MESH = {
   rimStrength: 0.28,
   /** Leaves lean less toward the shade tint than wood does, so dark foliage stays green, not grey. */
   shadeMix: 0.35,
+  /** 0: the whole leaf rides the wind with its stem. 1: rooted at the base, only the tip bends. */
+  swayAnchor: 0,
+  /** Extra flutter of the tip across the leaf's own plane, in world units. */
+  flutter: 0.1,
 } as const;
 
 /** A blade of grass: the same shader as a leaf, cut as a thin taper with no rim or vein. */
@@ -307,6 +311,8 @@ export const GRASS_MESH = {
   /** Blades are lit by the ground's normal, which faces up: a rim there would wash them out. */
   rimStrength: 0,
   shadeMix: 0.35,
+  swayAnchor: 1,
+  flutter: 0,
 } as const;
 
 /** Illustrated shading shared by every toon material. Colors live in theme.ts. */
@@ -490,6 +496,59 @@ export const DEBUG_VIEW = {
   /** Extra room around the layout bounds when framing the camera. */
   framingMargin: 1.1,
   defaultSeed: 'debug',
+} as const;
+
+/**
+ * A breeze that never stops. Every swaying thing reads the same field (shaders/wind.glsl, mirrored
+ * in scene/wind/windField.ts), scaled by its weight: 0 at the trunk's base, 1 at the farthest tip.
+ */
+export const WIND = {
+  /** Sway at weight 1 in calm air, in world units. */
+  amplitude: 0.3,
+  /** Horizontal direction the wind blows toward (x, z): mostly across the screen. */
+  direction: [1, 0.2] as const,
+  /** Three layered oscillations: angular frequencies (rad/s), how much each counts and its phase. */
+  frequencies: [0.55, 1.2, 2.45] as const,
+  mix: [0.62, 0.28, 0.1] as const,
+  phases: [0, 1.7, 4.1] as const,
+  /** Phase lost per world unit along each axis, so the sway rolls across the crown as a wave. */
+  wave: [0.07, 0.035, 0.02] as const,
+  /** Up and down bob, relative to the amplitude, and its angular frequency. */
+  bobRatio: 0.3,
+  bobFrequency: 0.85,
+  /** Weight = (reach / farthest reach)^exponent: stiff near the trunk, supple at the twigs. */
+  weightExponent: 1.6,
+  /** Samples per branch when measuring its length for the weights. */
+  curveSamples: 32,
+  /** Grass blades all sway with this weight (at their tip; their root stays put). */
+  grassWeight: 0.55,
+  /** Angular frequency of a leaf's flutter (its size is LEAF_MESH.flutter). */
+  flutterFrequency: 3.2,
+  /** A lantern tilts this many radians per unit of sideways sway, like something hanging. */
+  fruitTilt: 0.25,
+  gust: {
+    seed: 'wind-gust',
+    /** Time is cut into slots of this many seconds; each holds at most one gust. */
+    interval: 12,
+    /** Probability that a slot has a gust. */
+    chance: 0.65,
+    minDuration: 3,
+    maxDuration: 5.5,
+    /** Fraction of the gust spent swelling; the rest is a slower fade. */
+    rise: 0.35,
+    /** Weakest gust, as a fraction of the strongest. */
+    minPeak: 0.5,
+    /** At the strongest gust the sway grows by this fraction… */
+    boost: 1.1,
+    /** …and the whole crown leans this many world units downwind (at weight 1). */
+    lean: 0.45,
+  },
+  /** With prefers-reduced-motion: a fraction of the sway and no gusts. */
+  reducedMotionScale: 0.3,
+  /** How fast (1/s) the wind settles into a new strength when reduced motion changes. */
+  settleRate: 1.5,
+  /** Longest step the wind clock takes in one frame, so a stalled tab doesn't jump. */
+  maxStep: 0.1,
 } as const;
 
 /** Seconds. */
