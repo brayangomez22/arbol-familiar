@@ -1,4 +1,5 @@
 import { useAppStore } from '@/state/store';
+import buttonStyles from './RoundButton.module.css';
 import styles from './ZoomControls.module.css';
 import { useCameraShortcuts } from './useCameraShortcuts';
 
@@ -11,7 +12,7 @@ export function ZoomControls() {
     <div className={styles.controls} role="group" aria-label="Zoom del árbol">
       <button
         type="button"
-        className={styles.button}
+        className={buttonStyles.button}
         aria-label="Acercar"
         title="Acercar (+)"
         onClick={() => {
@@ -24,7 +25,7 @@ export function ZoomControls() {
       </button>
       <button
         type="button"
-        className={styles.button}
+        className={buttonStyles.button}
         aria-label="Alejar"
         title="Alejar (−)"
         onClick={() => {
@@ -37,7 +38,7 @@ export function ZoomControls() {
       </button>
       <button
         type="button"
-        className={styles.button}
+        className={buttonStyles.button}
         aria-label="Ver todo el árbol"
         title="Ver todo el árbol (0)"
         onClick={() => {

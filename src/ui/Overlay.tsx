@@ -1,5 +1,5 @@
 import { useAppStore } from '@/state/store';
-import { ZoomControls } from './Controls/ZoomControls';
+import { Controls } from './Controls/Controls';
 import { SkipIntroButton } from './Intro/SkipIntroButton';
 import styles from './Overlay.module.css';
 import { TitleCard, type FamilySummary } from './TitleCard/TitleCard';
@@ -15,7 +15,7 @@ export function Overlay({ summary }: OverlayProps) {
     <>
       <div className={`${styles.overlay} ${ready ? '' : styles.hidden}`} aria-hidden={!ready}>
         <TitleCard summary={summary} />
-        <ZoomControls />
+        <Controls />
       </div>
       <SkipIntroButton />
     </>

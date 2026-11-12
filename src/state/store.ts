@@ -29,7 +29,10 @@ export type IntroPhase = 'pending' | 'playing' | 'done';
 
 export interface IntroSlice {
   introPhase: IntroPhase;
+  /** How many times the visitor asked to see the intro again; each one plays it from the seed. */
+  introReplays: number;
   setIntroPhase: (phase: IntroPhase) => void;
+  replayIntro: () => void;
 }
 
 export type CameraAction = 'zoomIn' | 'zoomOut' | 'frameAll';
@@ -87,10 +90,20 @@ const createAudioSlice: Slice<AudioSlice> = (set) => ({
   },
 });
 
-const createIntroSlice: Slice<IntroSlice> = (set) => ({
+const createIntroSlice: Slice<IntroSlice> = (set, get) => ({
   introPhase: 'pending',
+  introReplays: 0,
   setIntroPhase: (phase) => {
     set({ introPhase: phase });
+  },
+  replayIntro: () => {
+    // The intro flies the camera from the seed: a selected person would fight it for the view.
+    set({
+      introPhase: 'playing',
+      introReplays: get().introReplays + 1,
+      selectedPersonId: null,
+      hoveredPersonId: null,
+    });
   },
 });
 

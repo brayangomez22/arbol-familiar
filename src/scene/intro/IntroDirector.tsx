@@ -24,12 +24,15 @@ interface IntroDirectorProps {
 /**
  * Plays the opening once per visitor: seed, shoot, the tree growing generation by generation and
  * the camera pulling back to frame it. Without it (seen before, or reduced motion) the tree is
- * simply complete. The UI's "Saltar" sets the phase to done, which jumps to the end.
+ * simply complete. The UI's "Saltar" sets the phase to done, which jumps to the end, and its
+ * "Ver la intro de nuevo" sets it back to playing, which starts over from the seed.
  */
 export function IntroDirector({ layout, schedule }: IntroDirectorProps) {
   const controls = useThree((state) => state.controls);
   const getState = useThree((state) => state.get);
   const reducedMotion = useReducedMotion();
+  // Not read inside the effect: a new value only has to run it again.
+  const replays = useAppStore((state) => state.introReplays);
   const seedMotion = useRef<SeedMotion>({ fall: { value: 0 }, sink: { value: 0 } });
   const dust = useRef<SparkBurstHandle>(null);
   const ground = useMemo(() => {
@@ -53,7 +56,9 @@ export function IntroDirector({ layout, schedule }: IntroDirectorProps) {
       rememberIntroSeen();
       showComplete();
     };
-    if (reducedMotion || hasSeenIntro() || store.introPhase === 'done') {
+    // Already playing means a replay was asked for, even though it has been seen.
+    const seen = hasSeenIntro() && store.introPhase !== 'playing';
+    if (reducedMotion || seen || store.introPhase === 'done') {
       showComplete();
       return;
     }
@@ -162,7 +167,7 @@ export function IntroDirector({ layout, schedule }: IntroDirectorProps) {
       cameraControls?.removeEventListener('controlstart', releaseCamera);
       timeline.kill();
     };
-  }, [controls, getState, reducedMotion, layout.bounds, ground, schedule]);
+  }, [controls, getState, reducedMotion, layout.bounds, ground, schedule, replays]);
 
   return (
     <>

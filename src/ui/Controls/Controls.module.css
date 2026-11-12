@@ -1,0 +1,11 @@
+/* Bottom right, one column: replay apart on top, then the zoom group. */
+.column {
+  --controls-gap: 8px;
+
+  position: fixed;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--controls-gap) * 3);
+}

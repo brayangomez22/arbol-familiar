@@ -1,0 +1,41 @@
+/* The floating round buttons of the controls column. */
+.button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: var(--border-card);
+  border-radius: 50%;
+  background: var(--color-card);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(6px);
+  cursor: pointer;
+  transition: transform 150ms ease;
+}
+
+.button:hover {
+  transform: scale(1.06);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.button svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .button {
+    transition: none;
+  }
+}
