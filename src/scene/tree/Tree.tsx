@@ -9,6 +9,7 @@ import { IntroDirector } from '../intro/IntroDirector';
 import { SelectionDirector } from '../selection/SelectionDirector';
 import { BranchMesh, type BranchMeshHandle } from './BranchMesh';
 import type { WoodMeasure } from './branchGeometry';
+import { FallingLeaves } from './FallingLeaves';
 import { Fruits } from './Fruits';
 import { Leaves } from './Leaves';
 
@@ -55,6 +56,7 @@ export function Tree({ layout, labels }: TreeProps) {
         reach={reach}
         schedule={schedule}
       />
+      <FallingLeaves clusters={layout.leafClusters} branches={layout.branches} />
       <Fruits
         fruits={layout.fruits}
         branches={layout.branches}

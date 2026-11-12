@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
+import { hillTop } from '@/layout/terrain';
 import type { TreeLayout } from '@/layout/types';
-import { vec3 } from '@/layout/vec';
 import { Clouds } from './Clouds';
 import { Grass } from './Grass';
 import { Hill } from './Hill';
@@ -14,11 +14,7 @@ interface SceneryProps {
 
 /** Everything around the tree: sky, clouds, distant hills, the hill it stands on, grass and pollen. */
 export function Scenery({ layout }: SceneryProps) {
-  const top = useMemo(() => {
-    const base = layout.branches.find((branch) => branch.kind === 'trunk')?.points[0];
-    // The hill is centered under the trunk but its top stays at ground level (y = 0).
-    return vec3(base?.x ?? 0, 0, base?.z ?? 0);
-  }, [layout.branches]);
+  const top = useMemo(() => hillTop(layout.branches), [layout.branches]);
 
   return (
     <>

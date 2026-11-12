@@ -1,10 +1,16 @@
 import type { SceneryConfig } from '@/config/constants';
 import { createRandom } from './random';
-import type { Vec3 } from './types';
+import type { BranchSegment, Vec3 } from './types';
 import { normalize, vec3 } from './vec';
 
 type HillConfig = SceneryConfig['hill'];
 type GrassConfig = SceneryConfig['grass'];
+
+/** The hilltop: centered under the trunk's base, at ground level (y = 0). */
+export function hillTop(branches: readonly BranchSegment[]): Vec3 {
+  const base = branches.find((branch) => branch.kind === 'trunk')?.points[0];
+  return vec3(base?.x ?? 0, 0, base?.z ?? 0);
+}
 
 /**
  * Height of the ground around a hilltop at `top` (the trunk's base): 0 at the top, falling toward

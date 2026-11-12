@@ -715,6 +715,45 @@ export const INTRO_DUST = {
   fadeOutStart: 0.25,
 } as const;
 
+/**
+ * Now and then a leaf lets go of the crown and tumbles down to the grass. How many can be in the
+ * air at once comes from quality.ts; each of those slots waits, drops one leaf, and waits again.
+ */
+export const FALLING_LEAVES = {
+  seed: 'falling-leaf',
+  /** Seconds a slot waits before its first leaf, spread across the slots so they never fall together. */
+  firstWait: [4, 22] as const,
+  /** Seconds between one leaf touching down and the next one letting go, in the same slot. */
+  wait: [10, 26] as const,
+  /** Where in its cluster a leaf lets go: from this fraction of the radius out to the edge. */
+  shell: 0.6,
+  /** Falling speed once the leaf has caught the air, in world units per second. */
+  speed: [1.3, 1.9] as const,
+  /** Seconds it takes to reach that speed after letting go. */
+  catchAir: 1.2,
+  /** Side-to-side swing as it falls, like a pendulum: half width and angular frequency (rad/s). */
+  swing: [0.9, 1.7] as const,
+  swingFrequency: [1.1, 1.7] as const,
+  /** World units it travels downwind per unit it falls. */
+  driftPerFall: 0.18,
+  /** Tilt that follows the swing (radians at the widest point) and a slow tumble around its own length. */
+  rock: 0.7,
+  tumble: [0.6, 1.6] as const,
+  size: 1.2,
+  sizeJitter: 0.2,
+  /** Seconds to appear as it lets go, hidden by the crown, and to shrink away from the grass. */
+  appear: 0.4,
+  /** Seconds it lies on the grass before going. */
+  lie: [3, 6] as const,
+  vanish: 1.2,
+  /** Just above the ground, so the grass half covers it. */
+  restHeight: 0.15,
+  /** Turn of the leaf on the grass, from lying flat (0) to facing the camera (π/2). */
+  restTilt: 0.35,
+} as const;
+
+export type FallingLeavesConfig = Widen<typeof FALLING_LEAVES>;
+
 /** Seconds. */
 export const TIMING = {
   introDuration: 8,

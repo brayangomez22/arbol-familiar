@@ -11,6 +11,8 @@ export interface QualitySettings {
   /** Leaves in a full cluster; sparser clusters get proportionally fewer. */
   readonly leavesPerCluster: number;
   readonly particles: number;
+  /** Leaves that can be falling from the crown at the same time. */
+  readonly fallingLeaves: number;
   readonly grassBlades: number;
   readonly cloudPuffSegments: number;
 }
@@ -25,6 +27,7 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     depthOfField: true,
     leavesPerCluster: 110,
     particles: 400,
+    fallingLeaves: 4,
     grassBlades: 1400,
     cloudPuffSegments: 40,
   },
@@ -37,6 +40,7 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     depthOfField: false,
     leavesPerCluster: 70,
     particles: 200,
+    fallingLeaves: 3,
     grassBlades: 800,
     cloudPuffSegments: 28,
   },
@@ -49,6 +53,7 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     depthOfField: false,
     leavesPerCluster: 35,
     particles: 60,
+    fallingLeaves: 1,
     grassBlades: 300,
     cloudPuffSegments: 18,
   },
