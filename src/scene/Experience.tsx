@@ -8,7 +8,6 @@ import { useAppStore } from '@/state/store';
 import { CanvasControls } from './camera/CanvasControls';
 import { CanvasCursor } from './camera/CanvasCursor';
 import { Ground } from './environment/Ground';
-import { Lights } from './environment/Lights';
 import { Tree } from './tree/Tree';
 
 interface ExperienceProps {
@@ -26,6 +25,8 @@ export function Experience({ layout, labels }: ExperienceProps) {
     <Canvas
       dpr={[...quality.dpr]}
       gl={{ antialias: quality.antialias }}
+      // No tone mapping: the theme's colors are the illustration's colors, exactly.
+      flat
       camera={{
         fov: CAMERA.fov,
         near: CAMERA.near,
@@ -38,7 +39,6 @@ export function Experience({ layout, labels }: ExperienceProps) {
       }}
     >
       <color attach="background" args={[dayPalette.sky.horizon]} />
-      <Lights />
       <Ground bounds={layout.bounds} />
       <Tree layout={layout} labels={labels} />
       <CanvasControls bounds={layout.bounds} />

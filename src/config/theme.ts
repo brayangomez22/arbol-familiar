@@ -13,6 +13,16 @@ export interface Palette {
   readonly ground: string;
   readonly ink: string;
   readonly paper: string;
+  /** Tint every toon shadow leans toward, so shade reads as colored light rather than black. */
+  readonly shade: string;
+  /** Lightest toon band. */
+  readonly light: string;
+  /** Soft back light on the sunny edge of every shape. */
+  readonly rim: string;
+  /** Contour lines: warm and dark, never pure black. */
+  readonly outline: string;
+  /** Glow behind each fruit. */
+  readonly halo: string;
 }
 
 export const dayPalette: Palette = {
@@ -25,6 +35,11 @@ export const dayPalette: Palette = {
   ground: '#cdbb93',
   ink: '#3b2a20',
   paper: '#fbf4e8',
+  shade: '#5d4a6e',
+  light: '#fff4dc',
+  rim: '#ffe0b5',
+  outline: '#4a3024',
+  halo: '#fff3da',
 };
 
 export const nightPalette: Palette = {
@@ -37,6 +52,11 @@ export const nightPalette: Palette = {
   ground: '#2b2a45',
   ink: '#f3ead9',
   paper: '#24224a',
+  shade: '#15163a',
+  light: '#d9d2ff',
+  rim: '#8f86d6',
+  outline: '#0f0e26',
+  halo: '#ffd9a0',
 };
 
 export const fonts = {

@@ -39,6 +39,19 @@ describe('buildTaperedTube', () => {
   });
 });
 
+describe('bark coordinates', () => {
+  it('measures uv.x in world units along the branch and marks tubes as bark', () => {
+    const tube = buildTaperedTube(straight);
+    const uv = tube.getAttribute('uv');
+    const bark = tube.getAttribute('bark');
+
+    expect(uv.getX(0)).toBeCloseTo(0, 6);
+    expect(uv.getX(uv.count - 1)).toBeCloseTo(10, 4);
+    expect(bark.count).toBe(uv.count);
+    expect(Array.from(bark.array).every((value) => value === 1)).toBe(true);
+  });
+});
+
 describe('buildBranchGeometry', () => {
   it('merges every segment into one indexed geometry', () => {
     const other = { ...straight, id: 'c', points: straight.points.map((p) => ({ ...p, x: 4 })) };

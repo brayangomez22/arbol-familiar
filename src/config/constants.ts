@@ -185,9 +185,38 @@ export const TREE_MESH = {
   maxRadialSegments: 20,
 } as const;
 
+/** A lantern-like fruit: a ribbed body of radius 1 under a small cap and stem. */
 export const FRUIT_MESH = {
-  widthSegments: 32,
-  heightSegments: 24,
+  /** Points along the body profile, from the bottom pole to the top pole. */
+  profileSegments: 24,
+  radialSegments: 48,
+  /** Top and bottom of the body, in radii from its center: slightly taller than wide. */
+  top: 1.08,
+  bottom: 1.02,
+  /** Below 1 the sides bulge out like a paper lantern; 1 is an ellipse. */
+  roundness: 0.75,
+  ribs: 8,
+  /** How deep the grooves between ribs are, as a fraction of the radius. */
+  ribDepth: 0.06,
+  /** Higher makes the grooves narrower. */
+  ribSharpness: 6,
+  /** How much the ribs bend the shading normals (0 = shaded like a smooth body). */
+  ribShading: 0.3,
+  capRadius: 0.32,
+  capHeight: 0.14,
+  /** Top radius of the cap relative to its bottom. */
+  capTaper: 0.85,
+  /** Fraction of the cap sunk into the body. */
+  capSink: 0.4,
+  stemRadius: 0.06,
+  stemTaper: 0.7,
+  stemHeight: 0.38,
+  capSegments: 16,
+  /** Halo quad side, in fruit radii, and its peak opacity. */
+  haloSize: 3.4,
+  haloOpacity: 0.55,
+  /** How far behind the fruit (toward the far side, in fruit radii) the halo is drawn. */
+  haloDepthOffset: 1.2,
   /** Scale of a hovered or selected fruit. */
   highlightScale: 1.18,
   /** Higher eases faster (1/s). */
@@ -212,11 +241,33 @@ export const FRUIT_LABEL = {
   minOpacity: 0.01,
 } as const;
 
-/** Placeholder lighting until the toon material arrives (phase 3). */
-export const LIGHTING = {
-  hemisphereIntensity: 1.6,
-  sunIntensity: 1.8,
-  sunPosition: [25, 40, 35] as const,
+/** Illustrated shading shared by every toon material. Colors live in theme.ts. */
+export const TOON = {
+  /** Toward the sun: upper right, a bit in front. Need not be normalized. */
+  sunDirection: [0.55, 0.8, 0.45] as const,
+  /** Half-Lambert light amount where the bands change: shade → mid → base → light. */
+  bandEdges: [0.38, 0.6, 0.86] as const,
+  /** Half width of each band edge: just enough to anti-alias it. */
+  bandSoftness: 0.015,
+  /** How far the mid and base bands go from the shade color to the base color. */
+  bandMix: [0.55, 1] as const,
+  highlightMix: 0.3,
+  /** How far a shape's shade color leans from its base color toward the theme's shade tint. */
+  shadeMix: 0.55,
+  rimStrength: 0.28,
+  rimPower: 3,
+  outline: {
+    /** In CSS pixels: thin like an ink line. */
+    branchThickness: 1.6,
+    fruitThickness: 1.4,
+  },
+  bark: {
+    /** Grooves around the circumference of every branch. A whole number keeps the seam hidden. */
+    streaks: 7,
+    /** How much the grooves wander as they run along the branch. */
+    warp: 0.35,
+    strength: 0.5,
+  },
 } as const;
 
 export const GROUND = {

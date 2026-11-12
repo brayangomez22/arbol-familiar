@@ -1,10 +1,14 @@
 import { useEffect, useMemo } from 'react';
-import { MeshStandardMaterial, SphereGeometry } from 'three';
+import { PlaneGeometry } from 'three';
 import { FRUIT_LABEL, FRUIT_MESH } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
 import type { PersonId } from '@/domain/types';
-import type { BranchSegment, FruitKind, FruitPlacement } from '@/layout/types';
-import { Fruit } from './Fruit';
+import type { BranchSegment, FruitPlacement } from '@/layout/types';
+import { HaloMaterial } from '../materials/HaloMaterial';
+import { ToonMaterial } from '../materials/ToonMaterial';
+import { Fruit, type FruitResources } from './Fruit';
+import { fruitColorIndex } from './fruitColor';
+import { buildLanternBody, buildLanternCap } from './fruitGeometry';
 
 interface FruitsProps {
   readonly fruits: readonly FruitPlacement[];
@@ -12,32 +16,35 @@ interface FruitsProps {
   readonly labels: ReadonlyMap<PersonId, string>;
 }
 
-// Placeholder look until phase 3 gives each person their own color and shape.
-const KIND_COLORS: Record<FruitKind, string> = {
-  blood: dayPalette.fruits[0] ?? dayPalette.trunk,
-  graft: dayPalette.fruits[3] ?? dayPalette.trunk,
-};
-
-/** All the people, sharing one geometry and one material per kind. */
+/** All the people. Geometries are shared, and there is one material per theme fruit color. */
 export function Fruits({ fruits, branches, labels }: FruitsProps) {
-  const geometry = useMemo(
-    () => new SphereGeometry(1, FRUIT_MESH.widthSegments, FRUIT_MESH.heightSegments),
-    [],
-  );
-  const materials = useMemo(
-    (): Record<FruitKind, MeshStandardMaterial> => ({
-      blood: new MeshStandardMaterial({ color: KIND_COLORS.blood, roughness: 0.6 }),
-      graft: new MeshStandardMaterial({ color: KIND_COLORS.graft, roughness: 0.6 }),
+  const shared = useMemo(
+    () => ({
+      body: buildLanternBody(),
+      cap: buildLanternCap(),
+      halo: new PlaneGeometry(FRUIT_MESH.haloSize, FRUIT_MESH.haloSize),
+      bodyMaterials: dayPalette.fruits.map(
+        (color) => new ToonMaterial({ color, palette: dayPalette }),
+      ),
+      capMaterial: new ToonMaterial({ color: dayPalette.trunk, palette: dayPalette }),
+      haloMaterial: new HaloMaterial({
+        color: dayPalette.halo,
+        opacity: FRUIT_MESH.haloOpacity,
+        depthOffset: FRUIT_MESH.haloDepthOffset,
+      }),
     }),
     [],
   );
   useEffect(
     () => () => {
-      geometry.dispose();
-      materials.blood.dispose();
-      materials.graft.dispose();
+      shared.body.dispose();
+      shared.cap.dispose();
+      shared.halo.dispose();
+      for (const material of shared.bodyMaterials) material.dispose();
+      shared.capMaterial.dispose();
+      shared.haloMaterial.dispose();
     },
-    [geometry, materials],
+    [shared],
   );
 
   const generationOf = useMemo(
@@ -45,16 +52,27 @@ export function Fruits({ fruits, branches, labels }: FruitsProps) {
     [branches],
   );
 
-  return fruits.map((fruit) => (
-    <Fruit
-      key={fruit.personId}
-      fruit={fruit}
-      geometry={geometry}
-      material={materials[fruit.kind]}
-      label={labels.get(fruit.personId) ?? ''}
-      alwaysLabeled={
-        (generationOf.get(fruit.anchorBranchId) ?? 0) <= FRUIT_LABEL.alwaysVisibleGenerations
-      }
-    />
-  ));
+  return fruits.map((fruit) => {
+    const bodyMaterial = shared.bodyMaterials[fruitColorIndex(fruit.personId, dayPalette)];
+    if (!bodyMaterial) return null;
+    const resources: FruitResources = {
+      bodyGeometry: shared.body,
+      bodyMaterial,
+      capGeometry: shared.cap,
+      capMaterial: shared.capMaterial,
+      haloGeometry: shared.halo,
+      haloMaterial: shared.haloMaterial,
+    };
+    return (
+      <Fruit
+        key={fruit.personId}
+        fruit={fruit}
+        resources={resources}
+        label={labels.get(fruit.personId) ?? ''}
+        alwaysLabeled={
+          (generationOf.get(fruit.anchorBranchId) ?? 0) <= FRUIT_LABEL.alwaysVisibleGenerations
+        }
+      />
+    );
+  });
 }

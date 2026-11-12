@@ -1,4 +1,11 @@
-import { CatmullRomCurve3, SphereGeometry, TubeGeometry, Vector3, BufferGeometry } from 'three';
+import {
+  BufferAttribute,
+  BufferGeometry,
+  CatmullRomCurve3,
+  SphereGeometry,
+  TubeGeometry,
+  Vector3,
+} from 'three';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { TREE_MESH } from '@/config/constants';
 import type { BranchSegment, Vec3 } from '@/layout/types';
@@ -8,6 +15,9 @@ export type TreeMeshDetail = typeof TREE_MESH;
 /**
  * Every segment as a tapered tube, with a sphere at each end so joints and tips read as one smooth
  * piece of wood. Merged into a single geometry: one draw call for the whole tree.
+ *
+ * Tubes carry `bark = 1` and a `uv` whose x is arc length in world units, so the bark grooves keep
+ * the same spacing on a long limb and a short twig. Knots carry `bark = 0` and stay smooth.
  */
 export function buildBranchGeometry(
   segments: readonly BranchSegment[],
@@ -59,14 +69,24 @@ export function buildTaperedTube(
       position.setXYZ(index, vertex.x, vertex.y, vertex.z);
     }
   }
-  return tube;
+
+  const uv = tube.getAttribute('uv');
+  const length = curve.getLength();
+  for (let i = 0; i < uv.count; i++) uv.setX(i, uv.getX(i) * length);
+  return withBark(tube, 1);
 }
 
 function buildKnot(center: Vec3, radius: number, detail: TreeMeshDetail): SphereGeometry {
   const width = radialSegments(radius, detail);
   const knot = new SphereGeometry(radius, width, Math.ceil(width / 2));
   knot.translate(center.x, center.y, center.z);
-  return knot;
+  return withBark(knot, 0);
+}
+
+function withBark<T extends BufferGeometry>(geometry: T, value: number): T {
+  const count = geometry.getAttribute('position').count;
+  geometry.setAttribute('bark', new BufferAttribute(new Float32Array(count).fill(value), 1));
+  return geometry;
 }
 
 function radialSegments(radius: number, detail: TreeMeshDetail): number {
