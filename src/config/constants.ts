@@ -123,9 +123,9 @@ export const LAYOUT = {
     /** Sideways wobble of the middle control points, as a fraction of the length. */
     wobble: 0.15,
     /** Height on the trunk where the roots start to flare out. */
-    startHeight: 0.6,
-    /** How deep the tips sink below the ground. */
-    depth: 1.4,
+    startHeight: 0.9,
+    /** How deep the tips sink below the ground: shallow, so the roots show as they leave the trunk. */
+    depth: 0.7,
     /** Roots pointing at or away from the camera are squashed so the root plate reads from the front. */
     zSquash: 0.55,
     /** Root base radius relative to the trunk base. */
@@ -275,13 +275,30 @@ export const LEAF_MESH = {
   aspect: 0.55,
   /** Below 1 the leaf is fuller near the stem. */
   shapeBias: 0.8,
+  /** 0 is a pointed oval, 1 a straight taper from a wide base (a blade of grass). */
+  taper: 0,
   /** Where the darker rim starts (1 = the very edge) and how dark it gets. */
   edgeStart: 0.72,
   edgeMix: 0.45,
   /** Half width of the central vein, in uv units, and how dark it is. */
   veinWidth: 0.025,
   veinMix: 0.25,
+  rimStrength: 0.28,
   /** Leaves lean less toward the shade tint than wood does, so dark foliage stays green, not grey. */
+  shadeMix: 0.35,
+} as const;
+
+/** A blade of grass: the same shader as a leaf, cut as a thin taper with no rim or vein. */
+export const GRASS_MESH = {
+  aspect: 0.16,
+  shapeBias: 1,
+  taper: 1,
+  edgeStart: 0.9,
+  edgeMix: 0,
+  veinWidth: 0.01,
+  veinMix: 0,
+  /** Blades are lit by the ground's normal, which faces up: a rim there would wash them out. */
+  rimStrength: 0,
   shadeMix: 0.35,
 } as const;
 
@@ -314,9 +331,122 @@ export const TOON = {
   },
 } as const;
 
-export const GROUND = {
-  /** Size of the ground plane, as a multiple of the tree's width. */
-  sizeFactor: 20,
+/**
+ * Everything around the tree. The tree stands on top of a hill whose back falls away, so the
+ * ground's edge sits low behind the trunk and the crown stands against the sky.
+ */
+export const SCENERY = {
+  seed: 'scenery',
+  hill: {
+    /** How far the ground drops from the top (under the trunk) to the far plain. */
+    drop: 22,
+    /** Gaussian widths of the hilltop: wide sideways, short front to back so its back drops fast. */
+    radiusX: 34,
+    radiusZ: 20,
+    /** Side of the square ground mesh and its grid resolution. */
+    /** Large enough that its far edge hides behind the first ridge. */
+    size: 480,
+    segments: 220,
+  },
+  grass: {
+    /** Blades grow in tufts around the trunk, between these distances from its base. */
+    innerRadius: 1.4,
+    outerRadius: 16,
+    /** Above 1 crowds the tufts toward the trunk. */
+    falloff: 1.6,
+    bladesPerTuft: 9,
+    tuftRadius: 0.7,
+    height: 0.9,
+    heightJitter: 0.4,
+    /** Largest lean away from vertical, in radians. */
+    maxLean: 0.35,
+    /** Random turn around the vertical, in radians: blades mostly face the camera. */
+    yawJitter: 0.9,
+    /** Large on purpose: blades spread over several toon bands, which reads as texture. */
+    normalJitter: 0.9,
+  },
+  clouds: {
+    /** Each layer is farther back, so panning slides it less: parallax from the real perspective. */
+    layers: [
+      { z: -60, count: 4, scale: 1, drift: 0.25 },
+      { z: -130, count: 5, scale: 1.8, drift: 0.15 },
+      { z: -220, count: 6, scale: 2.8, drift: 0.08 },
+    ],
+    /**
+     * Camera distance the layouts are designed around; layers farther than this spread out
+     * proportionally so they cover the same part of the view.
+     */
+    referenceDistance: 60,
+    /** Horizontal spread, as a multiple of the tree's width, before the depth spread. */
+    spreadX: 1.6,
+    /** Height above the tree's center, as fractions of the tree's height. */
+    minHeight: 0.15,
+    maxHeight: 0.75,
+    /** Random shift of each cloud within its even slot, as a fraction of the slot. */
+    slotJitter: 0.35,
+    /** Puff centers sit this far above the flat bottom, as a fraction of their radius. */
+    minPuffLift: 0.1,
+    maxPuffLift: 0.45,
+    minPuffs: 4,
+    maxPuffs: 7,
+    width: 9,
+    widthJitter: 0.35,
+    puffRadius: 1.9,
+    /** Puffs in the middle are up to this much bigger than the ones at the ends. */
+    puffBulge: 0.9,
+    puffJitter: 0.25,
+    /** Each puff sits this much in front of the previous one, so they never z-fight. */
+    puffDepthStep: 0.04,
+    /**
+     * Each puff is lit by a copy of itself shifted this far toward the sun (in puff radii): what
+     * the copy does not cover is a crescent of shade on the far side.
+     */
+    shadeOffset: 0.32,
+    /** The bottom of every cloud is in shade up to this height, as a fraction of its puff radius. */
+    bottomShade: 0.35,
+  },
+  ridges: {
+    layers: [
+      { z: -150, height: 9, fog: 0.12 },
+      { z: -260, height: 16, fog: 0.55 },
+    ],
+    /** Where the ridge line sits, below the tree's lowest point. */
+    baseDrop: 6,
+    /** Half width of each ridge, as a multiple of its distance from the camera. */
+    halfWidthFactor: 2.2,
+    points: 96,
+    /** Sine waves summed into the ridge line: frequency (cycles over its width) and weight. */
+    waves: [
+      [2, 0.55],
+      [5, 0.3],
+      [11, 0.15],
+    ],
+    /** How far down the ridge's body reaches below its line. */
+    depth: 300,
+  },
+  pollen: {
+    /** Box the pollen floats in, as padding around the tree's bounds. */
+    padding: 6,
+    size: 0.16,
+    sizeJitter: 0.5,
+    /** Floating motion: amplitude (world units) and speed (radians per second). */
+    driftAmplitude: 0.6,
+    driftSpeed: 0.35,
+    opacity: 0.75,
+  },
+} as const;
+
+export type SceneryConfig = Widen<typeof SCENERY>;
+
+/** Screen-space sky behind everything. */
+export const SKY = {
+  /** Where the sun glow sits on screen (0–1 from the bottom left), how wide and how strong. */
+  sunPosition: [0.78, 0.82] as const,
+  sunRadius: 0.45,
+  sunStrength: 0.35,
+  /** Bottom of the gradient (horizon color) and where it reaches the top color. */
+  gradientStart: 0.15,
+  gradientEnd: 1,
 } as const;
 
 /** Developer view at ?debug=layout. */

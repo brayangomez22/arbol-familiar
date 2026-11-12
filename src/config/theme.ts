@@ -23,6 +23,13 @@ export interface Palette {
   readonly outline: string;
   /** Glow behind each fruit. */
   readonly halo: string;
+  readonly hill: string;
+  readonly grass: readonly string[];
+  readonly cloud: string;
+  readonly cloudShade: string;
+  /** Glow of the sun (or moon) in the sky. */
+  readonly sunGlow: string;
+  readonly pollen: string;
 }
 
 export const dayPalette: Palette = {
@@ -40,6 +47,12 @@ export const dayPalette: Palette = {
   rim: '#ffe0b5',
   outline: '#4a3024',
   halo: '#fff3da',
+  hill: '#a7b07a',
+  grass: ['#7f9358', '#6e824c', '#93a466', '#62753f'],
+  cloud: '#fff8ee',
+  cloudShade: '#efd6cc',
+  sunGlow: '#fff1cf',
+  pollen: '#fff4cf',
 };
 
 export const nightPalette: Palette = {
@@ -57,6 +70,12 @@ export const nightPalette: Palette = {
   rim: '#8f86d6',
   outline: '#0f0e26',
   halo: '#ffd9a0',
+  hill: '#2f3d4a',
+  grass: ['#34484c', '#2c4044', '#3d5357', '#253a3d'],
+  cloud: '#3e3f74',
+  cloudShade: '#2c2c5c',
+  sunGlow: '#c9c4ff',
+  pollen: '#ffe6a3',
 };
 
 export const fonts = {

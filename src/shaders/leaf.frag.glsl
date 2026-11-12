@@ -7,6 +7,8 @@ uniform float uVeinWidth;
 uniform float uVeinMix;
 /** Below 1 the leaf is fuller near the stem; above 1, near the tip. */
 uniform float uShapeBias;
+/** 0 is a pointed oval, 1 a straight taper from a wide base. */
+uniform float uTaper;
 
 varying vec3 vShadeNormal;
 varying vec3 vWorldPosition;
@@ -18,7 +20,8 @@ const float PI = 3.14159265359;
 void main() {
   // The leaf outline lives here, not in the geometry: a quad cut to a pointed oval. uv.y runs
   // from the stem (0) to the tip (1); halfWidth is in the same units as uv.x.
-  float halfWidth = 0.5 * sin(PI * pow(vUv.y, uShapeBias));
+  float oval = sin(PI * pow(vUv.y, uShapeBias));
+  float halfWidth = 0.5 * mix(oval, 1.0 - vUv.y, uTaper);
   float across = abs(vUv.x - 0.5);
   float edge = across / max(halfWidth, 1e-4);
   float edgeWidth = fwidth(edge);

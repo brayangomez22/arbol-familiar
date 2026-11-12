@@ -7,7 +7,7 @@ import type { TreeLayout } from '@/layout/types';
 import { useAppStore } from '@/state/store';
 import { CanvasControls } from './camera/CanvasControls';
 import { CanvasCursor } from './camera/CanvasCursor';
-import { Ground } from './environment/Ground';
+import { Scenery } from './environment/Scenery';
 import { Tree } from './tree/Tree';
 
 interface ExperienceProps {
@@ -39,7 +39,7 @@ export function Experience({ layout, labels }: ExperienceProps) {
       }}
     >
       <color attach="background" args={[dayPalette.sky.horizon]} />
-      <Ground bounds={layout.bounds} />
+      <Scenery layout={layout} />
       <Tree layout={layout} labels={labels} />
       <CanvasControls bounds={layout.bounds} />
       <CanvasCursor />

@@ -10,6 +10,11 @@ export interface ToonMaterialOptions {
   readonly palette: Palette;
   /** Draws grooves along meshes that carry a `bark` attribute (see branchGeometry.ts). */
   readonly bark?: boolean;
+  /**
+   * Rim light on the sunny edge. Off for the ground: seen from the side, its upward normals would
+   * light up all over.
+   */
+  readonly rim?: boolean;
 }
 
 /**
@@ -18,7 +23,7 @@ export interface ToonMaterialOptions {
  * never depends on what else is in the scene.
  */
 export class ToonMaterial extends ShaderMaterial {
-  constructor({ color, palette, bark = false }: ToonMaterialOptions) {
+  constructor({ color, palette, bark = false, rim = true }: ToonMaterialOptions) {
     const base = new Color(color);
     super({
       vertexShader,
@@ -31,6 +36,7 @@ export class ToonMaterial extends ShaderMaterial {
         uBarkStreaks: { value: TOON.bark.streaks },
         uBarkWarp: { value: TOON.bark.warp },
         uBarkStrength: { value: bark ? TOON.bark.strength : 0 },
+        uRimStrength: { value: rim ? TOON.rimStrength : 0 },
       },
     });
   }

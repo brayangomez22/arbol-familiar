@@ -11,6 +11,8 @@ export interface QualitySettings {
   /** Leaves in a full cluster; sparser clusters get proportionally fewer. */
   readonly leavesPerCluster: number;
   readonly particles: number;
+  readonly grassBlades: number;
+  readonly cloudPuffSegments: number;
 }
 
 export const QUALITY: Record<QualityTier, QualitySettings> = {
@@ -23,6 +25,8 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     depthOfField: true,
     leavesPerCluster: 110,
     particles: 400,
+    grassBlades: 1400,
+    cloudPuffSegments: 40,
   },
   medium: {
     dpr: [1, 1.5],
@@ -33,6 +37,8 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     depthOfField: false,
     leavesPerCluster: 70,
     particles: 200,
+    grassBlades: 800,
+    cloudPuffSegments: 28,
   },
   low: {
     dpr: [1, 1],
@@ -43,6 +49,8 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     depthOfField: false,
     leavesPerCluster: 35,
     particles: 60,
+    grassBlades: 300,
+    cloudPuffSegments: 18,
   },
 };
 
