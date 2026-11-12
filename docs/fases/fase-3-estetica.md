@@ -17,6 +17,11 @@ Que deje de parecer 3D genérico y se vea como una **ilustración viva**. Ver `d
 - **Postprocesado**: textura de papel/grano multiplicada, viñeta suave, bloom sutil (más fuerte de noche en la fase 6).
 - **Overlay UI** con el mismo lenguaje visual: tarjetas color papel, serif en títulos, sombras suaves.
 
+## Pendientes heredados de fases anteriores
+
+- **(Fase 2) El horizonte corta el árbol por la mitad.** El suelo provisional es un plano plano en y = 0 y la cámara mira a la altura del centro del árbol, así que la línea del suelo cruza la copa. La colina del alcance de esta fase debería resolverlo (o un cielo que se funda con el suelo).
+- **(Fase 2) Nombres que se pisan.** Un injerto cuelga a `graftDistance` de su fruto de sangre y, con el zoom cerca, sus nombres se superponen (p. ej. Jorge Gómez y Patricia Ruiz). Revisarlo al rediseñar frutos y etiquetas: desplazar el nombre del injerto o juntar los dos nombres de la pareja.
+
 ## Criterios de terminado
 
 - [ ] Una captura del árbol podría pasar por una ilustración.
