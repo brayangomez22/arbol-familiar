@@ -23,6 +23,10 @@ export interface Palette {
   readonly outline: string;
   /** Glow behind each fruit. */
   readonly halo: string;
+  /** The glow of a hovered or selected fruit warms toward this. */
+  readonly haloGlow: string;
+  /** Specks of light that rise from a hovered fruit. */
+  readonly spark: string;
   readonly hill: string;
   readonly grass: readonly string[];
   readonly cloud: string;
@@ -49,6 +53,8 @@ export const dayPalette: Palette = {
   rim: '#ffe0b5',
   outline: '#4a3024',
   halo: '#fff3da',
+  haloGlow: '#ffd27f',
+  spark: '#f6be55',
   hill: '#a7b07a',
   grass: ['#7f9358', '#6e824c', '#93a466', '#62753f'],
   cloud: '#fff8ee',
@@ -73,6 +79,8 @@ export const nightPalette: Palette = {
   rim: '#8f86d6',
   outline: '#0f0e26',
   halo: '#ffd9a0',
+  haloGlow: '#ffc56e',
+  spark: '#ffe08a',
   hill: '#2f3d4a',
   grass: ['#34484c', '#2c4044', '#3d5357', '#253a3d'],
   cloud: '#3e3f74',

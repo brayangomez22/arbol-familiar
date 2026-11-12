@@ -4,11 +4,12 @@ import { FRUIT_LABEL, FRUIT_MESH, WIND } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
 import type { PersonId } from '@/domain/types';
 import { swayWeight, type TreeReach } from '@/layout/reach';
-import type { BranchSegment, FruitPlacement, Vec3 } from '@/layout/types';
+import type { BranchSegment, FruitPlacement } from '@/layout/types';
 import { HaloMaterial } from '../materials/HaloMaterial';
 import { ToonMaterial } from '../materials/ToonMaterial';
 import { Fruit, type FruitResources } from './Fruit';
 import { fruitColorIndex } from './fruitColor';
+import { FruitSparks, type SparkSource } from './FruitSparks';
 import { labelAlignments } from './labelAlignment';
 import { buildLanternBody, buildLanternCap } from './fruitGeometry';
 
@@ -17,12 +18,6 @@ interface FruitsProps {
   readonly branches: readonly BranchSegment[];
   readonly labels: ReadonlyMap<PersonId, string>;
   readonly reach: TreeReach;
-}
-
-interface FruitSway {
-  /** The tip of the fruit's branch: the fruit moves with the wind exactly as that point does. */
-  readonly anchor: Vec3;
-  readonly weight: number;
 }
 
 /** All the people. Geometries are shared, and there is one material per theme fruit color. */
@@ -40,6 +35,9 @@ export function Fruits({ fruits, branches, labels, reach }: FruitsProps) {
         color: dayPalette.halo,
         opacity: FRUIT_MESH.haloOpacity,
         depthOffset: FRUIT_MESH.haloDepthOffset,
+        glowColor: dayPalette.haloGlow,
+        glowOpacity: FRUIT_MESH.haloGlow.opacity,
+        glowGrowth: FRUIT_MESH.haloGlow.growth,
       }),
       // Names are captions over the picture: always readable, never hidden behind a branch.
       labelMaterial: new MeshBasicMaterial({
@@ -68,23 +66,32 @@ export function Fruits({ fruits, branches, labels, reach }: FruitsProps) {
     () => new Map(branches.map((branch) => [branch.id, branch.generation])),
     [branches],
   );
-  const swayOf = useMemo(
-    () =>
-      new Map(
-        branches.flatMap((branch): [string, FruitSway][] => {
-          const tip = branch.points.at(-1);
-          if (!tip) return [];
-          const weight = swayWeight(reach.atFraction(branch.id, 1), reach.max, WIND.weightExponent);
-          return [[branch.id, { anchor: tip, weight }]];
-        }),
-      ),
-    [branches, reach],
-  );
+  // Each fruit moves with the wind exactly as the tip of its branch does.
+  const sources = useMemo(() => {
+    const byId = new Map(branches.map((branch) => [branch.id, branch]));
+    return new Map(
+      fruits.map((fruit): [PersonId, SparkSource] => {
+        const tip = byId.get(fruit.anchorBranchId)?.points.at(-1);
+        const weight = tip
+          ? swayWeight(reach.atFraction(fruit.anchorBranchId, 1), reach.max, WIND.weightExponent)
+          : 0;
+        return [
+          fruit.personId,
+          {
+            position: fruit.position,
+            size: fruit.size,
+            swayAnchor: tip ?? fruit.position,
+            swayWeight: weight,
+          },
+        ];
+      }),
+    );
+  }, [fruits, branches, reach]);
 
-  return fruits.map((fruit) => {
+  const lanterns = fruits.map((fruit) => {
     const bodyMaterial = shared.bodyMaterials[fruitColorIndex(fruit.personId, dayPalette)];
-    if (!bodyMaterial) return null;
-    const sway = swayOf.get(fruit.anchorBranchId) ?? { anchor: fruit.position, weight: 0 };
+    const source = sources.get(fruit.personId);
+    if (!bodyMaterial || !source) return null;
     const resources: FruitResources = {
       bodyGeometry: shared.body,
       bodyMaterial,
@@ -101,12 +108,19 @@ export function Fruits({ fruits, branches, labels, reach }: FruitsProps) {
         resources={resources}
         label={labels.get(fruit.personId) ?? ''}
         labelAlign={alignments.get(fruit.personId) ?? 'center'}
-        swayAnchor={sway.anchor}
-        swayWeight={sway.weight}
+        swayAnchor={source.swayAnchor}
+        swayWeight={source.swayWeight}
         alwaysLabeled={
           (generationOf.get(fruit.anchorBranchId) ?? 0) <= FRUIT_LABEL.alwaysVisibleGenerations
         }
       />
     );
   });
+
+  return (
+    <>
+      {lanterns}
+      <FruitSparks sources={sources} />
+    </>
+  );
 }

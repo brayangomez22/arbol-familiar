@@ -246,9 +246,45 @@ export const FRUIT_MESH = {
   /** How far behind the fruit (toward the far side, in fruit radii) the halo is drawn. */
   haloDepthOffset: 1.2,
   /** Scale of a hovered or selected fruit. */
-  highlightScale: 1.18,
-  /** Higher eases faster (1/s). */
-  scaleRate: 14,
+  highlightScale: 1.15,
+  /**
+   * The scale follows a spring: stiffness in 1/s², and a damping ratio just under 1 so it settles
+   * with the smallest overshoot (no exaggerated bounce).
+   */
+  scaleSpring: { stiffness: 260, dampingRatio: 0.6 },
+  /** A hovered or selected fruit's halo: peak opacity, how much it grows and how fast (1/s). */
+  haloGlow: { opacity: 1, growth: 0.35, rate: 9 },
+} as const;
+
+/** Specks of light that rise from a fruit when the pointer reaches it. */
+export const HOVER_SPARKS = {
+  perHover: 6,
+  /** Seconds between one speck of a burst and the next, so they don't all pop at once. */
+  stagger: 0.07,
+  /** Specks alive at once across all fruits; the oldest are reused first. */
+  pool: 36,
+  /** Seconds each speck lives. */
+  minLife: 1.3,
+  maxLife: 2.1,
+  /** Where they start, in fruit radii from its center: a band around its lower half. */
+  spread: 0.9,
+  startBelow: 0.6,
+  startAbove: 0.3,
+  /** Toward the camera, in fruit radii, so the lantern itself never hides them. */
+  startFront: 0.7,
+  /** World units per second upward, and the ± sideways drift. */
+  rise: 1.1,
+  drift: 0.25,
+  /** Side to side flicker as they rise: amplitude (world units) and angular frequency. */
+  wiggle: 0.12,
+  wiggleFrequency: 5,
+  /** World size at birth; they shrink to `endSize` of it as they fade. */
+  size: 0.32,
+  endSize: 0.45,
+  opacity: 1,
+  /** Fractions of the life spent fading in and where the fade out starts. */
+  fadeIn: 0.15,
+  fadeOutStart: 0.5,
 } as const;
 
 export const FRUIT_LABEL = {

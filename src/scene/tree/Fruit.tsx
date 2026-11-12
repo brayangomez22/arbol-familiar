@@ -7,6 +7,8 @@ import { dayPalette } from '@/config/theme';
 import type { FruitPlacement, Vec3 } from '@/layout/types';
 import { useAppStore } from '@/state/store';
 import { damp } from '../damp';
+import type { HaloMaterial } from '../materials/HaloMaterial';
+import { stepSpring, type SpringState } from '../spring';
 import { windSway } from '../wind/windField';
 import { windFrame } from '../wind/windUniforms';
 import { FruitLabel } from './FruitLabel';
@@ -19,7 +21,7 @@ export interface FruitResources {
   readonly capGeometry: BufferGeometry;
   readonly capMaterial: Material;
   readonly haloGeometry: BufferGeometry;
-  readonly haloMaterial: Material;
+  readonly haloMaterial: HaloMaterial;
   readonly labelMaterial: Material;
 }
 
@@ -54,6 +56,16 @@ export function Fruit({
   const holder = useRef<Group>(null);
   const lantern = useRef<Group>(null);
   const sway = useMemo(() => new Vector3(), []);
+  const scale = useRef<SpringState>({ value: size, velocity: 0 });
+  const glow = useRef(0);
+  // The halo material is shared: each fruit sets its own glow right before its halo is drawn.
+  const { haloMaterial } = resources;
+  const applyGlow = useMemo(
+    () => () => {
+      haloMaterial.setGlow(glow.current);
+    },
+    [haloMaterial],
+  );
   const highlighted = useAppStore(
     (state) => state.hoveredPersonId === personId || state.selectedPersonId === personId,
   );
@@ -68,7 +80,9 @@ export function Fruit({
     // Pushed sideways, a hanging lantern swings its bottom downwind.
     current.rotation.z = sway.x * WIND.fruitTilt;
     const target = size * (highlighted ? FRUIT_MESH.highlightScale : 1);
-    current.scale.setScalar(damp(current.scale.x, target, FRUIT_MESH.scaleRate, delta));
+    stepSpring(scale.current, target, FRUIT_MESH.scaleSpring, delta);
+    current.scale.setScalar(scale.current.value);
+    glow.current = damp(glow.current, highlighted ? 1 : 0, FRUIT_MESH.haloGlow.rate, delta);
   });
 
   const handleOver = (event: ThreeEvent<PointerEvent>) => {
@@ -98,6 +112,7 @@ export function Fruit({
           geometry={resources.haloGeometry}
           material={resources.haloMaterial}
           raycast={ignoreRaycast}
+          onBeforeRender={applyGlow}
         />
         <mesh geometry={resources.bodyGeometry} material={resources.bodyMaterial}>
           <Outlines

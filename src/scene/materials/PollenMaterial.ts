@@ -3,6 +3,7 @@ import { SCENERY } from '@/config/constants';
 import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/pollen.frag.glsl?raw';
 import vertexShader from '@/shaders/pollen.vert.glsl?raw';
+import { pixelsPerUnit } from './pixelsPerUnit';
 
 /** Soft round specks that float on their own in the vertex shader; JS only advances the clock. */
 export class PollenMaterial extends ShaderMaterial {
@@ -32,6 +33,6 @@ export class PollenMaterial extends ShaderMaterial {
   /** Size in pixels of one world unit at distance 1, from the drawing buffer height and the fov. */
   setViewport(bufferHeight: number, fovDegrees: number): void {
     const uniform = this.uniforms.uPixelsPerUnit;
-    if (uniform) uniform.value = bufferHeight / (2 * Math.tan((fovDegrees * Math.PI) / 360));
+    if (uniform) uniform.value = pixelsPerUnit(bufferHeight, fovDegrees);
   }
 }
