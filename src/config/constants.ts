@@ -148,6 +148,34 @@ export const LAYOUT = {
     innerDensity: 0.55,
     densityJitter: 0.15,
   },
+  /** Individual leaves inside the clusters. How many per full cluster comes from quality.ts. */
+  leaf: {
+    /** Length from stem to tip. */
+    size: 1.3,
+    sizeJitter: 0.25,
+    /** Clusters are flattened toward the camera, like the crown itself. */
+    depthScale: 0.45,
+    /** 0 fills the cluster evenly, 1 puts every leaf on its surface where the light reads. */
+    shellBias: 0.55,
+    /** How far each leaf turns from facing the camera toward facing out of its cluster. */
+    facingTilt: 0.55,
+    /** Random turn of each leaf around its own facing, in radians. */
+    spinJitter: 0.7,
+    /** Random tilt of the shading normal, so a cluster is lit as a lumpy mass, not a ball. */
+    normalJitter: 0.35,
+    /** Tries per leaf before giving up on a crowded cluster. */
+    attemptsPerLeaf: 4,
+    /**
+     * No leaf in front of a fruit or its name: a box around each fruit's center, as seen from the
+     * front, that leaves may only fill from behind (`frontMargin` behind the fruit's center).
+     */
+    keepOut: {
+      halfWidth: 2.3,
+      above: 1.6,
+      below: 3,
+      frontMargin: 1,
+    },
+  },
 } as const;
 
 type Widen<T> = { readonly [K in keyof T]: T[K] extends number ? number : Widen<T[K]> };
@@ -239,6 +267,22 @@ export const FRUIT_LABEL = {
   fadeRate: 10,
   /** Below this opacity the label is not drawn at all. */
   minOpacity: 0.01,
+} as const;
+
+/** One leaf quad; its outline is cut in shaders/leaf.frag.glsl. */
+export const LEAF_MESH = {
+  /** Width of the quad relative to its length. */
+  aspect: 0.55,
+  /** Below 1 the leaf is fuller near the stem. */
+  shapeBias: 0.8,
+  /** Where the darker rim starts (1 = the very edge) and how dark it gets. */
+  edgeStart: 0.72,
+  edgeMix: 0.45,
+  /** Half width of the central vein, in uv units, and how dark it is. */
+  veinWidth: 0.025,
+  veinMix: 0.25,
+  /** Leaves lean less toward the shade tint than wood does, so dark foliage stays green, not grey. */
+  shadeMix: 0.35,
 } as const;
 
 /** Illustrated shading shared by every toon material. Colors live in theme.ts. */

@@ -1,4 +1,4 @@
-import type { BufferGeometry} from 'three';
+import type { BufferGeometry } from 'three';
 import { CylinderGeometry, LatheGeometry, Vector2, Vector3 } from 'three';
 import { mergeGeometries, mergeVertices } from 'three/addons/utils/BufferGeometryUtils.js';
 import { FRUIT_MESH } from '@/config/constants';

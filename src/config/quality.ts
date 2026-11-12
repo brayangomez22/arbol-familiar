@@ -8,7 +8,8 @@ export interface QualitySettings {
   readonly postprocessing: boolean;
   readonly bloom: boolean;
   readonly depthOfField: boolean;
-  readonly leavesPerBranch: number;
+  /** Leaves in a full cluster; sparser clusters get proportionally fewer. */
+  readonly leavesPerCluster: number;
   readonly particles: number;
 }
 
@@ -20,7 +21,7 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     postprocessing: true,
     bloom: true,
     depthOfField: true,
-    leavesPerBranch: 60,
+    leavesPerCluster: 110,
     particles: 400,
   },
   medium: {
@@ -30,7 +31,7 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     postprocessing: true,
     bloom: true,
     depthOfField: false,
-    leavesPerBranch: 35,
+    leavesPerCluster: 70,
     particles: 200,
   },
   low: {
@@ -40,7 +41,7 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
     postprocessing: false,
     bloom: false,
     depthOfField: false,
-    leavesPerBranch: 15,
+    leavesPerCluster: 35,
     particles: 60,
   },
 };

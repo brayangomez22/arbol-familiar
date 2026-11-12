@@ -1,8 +1,9 @@
-import { Color, ShaderMaterial, Vector2, Vector3, type ColorRepresentation } from 'three';
+import { Color, ShaderMaterial, type ColorRepresentation } from 'three';
 import { TOON } from '@/config/constants';
 import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/toon.frag.glsl?raw';
 import vertexShader from '@/shaders/toon.vert.glsl?raw';
+import { toonUniforms, withToonShading } from './toonUniforms';
 
 export interface ToonMaterialOptions {
   readonly color: ColorRepresentation;
@@ -21,20 +22,12 @@ export class ToonMaterial extends ShaderMaterial {
     const base = new Color(color);
     super({
       vertexShader,
-      fragmentShader,
+      fragmentShader: withToonShading(fragmentShader),
       uniforms: {
+        ...toonUniforms(palette),
         uBaseColor: { value: base },
         uShadeColor: { value: base.clone().lerp(new Color(palette.shade), TOON.shadeMix) },
-        uLightColor: { value: new Color(palette.light) },
-        uRimColor: { value: new Color(palette.rim) },
         uGrooveColor: { value: new Color(palette.trunkShadow) },
-        uSunDirection: { value: new Vector3(...TOON.sunDirection).normalize() },
-        uBandEdges: { value: new Vector3(...TOON.bandEdges) },
-        uBandSoftness: { value: TOON.bandSoftness },
-        uBandMix: { value: new Vector2(...TOON.bandMix) },
-        uHighlightMix: { value: TOON.highlightMix },
-        uRimStrength: { value: TOON.rimStrength },
-        uRimPower: { value: TOON.rimPower },
         uBarkStreaks: { value: TOON.bark.streaks },
         uBarkWarp: { value: TOON.bark.warp },
         uBarkStrength: { value: bark ? TOON.bark.strength : 0 },
