@@ -40,6 +40,29 @@ Las animaciones que hacen el sitio especial. Todo debe sentirse suave y orgánic
 - Hojas que se caen de vez en cuando (pocas, cayendo con giro).
 - Transiciones de la UI con la misma curva de easing que la escena (definidas en `animation/easings.ts`).
 
+### Estado (fase 4)
+
+Hecho y revisado en el navegador, un commit por bloque, en el orden pedido:
+
+- **Viento (4.2):** `shaders/wind.glsl` con gemelo CPU en `scene/wind/windField.ts` para los frutos. El peso sale del alcance a lo largo de la madera (`layout/reach.ts`). Las ráfagas siguen un horario determinista (`scene/wind/gusts.ts`). Las ramas usan un contorno propio (`OutlineMaterial`), porque `<Outlines>` de drei no sigue la deformación del vertex shader.
+- **Hover (4.3):** resorte a ×1,15 (`scene/spring.ts`), halo cálido por fruto sobre un material compartido (`onBeforeRender` + `uniformsNeedUpdate`) y chispas doradas (`SparkBurst`).
+- **Selección (4.4):** vuelo de cámara (`animation/cameraFly.ts`), savia por el linaje (`layout/sapPath.ts` + `USE_SAP` en `toon.frag.glsl`), foco con desaturación y profundidad de campo, todo en `animation/selectionTimeline.ts`. Un clic nuevo, un arrastre o el zoom cancelan lo anterior.
+- **Intro (4.1):** calendario de crecimiento en `layout/growth.ts`, `shaders/growth.glsl`, timeline en `animation/introTimeline.ts` y director en `scene/intro/`. Arranca después de `gl.compileAsync` para no dar tirones. Se puede saltar con el botón o con Escape, queda recordada en localStorage y con reduced-motion se reemplaza por un fundido.
+- **Easings compartidos (parte de 4.5):** `animation/easings.ts`, expuestos a CSS como `--ease-standard`, `--ease-out` y `--ease-in`.
+
+Los cuatro criterios de terminado se verificaron. Durante la intro, el peor cuadro midió 38 ms (51 fps de media en dev sobre GPU integrada, igual que la escena sin intro).
+
+**Falta de esta fase:**
+
+- **Hojas que caen (4.5).** No estaba en el orden pedido. Queda por decidir si se hace aquí o junto a las hojas doradas de los fallecidos (fase 6).
+
+## Pendientes para fases siguientes
+
+- **(Fase 4) Clic real en un fruto sin probar.** La selección se probó disparando `selectPerson` en el store; los clics simulados no llegan porque camera-controls captura el puntero. Confirmar con un clic de verdad.
+- **(Fase 4) Test de rendimiento inestable.** `buildTreeLayout.test.ts` ("150-person family in under 50 ms") falla cuando la máquina está cargada (63–105 ms medidos, también en `main` sin cambios). Subir el margen o medir de otra forma.
+- **(Fase 4) Profundidad de campo solo en calidad alta.** Con desenfoque fuerte deja un halo tenue alrededor de los nombres, por eso `bokehScale` quedó en 1,5. Revisarlo con el bloom de noche (fase 6).
+- **(Fase 4) Panel de la persona (fase 5).** El vuelo deja a la persona centrada. Si la ficha se abre a un lado, desplazar el encuadre final en `SelectionDirector`.
+
 ## Criterios de terminado
 
 - [ ] Intro completa, saltable, que no se repite y que respeta `reduced-motion`.
