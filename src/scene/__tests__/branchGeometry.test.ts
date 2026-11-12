@@ -1,7 +1,7 @@
 import { Vector3 } from 'three';
 import { describe, expect, it } from 'vitest';
 import type { BranchSegment } from '@/layout/types';
-import { buildBranchGeometry, buildTaperedTube } from '../tree/branchGeometry';
+import { buildBranchGeometry, buildTaperedTube, setSapLimits } from '../tree/branchGeometry';
 
 const straight: BranchSegment = {
   id: 'b',
@@ -52,35 +52,74 @@ describe('bark coordinates', () => {
   });
 });
 
+const other: BranchSegment = {
+  ...straight,
+  id: 'c',
+  points: straight.points.map((p) => ({ ...p, x: 4 })),
+};
+
+// Reach is height along this vertical branch; the weight is a tenth of it.
+const wood = { reachAt: (_: string, u: number) => u * 10, swayOf: (reach: number) => reach / 10 };
+
 describe('buildBranchGeometry', () => {
   it('merges every segment into one indexed geometry', () => {
-    const other = { ...straight, id: 'c', points: straight.points.map((p) => ({ ...p, x: 4 })) };
-    const single = buildBranchGeometry([straight]);
-    const double = buildBranchGeometry([straight, other]);
+    const single = buildBranchGeometry([straight]).geometry;
+    const double = buildBranchGeometry([straight, other]).geometry;
 
     expect(double.index).not.toBeNull();
     expect(double.getAttribute('position').count).toBe(2 * single.getAttribute('position').count);
   });
 
-  it('gives every ring its wind weight and each knot the weight of its end', () => {
-    const geometry = buildBranchGeometry([straight], (_, u) => u);
+  it('gives every ring its reach and wind weight, and each knot those of its end', () => {
+    const { geometry } = buildBranchGeometry([straight], wood);
     const position = geometry.getAttribute('position');
+    const reach = geometry.getAttribute('aReach');
     const sway = geometry.getAttribute('aSway');
+    expect(reach.count).toBe(position.count);
     expect(sway.count).toBe(position.count);
 
-    // Along this vertical branch the weight is height / 10; knots sit at y = 0 and y = 10 with
-    // vertices above and below, so they are checked by their center instead.
-    const tube = buildTaperedTube(straight);
-    const tubeCount = tube.getAttribute('position').count;
+    // Knots sit at y = 0 and y = 10 with vertices above and below, so they are checked by value.
+    const tubeCount = buildTaperedTube(straight).getAttribute('position').count;
     for (let i = 0; i < tubeCount; i++) {
+      expect(reach.getX(i)).toBeCloseTo(position.getY(i), 4);
       expect(sway.getX(i)).toBeCloseTo(position.getY(i) / 10, 5);
     }
-    const values = new Set(Array.from(sway.array).slice(tubeCount));
-    expect(values).toEqual(new Set([0, 1]));
+    expect(new Set(Array.from(reach.array).slice(tubeCount))).toEqual(new Set([0, 10]));
+    expect(new Set(Array.from(sway.array).slice(tubeCount))).toEqual(new Set([0, 1]));
   });
 
-  it('keeps branches still when no weights are given', () => {
-    const sway = buildBranchGeometry([straight]).getAttribute('aSway');
-    expect(Array.from(sway.array).every((value) => value === 0)).toBe(true);
+  it('keeps branches still and off the lineage by default', () => {
+    const { geometry } = buildBranchGeometry([straight]);
+    expect(Array.from(geometry.getAttribute('aSway').array).every((v) => v === 0)).toBe(true);
+    expect(Array.from(geometry.getAttribute('aSapLimit').array).every((v) => v < 0)).toBe(true);
+  });
+
+  it("records where each segment's vertices are", () => {
+    const { geometry, ranges } = buildBranchGeometry([straight, other]);
+    const first = ranges.get('b');
+    const second = ranges.get('c');
+    expect(first?.start).toBe(0);
+    expect(second?.start).toBe(first?.count);
+    expect((first?.count ?? 0) + (second?.count ?? 0)).toBe(
+      geometry.getAttribute('position').count,
+    );
+  });
+});
+
+describe('setSapLimits', () => {
+  it('lights only the listed segments, up to their limit, and clears again', () => {
+    const built = buildBranchGeometry([straight, other], wood);
+    const limit = built.geometry.getAttribute('aSapLimit');
+    const range = built.ranges.get('c');
+    if (!range) throw new Error('missing range');
+
+    setSapLimits(built, new Map([['c', 7]]));
+    for (let i = 0; i < limit.count; i++) {
+      const inC = i >= range.start && i < range.start + range.count;
+      expect(limit.getX(i)).toBe(inC ? 7 : -1);
+    }
+
+    setSapLimits(built, null);
+    expect(Array.from(limit.array).every((v) => v === -1)).toBe(true);
   });
 });

@@ -27,6 +27,8 @@ export interface Palette {
   readonly haloGlow: string;
   /** Specks of light that rise from a hovered fruit. */
   readonly spark: string;
+  /** Light that runs up the selected person's lineage. */
+  readonly sap: string;
   readonly hill: string;
   readonly grass: readonly string[];
   readonly cloud: string;
@@ -55,6 +57,7 @@ export const dayPalette: Palette = {
   halo: '#fff3da',
   haloGlow: '#ffd27f',
   spark: '#f6be55',
+  sap: '#ffd36e',
   hill: '#a7b07a',
   grass: ['#7f9358', '#6e824c', '#93a466', '#62753f'],
   cloud: '#fff8ee',
@@ -81,6 +84,7 @@ export const nightPalette: Palette = {
   halo: '#ffd9a0',
   haloGlow: '#ffc56e',
   spark: '#ffe08a',
+  sap: '#ffe29a',
   hill: '#2f3d4a',
   grass: ['#34484c', '#2c4044', '#3d5357', '#253a3d'],
   cloud: '#3e3f74',

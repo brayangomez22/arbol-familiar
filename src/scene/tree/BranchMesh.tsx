@@ -1,26 +1,41 @@
 import { useThree } from '@react-three/fiber';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useImperativeHandle, useMemo, type Ref } from 'react';
 import { Vector2 } from 'three';
 import { TOON } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
 import type { BranchSegment } from '@/layout/types';
 import { OutlineMaterial } from '../materials/OutlineMaterial';
-import { ToonMaterial } from '../materials/ToonMaterial';
-import { buildBranchGeometry, type SwayAt } from './branchGeometry';
+import { ToonMaterial, type SapUniforms } from '../materials/ToonMaterial';
+import { buildBranchGeometry, setSapLimits, type WoodMeasure } from './branchGeometry';
+
+/** What a selection drives on the branches: the sap uniforms and which wood carries it. */
+export interface BranchMeshHandle {
+  readonly sap: SapUniforms;
+  showLineage(limits: ReadonlyMap<string, number> | null): void;
+}
 
 interface BranchMeshProps {
   readonly segments: readonly BranchSegment[];
   readonly color: string;
-  /** Wind weight along each segment; without it the wood stays still. */
-  readonly swayAt?: SwayAt;
+  /** Reach and wind weight along the wood; without it the wood stays still and carries no sap. */
+  readonly wood?: WoodMeasure;
+  readonly ref?: Ref<BranchMeshHandle>;
 }
 
 /** A set of branches (or roots) as one solid mesh of toon-shaded bark with an ink outline. */
-export function BranchMesh({ segments, color, swayAt }: BranchMeshProps) {
-  const geometry = useMemo(() => buildBranchGeometry(segments, swayAt), [segments, swayAt]);
+export function BranchMesh({ segments, color, wood, ref }: BranchMeshProps) {
+  const built = useMemo(() => buildBranchGeometry(segments, wood), [segments, wood]);
   const material = useMemo(
-    () => new ToonMaterial({ color, palette: dayPalette, bark: true, wind: true }),
-    [color],
+    () =>
+      new ToonMaterial({
+        color,
+        palette: dayPalette,
+        bark: true,
+        wind: true,
+        focus: true,
+        sap: wood !== undefined,
+      }),
+    [color, wood],
   );
   const outline = useMemo(
     () =>
@@ -33,9 +48,9 @@ export function BranchMesh({ segments, color, swayAt }: BranchMeshProps) {
   );
   useEffect(
     () => () => {
-      geometry.dispose();
+      built.geometry.dispose();
     },
-    [geometry],
+    [built],
   );
   useEffect(
     () => () => {
@@ -50,6 +65,17 @@ export function BranchMesh({ segments, color, swayAt }: BranchMeshProps) {
     [outline],
   );
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      sap: material.sap,
+      showLineage: (limits) => {
+        setSapLimits(built, limits);
+      },
+    }),
+    [material, built],
+  );
+
   const gl = useThree((state) => state.gl);
   const size = useThree((state) => state.size);
   const pixelRatio = useThree((state) => state.viewport.dpr);
@@ -60,8 +86,8 @@ export function BranchMesh({ segments, color, swayAt }: BranchMeshProps) {
 
   return (
     <>
-      <mesh geometry={geometry} material={material} />
-      <mesh geometry={geometry} material={outline} />
+      <mesh geometry={built.geometry} material={material} />
+      <mesh geometry={built.geometry} material={outline} />
     </>
   );
 }

@@ -9,6 +9,24 @@ varying vec3 vWorldNormal;
 varying vec3 vWorldPosition;
 varying vec2 vUv;
 varying float vBark;
+#ifdef USE_SAP
+varying float vReach;
+varying float vSapLimit;
+/** Reach of the pulse's head, in world units along the wood. */
+uniform float uSapFront;
+/** Fades the whole lineage in and out. */
+uniform float uSapIntensity;
+uniform float uSapHead;
+uniform float uSapTrail;
+uniform float uSapShine;
+/** How far the sap's shaded side leans toward the bark's shade color. */
+uniform float uSapShadeMix;
+uniform vec3 uSapColor;
+#endif
+#ifdef USE_FOCUS
+/** 1 while this object is the selected person (set per draw on shared materials). */
+uniform float uFocused;
+#endif
 
 const float TAU = 6.28318530718;
 
@@ -33,6 +51,25 @@ void main() {
   vec3 color = toonRamp(uBaseColor, uShadeColor, lit);
   color = mix(color, uGrooveColor, barkGroove(vUv) * vBark * uBarkStrength);
   color += toonRim(normal, viewDirection, lit);
+
+  float focused = 0.0;
+  #ifdef USE_SAP
+  // A bright head running up the lineage, leaving a warm light on the wood behind it. The trail
+  // is added light, so the bark's bands and grooves still show through; only the head takes the
+  // sap's own (toon-shaded) color.
+  float onLineage = step(vReach, vSapLimit);
+  float behind = uSapFront - vReach;
+  float head = onLineage * uSapIntensity * exp(-(behind * behind) / (uSapHead * uSapHead));
+  float trail = onLineage * uSapIntensity * uSapTrail * smoothstep(0.0, uSapHead, behind);
+  vec3 sapColor = toonRamp(uSapColor, mix(uSapColor, uShadeColor, uSapShadeMix), lit);
+  color += uSapColor * trail;
+  color = mix(color, sapColor, head) + uSapColor * head * uSapShine;
+  focused = onLineage;
+  #endif
+  #ifdef USE_FOCUS
+  focused = max(focused, uFocused);
+  color = applyFocus(color, focused);
+  #endif
 
   gl_FragColor = vec4(color, 1.0);
   #include <colorspace_fragment>

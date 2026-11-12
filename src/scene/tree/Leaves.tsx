@@ -37,7 +37,7 @@ export function Leaves({ clusters, fruits, reach }: LeavesProps) {
     );
     return buildLeafGeometry(leaves, clusterWeights);
   }, [leaves, clusters, reach]);
-  const material = useMemo(() => new LeafMaterial(dayPalette, LEAF_MESH), []);
+  const material = useMemo(() => new LeafMaterial(dayPalette, LEAF_MESH, { focus: true }), []);
   useEffect(
     () => () => {
       geometry.dispose();

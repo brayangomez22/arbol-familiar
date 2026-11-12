@@ -8,6 +8,7 @@ import type { FruitPlacement, Vec3 } from '@/layout/types';
 import { useAppStore } from '@/state/store';
 import { damp } from '../damp';
 import type { HaloMaterial } from '../materials/HaloMaterial';
+import type { ToonMaterial } from '../materials/ToonMaterial';
 import { stepSpring, type SpringState } from '../spring';
 import { windSway } from '../wind/windField';
 import { windFrame } from '../wind/windUniforms';
@@ -17,9 +18,9 @@ import type { LabelAlign } from './labelAlignment';
 /** Geometries and materials shared by every fruit (owned and disposed by Fruits). */
 export interface FruitResources {
   readonly bodyGeometry: BufferGeometry;
-  readonly bodyMaterial: Material;
+  readonly bodyMaterial: ToonMaterial;
   readonly capGeometry: BufferGeometry;
-  readonly capMaterial: Material;
+  readonly capMaterial: ToonMaterial;
   readonly haloGeometry: BufferGeometry;
   readonly haloMaterial: HaloMaterial;
   readonly labelMaterial: Material;
@@ -59,15 +60,30 @@ export function Fruit({
   const scale = useRef<SpringState>({ value: size, velocity: 0 });
   const glow = useRef(0);
   // The halo material is shared: each fruit sets its own glow right before its halo is drawn.
-  const { haloMaterial } = resources;
+  const { haloMaterial, bodyMaterial, capMaterial } = resources;
   const applyGlow = useMemo(
     () => () => {
       haloMaterial.setGlow(glow.current);
     },
     [haloMaterial],
   );
+
   const highlighted = useAppStore(
     (state) => state.hoveredPersonId === personId || state.selectedPersonId === personId,
+  );
+  const selected = useAppStore((state) => state.selectedPersonId === personId);
+  // Fruit materials are shared too: only the selected one stays in color when the tree steps back.
+  const applyBodyFocus = useMemo(
+    () => () => {
+      bodyMaterial.setFocused(selected ? 1 : 0);
+    },
+    [bodyMaterial, selected],
+  );
+  const applyCapFocus = useMemo(
+    () => () => {
+      capMaterial.setFocused(selected ? 1 : 0);
+    },
+    [capMaterial, selected],
   );
   const hoverPerson = useAppStore((state) => state.hoverPerson);
   const selectPerson = useAppStore((state) => state.selectPerson);
@@ -114,14 +130,22 @@ export function Fruit({
           raycast={ignoreRaycast}
           onBeforeRender={applyGlow}
         />
-        <mesh geometry={resources.bodyGeometry} material={resources.bodyMaterial}>
+        <mesh
+          geometry={resources.bodyGeometry}
+          material={resources.bodyMaterial}
+          onBeforeRender={applyBodyFocus}
+        >
           <Outlines
             thickness={TOON.outline.fruitThickness}
             color={dayPalette.outline}
             toneMapped={false}
           />
         </mesh>
-        <mesh geometry={resources.capGeometry} material={resources.capMaterial}>
+        <mesh
+          geometry={resources.capGeometry}
+          material={resources.capMaterial}
+          onBeforeRender={applyCapFocus}
+        >
           <Outlines
             thickness={TOON.outline.fruitThickness}
             color={dayPalette.outline}

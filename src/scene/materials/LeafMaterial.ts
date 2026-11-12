@@ -3,6 +3,7 @@ import { WIND, type LEAF_MESH } from '@/config/constants';
 import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/leaf.frag.glsl?raw';
 import vertexShader from '@/shaders/leaf.vert.glsl?raw';
+import { focusUniforms, withFocus } from '../selection/focusUniforms';
 import { windUniforms, withWind } from '../wind/windUniforms';
 import { toonUniforms, withToonShading } from './toonUniforms';
 
@@ -15,13 +16,16 @@ export type LeafShape = { readonly [K in keyof typeof LEAF_MESH]: number };
  * sorting is needed; the SMAA pass smooths it.
  */
 export class LeafMaterial extends ShaderMaterial {
-  constructor(palette: Palette, shape: LeafShape) {
+  /** `focus`: steps back with the rest of the tree when someone is selected (leaves, not grass). */
+  constructor(palette: Palette, shape: LeafShape, { focus = false }: { focus?: boolean } = {}) {
     super({
       vertexShader: withWind(vertexShader),
-      fragmentShader: withToonShading(fragmentShader),
+      fragmentShader: withFocus(withToonShading(fragmentShader)),
       side: DoubleSide,
+      defines: focus ? { USE_FOCUS: '' } : {},
       uniforms: {
         ...windUniforms,
+        ...focusUniforms,
         ...toonUniforms(palette),
         uShadeTint: { value: new Color(palette.shade) },
         uShadeMix: { value: shape.shadeMix },

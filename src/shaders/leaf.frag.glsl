@@ -36,6 +36,9 @@ void main() {
   color = mix(color, uEdgeColor, vein * uVeinMix);
   color = mix(color, uEdgeColor, smoothstep(uEdgeStart, 1.0, edge) * uEdgeMix);
   color += toonRim(normal, viewDirection, lit);
+  #ifdef USE_FOCUS
+  color = applyFocus(color, 0.0);
+  #endif
 
   gl_FragColor = vec4(color, 1.0);
   #include <colorspace_fragment>

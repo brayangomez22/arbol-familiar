@@ -310,6 +310,11 @@ export const FRUIT_LABEL = {
   fadeRate: 10,
   /** Below this opacity the label is not drawn at all. */
   minOpacity: 0.01,
+  /**
+   * Names write depth where there is ink (above this alpha), so the depth of field sees them at
+   * their fruit and keeps them sharp; their see-through parts write nothing.
+   */
+  depthAlphaTest: 0.02,
 } as const;
 
 /** One leaf quad; its outline is cut in shaders/leaf.frag.glsl. */
@@ -587,9 +592,50 @@ export const WIND = {
   maxStep: 0.1,
 } as const;
 
+/** Selecting a person: the camera flies to them, sap runs up their lineage, the rest steps back. */
+export const SELECTION = {
+  camera: {
+    /** Distance from the person at the end of the flight, and how far above them it looks from. */
+    distance: 24,
+    lift: 1.5,
+    /** Mid-flight, the camera is this fraction farther from what it looks at: a small breath out. */
+    pullBack: 0.25,
+  },
+  sap: {
+    /** Seconds the pulse takes from the trunk's base to the fruit. */
+    duration: 1.5,
+    /** Half width of the bright head, in world units along the wood. */
+    head: 1.6,
+    /** Light added to the wood behind the head while the person stays selected. */
+    trail: 0.4,
+    /** How much the head shines past its color: above 1 it reaches the bloom. */
+    shine: 0.35,
+    /** How far its shaded side leans toward the bark's shade, so it keeps the toon bands. */
+    shadeMix: 0.5,
+    /** Seconds to fade the previous lineage before the next one starts. */
+    fadeOut: 0.2,
+  },
+  focus: {
+    /** How far everything else moves toward grey (0–1) when someone is selected. */
+    desaturation: 0.55,
+    /** Seconds to step back on selection, and to come back on deselection. */
+    duration: 0.9,
+    release: 0.7,
+    /** Depth of field: world units kept sharp around the person, and the blur at full focus. */
+    focusRange: 10,
+    /**
+     * Soft: the tree is nearly flat, so the blur mostly separates it from the landscape. Stronger
+     * blur makes a faint ghost around the (sharp) names.
+     */
+    bokehScale: 1.5,
+  },
+  /** With prefers-reduced-motion: no flight, the lineage simply fades in. */
+  reducedMotionFade: 0.35,
+} as const;
+
 /** Seconds. */
 export const TIMING = {
   introDuration: 8,
   reducedMotionIntroDuration: 0.6,
-  cameraFlyDuration: 1.6,
+  cameraFlyDuration: 1.2,
 } as const;

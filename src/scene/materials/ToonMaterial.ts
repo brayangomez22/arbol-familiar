@@ -1,8 +1,9 @@
 import { Color, ShaderMaterial, type ColorRepresentation } from 'three';
-import { TOON } from '@/config/constants';
+import { SELECTION, TOON } from '@/config/constants';
 import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/toon.frag.glsl?raw';
 import vertexShader from '@/shaders/toon.vert.glsl?raw';
+import { focusUniforms, withFocus } from '../selection/focusUniforms';
 import { windUniforms, withWind } from '../wind/windUniforms';
 import { toonUniforms, withToonShading } from './toonUniforms';
 
@@ -18,6 +19,19 @@ export interface ToonMaterialOptions {
   readonly rim?: boolean;
   /** Sways with the shared wind; the geometry must carry an `aSway` weight per vertex. */
   readonly wind?: boolean;
+  /** Steps back (desaturates) when someone else is selected; see setFocused. */
+  readonly focus?: boolean;
+  /**
+   * Can carry the selection's sap: the geometry must have `aReach` and `aSapLimit` (see
+   * branchGeometry.ts) and JS drives the uniforms in `sap`.
+   */
+  readonly sap?: boolean;
+}
+
+/** The sap uniforms a selection animates. */
+export interface SapUniforms {
+  readonly uSapFront: { value: number };
+  readonly uSapIntensity: { value: number };
 }
 
 /**
@@ -26,14 +40,37 @@ export interface ToonMaterialOptions {
  * never depends on what else is in the scene.
  */
 export class ToonMaterial extends ShaderMaterial {
-  constructor({ color, palette, bark = false, rim = true, wind = false }: ToonMaterialOptions) {
+  readonly sap: SapUniforms;
+
+  constructor({
+    color,
+    palette,
+    bark = false,
+    rim = true,
+    wind = false,
+    focus = false,
+    sap = false,
+  }: ToonMaterialOptions) {
     const base = new Color(color);
+    const sapUniforms: SapUniforms = { uSapFront: { value: 0 }, uSapIntensity: { value: 0 } };
     super({
       vertexShader: withWind(vertexShader),
-      fragmentShader: withToonShading(fragmentShader),
-      defines: wind ? { USE_WIND: '' } : {},
+      fragmentShader: withFocus(withToonShading(fragmentShader)),
+      defines: {
+        ...(wind ? { USE_WIND: '' } : {}),
+        ...(focus ? { USE_FOCUS: '' } : {}),
+        ...(sap ? { USE_SAP: '' } : {}),
+      },
       uniforms: {
         ...windUniforms,
+        ...focusUniforms,
+        ...sapUniforms,
+        uFocused: { value: 0 },
+        uSapHead: { value: SELECTION.sap.head },
+        uSapTrail: { value: SELECTION.sap.trail },
+        uSapShine: { value: SELECTION.sap.shine },
+        uSapShadeMix: { value: SELECTION.sap.shadeMix },
+        uSapColor: { value: new Color(palette.sap) },
         ...toonUniforms(palette),
         uBaseColor: { value: base },
         uShadeColor: { value: base.clone().lerp(new Color(palette.shade), TOON.shadeMix) },
@@ -44,5 +81,17 @@ export class ToonMaterial extends ShaderMaterial {
         uRimStrength: { value: rim ? TOON.rimStrength : 0 },
       },
     });
+    this.sap = sapUniforms;
+  }
+
+  /**
+   * For a material shared by many objects (the fruits): call from each mesh's onBeforeRender so
+   * the renderer uploads this object's value for its own draw.
+   */
+  setFocused(focused: number): void {
+    const uniform = this.uniforms.uFocused;
+    if (!uniform || uniform.value === focused) return;
+    uniform.value = focused;
+    this.uniformsNeedUpdate = true;
   }
 }

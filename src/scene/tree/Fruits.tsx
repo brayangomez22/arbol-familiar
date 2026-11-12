@@ -28,9 +28,9 @@ export function Fruits({ fruits, branches, labels, reach }: FruitsProps) {
       cap: buildLanternCap(),
       halo: new PlaneGeometry(FRUIT_MESH.haloSize, FRUIT_MESH.haloSize),
       bodyMaterials: dayPalette.fruits.map(
-        (color) => new ToonMaterial({ color, palette: dayPalette }),
+        (color) => new ToonMaterial({ color, palette: dayPalette, focus: true }),
       ),
-      capMaterial: new ToonMaterial({ color: dayPalette.trunk, palette: dayPalette }),
+      capMaterial: new ToonMaterial({ color: dayPalette.trunk, palette: dayPalette, focus: true }),
       haloMaterial: new HaloMaterial({
         color: dayPalette.halo,
         opacity: FRUIT_MESH.haloOpacity,
@@ -40,10 +40,12 @@ export function Fruits({ fruits, branches, labels, reach }: FruitsProps) {
         glowGrowth: FRUIT_MESH.haloGlow.growth,
       }),
       // Names are captions over the picture: always readable, never hidden behind a branch.
+      // They still write depth where there is ink, so the depth of field doesn't blur them.
       labelMaterial: new MeshBasicMaterial({
         depthTest: false,
-        depthWrite: false,
+        depthWrite: true,
         transparent: true,
+        alphaTest: FRUIT_LABEL.depthAlphaTest,
       }),
     }),
     [],

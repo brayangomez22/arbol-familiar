@@ -3,6 +3,14 @@ attribute float bark;
 /** Wind weight: 0 at the trunk's base, 1 at the farthest tip (see layout/reach.ts). */
 attribute float aSway;
 #endif
+#ifdef USE_SAP
+/** World distance along the wood from the trunk's base. */
+attribute float aReach;
+/** Reach where the sap leaves this vertex's branch; below 0 when the branch is off the lineage. */
+attribute float aSapLimit;
+varying float vReach;
+varying float vSapLimit;
+#endif
 
 varying vec3 vWorldNormal;
 varying vec3 vWorldPosition;
@@ -14,6 +22,10 @@ void main() {
   #ifdef USE_WIND
   // The field is sampled at the rest position, so the outline (outline.vert.glsl) moves identically.
   worldPosition.xyz += windSway(worldPosition.xyz, aSway);
+  #endif
+  #ifdef USE_SAP
+  vReach = aReach;
+  vSapLimit = aSapLimit;
   #endif
   vWorldPosition = worldPosition.xyz;
   // Every toon mesh is scaled uniformly, so the model matrix is enough to carry the normal.
