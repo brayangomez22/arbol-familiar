@@ -32,7 +32,25 @@ export interface IntroSlice {
   setIntroPhase: (phase: IntroPhase) => void;
 }
 
-export type AppState = SelectionSlice & TimelineSlice & QualitySlice & AudioSlice & IntroSlice;
+export type CameraAction = 'zoomIn' | 'zoomOut' | 'frameAll';
+
+export interface CameraRequest {
+  readonly action: CameraAction;
+  readonly id: number;
+}
+
+export interface CameraSlice {
+  /** Latest command from the UI for the scene's camera. */
+  cameraRequest: CameraRequest | null;
+  requestCamera: (action: CameraAction) => void;
+}
+
+export type AppState = SelectionSlice &
+  TimelineSlice &
+  QualitySlice &
+  AudioSlice &
+  IntroSlice &
+  CameraSlice;
 
 type Slice<T> = StateCreator<AppState, [], [], T>;
 
@@ -76,10 +94,20 @@ const createIntroSlice: Slice<IntroSlice> = (set) => ({
   },
 });
 
+const createCameraSlice: Slice<CameraSlice> = (set, get) => ({
+  cameraRequest: null,
+  requestCamera: (action) => {
+    // A command rather than state: a new id each time, so pressing the same button twice still
+    // reaches the scene.
+    set({ cameraRequest: { action, id: (get().cameraRequest?.id ?? 0) + 1 } });
+  },
+});
+
 export const useAppStore = create<AppState>()((...args) => ({
   ...createSelectionSlice(...args),
   ...createTimelineSlice(...args),
   ...createQualitySlice(...args),
   ...createAudioSlice(...args),
   ...createIntroSlice(...args),
+  ...createCameraSlice(...args),
 }));

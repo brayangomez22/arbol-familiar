@@ -1,6 +1,8 @@
 import { lazy, Suspense } from 'react';
 import { readLayoutDebugOptions } from '@/scene/debug/layoutDebugOptions';
 import { Experience } from '@/scene/Experience';
+import { Overlay } from '@/ui/Overlay';
+import { familyLayout, fruitLabels } from './familyTree';
 
 // Loaded on demand so the developer view never weighs on the real site.
 const LayoutDebug = lazy(() =>
@@ -16,5 +18,10 @@ export function App() {
       </Suspense>
     );
   }
-  return <Experience />;
+  return (
+    <>
+      <Experience layout={familyLayout} labels={fruitLabels} />
+      <Overlay />
+    </>
+  );
 }

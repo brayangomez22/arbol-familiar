@@ -154,6 +154,76 @@ type Widen<T> = { readonly [K in keyof T]: T[K] extends number ? number : Widen<
 
 export type LayoutConfig = Widen<typeof LAYOUT>;
 
+/** Canvas-like navigation: drag to pan, wheel/pinch to zoom toward the cursor. */
+export const NAVIGATION = {
+  /** Closest the camera gets to the point it looks at. */
+  minDistance: 7,
+  /** Farthest zoom, as a multiple of the distance that frames the whole tree. */
+  maxDistanceFactor: 1.6,
+  /** Extra room around the layout bounds when framing everything. */
+  framingMargin: 1.08,
+  /** The point the camera looks at may wander this far past the layout bounds. */
+  boundaryMargin: 4,
+  /** Right drag tilts the view at most this much either way: a hint of depth, never a turn. */
+  parallaxAngle: 8 * DEG,
+  /** Each zoom button press multiplies or divides the distance by this. */
+  zoomStep: 1.5,
+  /** Seconds the camera takes to catch up with the input. */
+  smoothTime: 0.25,
+  draggingSmoothTime: 0.08,
+  /** A press that moves farther than this many pixels is a drag, never a click. */
+  clickTolerance: 6,
+} as const;
+
+/** How the layout becomes meshes. Segment counts follow length and thickness. */
+export const TREE_MESH = {
+  tubularSegmentsPerUnit: 3,
+  minTubularSegments: 8,
+  maxTubularSegments: 64,
+  radialSegmentsPerUnit: 24,
+  minRadialSegments: 6,
+  maxRadialSegments: 20,
+} as const;
+
+export const FRUIT_MESH = {
+  widthSegments: 32,
+  heightSegments: 24,
+  /** Scale of a hovered or selected fruit. */
+  highlightScale: 1.18,
+  /** Higher eases faster (1/s). */
+  scaleRate: 14,
+} as const;
+
+export const FRUIT_LABEL = {
+  fontSize: 0.5,
+  lineHeight: 1.05,
+  /** Space between the bottom of the fruit and the top of its name. */
+  gap: 0.3,
+  outlineWidth: 0.05,
+  outlineOpacity: 0.85,
+  /** Names of generations up to this one are always shown, however far the camera is. */
+  alwaysVisibleGenerations: 1,
+  /** Other names fade out between these camera distances. */
+  fadeStart: 38,
+  fadeEnd: 52,
+  /** Higher eases faster (1/s). */
+  fadeRate: 10,
+  /** Below this opacity the label is not drawn at all. */
+  minOpacity: 0.01,
+} as const;
+
+/** Placeholder lighting until the toon material arrives (phase 3). */
+export const LIGHTING = {
+  hemisphereIntensity: 1.6,
+  sunIntensity: 1.8,
+  sunPosition: [25, 40, 35] as const,
+} as const;
+
+export const GROUND = {
+  /** Size of the ground plane, as a multiple of the tree's width. */
+  sizeFactor: 20,
+} as const;
+
 /** Developer view at ?debug=layout. */
 export const DEBUG_VIEW = {
   /** Polyline segments drawn per branch curve. */
