@@ -1,3 +1,4 @@
+import { PhotoButton } from '../PhotoMode/PhotoButton';
 import { SearchButton } from '../Search/SearchButton';
 import { AudioButton } from './AudioButton';
 import styles from './Controls.module.css';
@@ -8,13 +9,14 @@ interface ControlsProps {
   readonly onSearch: () => void;
 }
 
-/** The floating buttons in the corner: search, see the intro again, sound, and the zoom group. */
+/** The floating buttons in the corner: search, intro again, sound, photo mode and the zoom group. */
 export function Controls({ onSearch }: ControlsProps) {
   return (
     <div className={styles.column}>
       <SearchButton onClick={onSearch} />
       <ReplayIntroButton />
       <AudioButton />
+      <PhotoButton />
       <ZoomControls />
     </div>
   );

@@ -77,13 +77,26 @@ export interface CameraSlice {
   setViewInset: (inset: ViewInset) => void;
 }
 
+export interface PhotoSlice {
+  /** The UI steps aside so the visitor can frame the tree. */
+  photoMode: boolean;
+  /** Bumped by the UI to ask the scene for a picture; 0 means none asked yet. */
+  photoRequest: number;
+  /** The last picture the scene took, as it came off the canvas. */
+  photo: Blob | null;
+  setPhotoMode: (on: boolean) => void;
+  requestPhoto: () => void;
+  setPhoto: (photo: Blob | null) => void;
+}
+
 export type AppState = SelectionSlice &
   TimelineSlice &
   AmbientSlice &
   QualitySlice &
   AudioSlice &
   IntroSlice &
-  CameraSlice;
+  CameraSlice &
+  PhotoSlice;
 
 type Slice<T> = StateCreator<AppState, [], [], T>;
 
@@ -172,6 +185,21 @@ const createCameraSlice: Slice<CameraSlice> = (set, get) => ({
   },
 });
 
+const createPhotoSlice: Slice<PhotoSlice> = (set, get) => ({
+  photoMode: false,
+  photoRequest: 0,
+  photo: null,
+  setPhotoMode: (on) => {
+    set({ photoMode: on, photo: null });
+  },
+  requestPhoto: () => {
+    set({ photoRequest: get().photoRequest + 1 });
+  },
+  setPhoto: (photo) => {
+    set({ photo });
+  },
+});
+
 export const useAppStore = create<AppState>()((...args) => ({
   ...createSelectionSlice(...args),
   ...createTimelineSlice(...args),
@@ -180,4 +208,5 @@ export const useAppStore = create<AppState>()((...args) => ({
   ...createAudioSlice(...args),
   ...createIntroSlice(...args),
   ...createCameraSlice(...args),
+  ...createPhotoSlice(...args),
 }));

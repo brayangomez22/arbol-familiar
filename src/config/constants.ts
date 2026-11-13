@@ -1067,3 +1067,18 @@ export const AUDIO = {
   duckLevel: 0.12,
   duckTime: 0.6,
 } as const;
+
+/** Photo mode: the caption stamped on each picture, as fractions of the picture's width. */
+export const PHOTO = {
+  caption: {
+    titleSize: 0.026,
+    dateSize: 0.013,
+    /** Never smaller than this, in pixels, so a phone's picture still reads. */
+    minTitleSize: 22,
+    margin: 0.02,
+    padding: 0.012,
+    radius: 0.008,
+  },
+  /** Seconds of the white flash when the picture is taken. */
+  flash: 0.45,
+} as const;

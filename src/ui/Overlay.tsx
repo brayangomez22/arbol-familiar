@@ -9,6 +9,7 @@ import { OriginsMap } from './OriginsMap/OriginsMap';
 import { OriginsMapButton } from './OriginsMap/OriginsMapButton';
 import styles from './Overlay.module.css';
 import { PersonPanel } from './PersonPanel/PersonPanel';
+import { PhotoMode } from './PhotoMode/PhotoMode';
 import { SearchPalette } from './Search/SearchPalette';
 import { useSearchShortcut } from './Search/useSearchShortcut';
 import { Timeline } from './Timeline/Timeline';
@@ -26,6 +27,7 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
   const ready = useAppStore((state) => state.introPhase === 'done');
   const panelOpen = useAppStore((state) => state.selectedPersonId !== null);
   const inset = useAppStore((state) => state.viewInset);
+  const photoMode = useAppStore((state) => state.photoMode);
   const [searchOpen, setSearchOpen] = useState(false);
   const [mapOpen, setMapOpen] = useState(false);
   const openSearch = useCallback(() => {
@@ -34,7 +36,7 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
   const closeMap = useCallback(() => {
     setMapOpen(false);
   }, []);
-  useSearchShortcut(ready && !searchOpen && !mapOpen, openSearch);
+  useSearchShortcut(ready && !searchOpen && !mapOpen && !photoMode, openSearch);
 
   // What the open panel covers, so the floating buttons and the search move out of its way.
   const occluded = {
@@ -45,9 +47,11 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
   return (
     <FamilyContext value={family}>
       <div
-        className={`${styles.overlay} ${ready ? '' : styles.hidden}`}
+        className={`${styles.overlay} ${ready && !photoMode ? '' : styles.hidden}`}
         style={occluded}
-        aria-hidden={!ready}
+        aria-hidden={!ready || photoMode}
+        // In photo mode the UI is gone for the keyboard too, not just for the eyes.
+        inert={photoMode}
       >
         <div className={styles.corner}>
           <TitleCard summary={summary} />
@@ -71,6 +75,7 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
         )}
         {mapOpen && <OriginsMap onClose={closeMap} />}
       </div>
+      {photoMode && <PhotoMode title={summary.title} />}
       <SkipIntroButton />
     </FamilyContext>
   );

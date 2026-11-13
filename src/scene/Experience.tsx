@@ -11,6 +11,7 @@ import { CanvasControls } from './camera/CanvasControls';
 import { CanvasCursor } from './camera/CanvasCursor';
 import { Effects } from './effects/Effects';
 import { Scenery } from './environment/Scenery';
+import { PhotoDirector } from './photo/PhotoDirector';
 import type { FamilyTime } from './timeline/familyTime';
 import { Tree } from './tree/Tree';
 import { Wind } from './wind/Wind';
@@ -62,6 +63,7 @@ export function Experience({ layout, labels, time }: ExperienceProps) {
       <CanvasControls bounds={layout.bounds} />
       <CanvasCursor />
       <Effects />
+      <PhotoDirector />
     </Canvas>
   );
 }
