@@ -22,7 +22,10 @@ export interface QualitySlice {
 
 export interface AudioSlice {
   audioEnabled: boolean;
+  /** A person's voice note is playing: the ambient music steps aside while it does. */
+  voiceNotePlaying: boolean;
   setAudioEnabled: (enabled: boolean) => void;
+  setVoiceNotePlaying: (playing: boolean) => void;
 }
 
 export type IntroPhase = 'pending' | 'playing' | 'done';
@@ -42,10 +45,22 @@ export interface CameraRequest {
   readonly id: number;
 }
 
+/** CSS pixels of the view covered by the person panel, on the right and at the bottom. */
+export interface ViewInset {
+  readonly right: number;
+  readonly bottom: number;
+}
+
 export interface CameraSlice {
   /** Latest command from the UI for the scene's camera. */
   cameraRequest: CameraRequest | null;
+  /**
+   * Where the person panel sits whenever someone is selected, so a flight frames the person in the
+   * part of the view it leaves free.
+   */
+  viewInset: ViewInset;
   requestCamera: (action: CameraAction) => void;
+  setViewInset: (inset: ViewInset) => void;
 }
 
 export type AppState = SelectionSlice &
@@ -85,8 +100,12 @@ const createQualitySlice: Slice<QualitySlice> = (set) => ({
 const createAudioSlice: Slice<AudioSlice> = (set) => ({
   // Off by default: sound must never start without the visitor asking for it.
   audioEnabled: false,
+  voiceNotePlaying: false,
   setAudioEnabled: (enabled) => {
     set({ audioEnabled: enabled });
+  },
+  setVoiceNotePlaying: (playing) => {
+    set({ voiceNotePlaying: playing });
   },
 });
 
@@ -109,6 +128,11 @@ const createIntroSlice: Slice<IntroSlice> = (set, get) => ({
 
 const createCameraSlice: Slice<CameraSlice> = (set, get) => ({
   cameraRequest: null,
+  viewInset: { right: 0, bottom: 0 },
+  setViewInset: (inset) => {
+    const current = get().viewInset;
+    if (current.right !== inset.right || current.bottom !== inset.bottom) set({ viewInset: inset });
+  },
   requestCamera: (action) => {
     // A command rather than state: a new id each time, so pressing the same button twice still
     // reaches the scene.

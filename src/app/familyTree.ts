@@ -1,8 +1,13 @@
+import { dayPalette } from '@/config/theme';
 import familyJson from '@/data/family.json';
 import { loadFamily } from '@/data/loadFamily';
-import type { PersonId } from '@/domain/types';
 import { generationOf, indexFamily } from '@/domain/genealogy';
+import { relativeInDirection } from '@/domain/navigation';
+import { searchEntryOf } from '@/domain/search';
+import type { PersonId } from '@/domain/types';
 import { buildTreeLayout } from '@/layout/buildTreeLayout';
+import { fruitColorIndex } from '@/scene/tree/fruitColor';
+import type { FamilyDirectory } from '@/ui/family/familyDirectory';
 
 const family = loadFamily(familyJson);
 
@@ -25,3 +30,15 @@ export const familySummary = {
   people: family.people.size,
   generations: Math.max(...[...family.people.keys()].map((id) => generationOf(index, id))) + 1,
 } as const;
+
+const fruitX = new Map(familyLayout.fruits.map((fruit) => [fruit.personId, fruit.position.x]));
+
+/** The family as the overlay sees it: relations, search and the colors of the fruits. */
+export const familyDirectory: FamilyDirectory = {
+  index,
+  searchEntries: [...family.people.values()].map(searchEntryOf),
+  fruitColorOf: (id) => dayPalette.fruits[fruitColorIndex(id, dayPalette)] ?? dayPalette.trunk,
+  relativeInDirection: (id, direction) =>
+    relativeInDirection(index, id, direction, (relativeId) => fruitX.get(relativeId) ?? 0),
+  isPerson: (id) => family.people.has(id),
+};

@@ -1,5 +1,5 @@
 import { cssEase } from '@/animation/easings';
-import { INTRO } from '@/config/constants';
+import { INTRO, PERSON_PANEL } from '@/config/constants';
 import { dayPalette, fonts, type Palette } from '@/config/theme';
 
 /**
@@ -12,12 +12,17 @@ export function applyThemeVariables(root: HTMLElement, palette: Palette = dayPal
     '--color-sky-horizon': palette.sky.horizon,
     '--color-ink': palette.ink,
     '--color-paper': palette.paper,
+    '--color-polaroid': palette.polaroid,
     '--font-display': fonts.display,
     '--font-body': fonts.body,
     '--ease-standard': cssEase('standard'),
     '--ease-out': cssEase('out'),
     '--ease-in': cssEase('in'),
     '--duration-ui-fade': `${INTRO.uiFade}s`,
+    '--panel-width': `${PERSON_PANEL.width}px`,
+    '--panel-margin': `${PERSON_PANEL.margin}px`,
+    '--sheet-peek': `${PERSON_PANEL.sheetPeek * 100}dvh`,
+    '--sheet-full': `${PERSON_PANEL.sheetFull * 100}dvh`,
   };
   for (const [name, value] of Object.entries(variables)) root.style.setProperty(name, value);
 }

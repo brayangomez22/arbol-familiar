@@ -9,13 +9,14 @@ import {
   type SelectionTargets,
   type SelectionTiming,
 } from '@/animation/selectionTimeline';
-import { SELECTION, TIMING } from '@/config/constants';
+import { CAMERA, SELECTION, TIMING } from '@/config/constants';
 import type { PersonId } from '@/domain/types';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import type { TreeReach } from '@/layout/reach';
 import { sapPath } from '@/layout/sapPath';
-import type { FruitPlacement, TreeLayout } from '@/layout/types';
+import type { TreeLayout, Vec3 } from '@/layout/types';
 import { useAppStore } from '@/state/store';
+import { insetShift } from '../camera/insetShift';
 import type { BranchMeshHandle } from '../tree/BranchMesh';
 import { focusPoint, focusUniforms } from './focusUniforms';
 
@@ -41,6 +42,7 @@ const TIMELINE: SelectionTiming = {
  */
 export function SelectionDirector({ layout, reach, branches }: SelectionDirectorProps) {
   const controls = useThree((state) => state.controls);
+  const getState = useThree((state) => state.get);
   const reducedMotion = useReducedMotion();
   const fruits = useMemo(
     () => new Map(layout.fruits.map((fruit) => [fruit.personId, fruit])),
@@ -84,7 +86,11 @@ export function SelectionDirector({ layout, reach, branches }: SelectionDirector
         TIMELINE,
         reducedMotion,
       );
-      if (cameraControls) flight = flyTo(cameraControls, fruit, reducedMotion, scratch);
+      if (cameraControls) {
+        const { viewInset } = useAppStore.getState();
+        const shift = insetShift(viewInset, getState().size, SELECTION_VIEW_DISTANCE, CAMERA.fov);
+        flight = flyTo(cameraControls, fruit.position, shift, reducedMotion, scratch);
+      }
     };
 
     const unsubscribe = useAppStore.subscribe((state, previous) => {
@@ -93,26 +99,36 @@ export function SelectionDirector({ layout, reach, branches }: SelectionDirector
       else if (state.cameraRequest !== previous.cameraRequest) stopFlight();
     });
     cameraControls?.addEventListener('controlstart', stopFlight);
+    // Someone may already be selected (a link to a person): the camera only now became available.
+    const selected = useAppStore.getState().selectedPersonId;
+    if (selected !== null) play(selected);
     return () => {
       unsubscribe();
       cameraControls?.removeEventListener('controlstart', stopFlight);
       timeline?.kill();
       stopFlight();
     };
-  }, [controls, branches, fruits, layout.branches, reach, reducedMotion]);
+  }, [controls, getState, branches, fruits, layout.branches, reach, reducedMotion]);
 
   return null;
 }
 
-/** Flies (or, with reduced motion, cuts) to a framing of the person; null when there is nothing to animate. */
+/** Distance from the camera to the person at the end of a flight. */
+const SELECTION_VIEW_DISTANCE = Math.hypot(SELECTION.camera.distance, SELECTION.camera.lift);
+
+/**
+ * Flies (or, with reduced motion, cuts) to a framing of the person, looking `shift` past them so
+ * they land in the part of the view the panel leaves free. Null when there is nothing to animate.
+ */
 function flyTo(
   controls: CameraControlsImpl,
-  fruit: FruitPlacement,
+  person: Vec3,
+  shift: Vec3,
   reducedMotion: boolean,
   scratch: { position: Vector3; target: Vector3 },
 ): gsap.core.Tween | null {
   const { camera } = SELECTION;
-  const target = { ...fruit.position };
+  const target = { x: person.x + shift.x, y: person.y + shift.y, z: person.z + shift.z };
   const end: CameraPose = {
     target,
     position: { x: target.x, y: target.y + camera.lift, z: target.z + camera.distance },

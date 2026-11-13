@@ -760,3 +760,34 @@ export const TIMING = {
   reducedMotionIntroDuration: 0.6,
   cameraFlyDuration: 1.2,
 } as const;
+
+/**
+ * The person panel: a column on the right on wide screens, a sheet pulled up from the bottom on
+ * phones. Sizes in CSS pixels unless noted.
+ */
+export const PERSON_PANEL = {
+  width: 400,
+  margin: 16,
+  /** Up to this viewport width the panel is a bottom sheet. */
+  sheetMaxWidth: 720,
+  /** Sheet heights as fractions of the viewport: resting, and pulled all the way up. */
+  sheetPeek: 0.46,
+  sheetFull: 0.92,
+  /** Let go below this fraction of its resting height, the sheet closes. */
+  sheetCloseAt: 0.6,
+  /** A flick faster than this (pixels per millisecond) carries on in its direction. */
+  sheetFlickVelocity: 0.5,
+  /** Polaroids lean up to this many degrees either way, seeded by the photo. */
+  polaroidTilt: 5,
+  /** Seconds the "copied" confirmation stays on the button. */
+  copiedFeedback: 2,
+  /** Bars in a voice note's waveform, and the height of the quietest one (fraction of the tallest). */
+  waveformBars: 44,
+  waveformFloor: 0.12,
+  /** Seconds the arrow keys move a voice note. */
+  voiceSeekStep: 5,
+} as const;
+
+export const SEARCH = {
+  maxResults: 8,
+} as const;

@@ -40,6 +40,8 @@ export interface Palette {
   readonly pollen: string;
   /** The vignette multiplies the corners by this color. */
   readonly vignette: string;
+  /** White border of the photos in a person's panel. */
+  readonly polaroid: string;
 }
 
 export const dayPalette: Palette = {
@@ -68,6 +70,7 @@ export const dayPalette: Palette = {
   sunGlow: '#fff1cf',
   pollen: '#fff4cf',
   vignette: '#c9a98c',
+  polaroid: '#fffcf5',
 };
 
 export const nightPalette: Palette = {
@@ -96,6 +99,7 @@ export const nightPalette: Palette = {
   sunGlow: '#c9c4ff',
   pollen: '#ffe6a3',
   vignette: '#0b0a20',
+  polaroid: '#f4ecdc',
 };
 
 export const fonts = {
