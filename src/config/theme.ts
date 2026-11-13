@@ -231,3 +231,11 @@ export const originsMapPalette = {
   place: '#b9563c',
   placeText: '#fffcf5',
 } as const;
+
+/** The visiting bird: a bluebird with a warm breast. */
+export const birdPalette = {
+  back: '#4d7a9a',
+  breast: '#e0915a',
+  beak: '#e8b84a',
+  eye: '#2a1d18',
+} as const;

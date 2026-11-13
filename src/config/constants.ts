@@ -1087,14 +1087,53 @@ export const PHOTO = {
 export const SIGNATURE = {
   lines: ['Hecho con amor', 'por Brayan, 2026'] as const,
   /** Height on the trunk, 0 = ground, 1 = top: over the root couple's branches, clear of the UI. */
-  at: 0.55,
+  at: 0.68,
   fontSize: 0.13,
   lineHeight: 1.15,
   /** Sits this far out of the bark, so it never flickers into it. */
   lift: 0.015,
   /** Camera distance where it starts to show, and where it is fully there (minDistance is 7). */
-  revealStart: 9.5,
-  revealEnd: 7.8,
+  revealStart: 8.6,
+  revealEnd: 7.6,
   opacity: 0.8,
   fadeRate: 4,
+} as const;
+
+/** A little bird that now and then perches on a branch, and flies off when touched. Seconds. */
+export const BIRD = {
+  perch: {
+    /** Stretch of each branch it may sit on (curve parameter) and how many points are tried. */
+    from: 0.3,
+    to: 0.85,
+    samples: 12,
+    /** Only near-level wood: rise over run of the branch there. */
+    maxSlope: 0.45,
+    /** Keeps clear of the fruits, in world units from their center. */
+    fruitClearance: 2,
+    /** Too thin a twig would look like it should bend. */
+    minRadius: 0.1,
+    /** Out of the leaves: a perch inside this fraction of a cluster's radius would be hidden. */
+    foliageClearance: 1,
+  },
+  /** Wait after the intro before the first visit, and between visits. */
+  firstVisit: [12, 25] as const,
+  wait: [35, 80] as const,
+  stay: [14, 26] as const,
+  arrive: 3.2,
+  leave: 2.2,
+  /** Seconds the visit fades in or out with reduced motion, where it does not fly. */
+  fade: 0.8,
+  /** World units: overall scale, and where flights start or end (sideways, up, toward the camera). */
+  size: 0.95,
+  flight: [16, 10, 5] as const,
+  /** Flight arcs this much above the straight line. */
+  arc: 3,
+  /** Wing beat, in radians per second, and how far the wings swing either way. */
+  flapRate: 24,
+  flapAngle: 1.1,
+  /** Perched: head bobs, a hop to turn around now and then. */
+  bobRate: 2.6,
+  hopEvery: [3, 7] as const,
+  hopHeight: 0.25,
+  hopDuration: 0.3,
 } as const;

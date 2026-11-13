@@ -34,11 +34,18 @@ Detalles que convierten el sitio en un recuerdo.
 - **Música ambiental:** `audio/AmbientAudio.ts` (un solo grafo Web Audio: música, viento sintetizado y pop por persona en la escala de la música) y `audio/AudioDirector.tsx`, que lo maneja desde el store. Fundidos de entrada y salida, música y viento bajan ~18 dB con una nota de voz, silencio con la pestaña en segundo plano y el contexto suspendido cuando está apagado. Preferencia en localStorage (`state/audioMemory.ts`). Si quedó prendida, arranca con el primer clic o tecla de la visita, nunca al cargar.
 - **La pista** (`public/audio/ambient.mp3`, 51 s, 600 KB) es sintetizada con `pnpm audio:ambient`: pad cálido y kalimba en re mayor. Es periódica, así que el bucle `AUDIO.music.loopStart/loopEnd` no tiene costura. Para usar una pista propia, reemplaza el archivo y ajusta esos dos valores (o pon el bucle en todo el archivo).
 
+- **Detalles sorpresa (elegidos: pájaro, firma y modo foto; el contador se sumó por ser una línea):**
+  - **Contador:** "21 personas · 4 generaciones · 88 años de historia", desde el primer año del timeline hasta hoy.
+  - **Firma:** "Hecho con amor por Brayan, 2026" tallada en la corteza (`scene/tree/BarkSignature.tsx`, lugar en `layout/signature.ts`), envuelta en el tronco con el color de su sombra. Solo aparece con la cámara a menos de 8.6 unidades (el zoom máximo es 7) y nunca durante la intro.
+  - **Pájaro:** `layout/birdPerches.ts` busca en cada rama el tramo más horizontal, grueso, lejos de los frutos y fuera de las hojas; con la familia actual quedan las ramas de José y Rosa. `scene/bird/birdBehavior.ts` (puro, con tests) decide ausente → llega → posado → se va; `Bird.tsx` lo vuela por una curva, mueve alas, cabeza y cola, da saltitos y se mece con el viento de su rama. Tocarlo lo espanta. Solo visita el árbol de hoy (no en el timeline) y, con movimiento reducido, aparece y desaparece sin volar.
+  - **Modo foto:** el botón de cámara oculta la UI (también para el teclado, con `inert`); "Tomar foto" captura el lienzo justo después de renderizarse (`scene/photo/PhotoDirector.tsx`, sin `preserveDrawingBuffer`) y le pone una etiqueta de papel con el nombre de la familia y la fecha. Se puede compartir (celulares), descargar, copiar o abrir en otra pestaña. Esc retrocede un paso.
+
 Verificado en Chromium (1280×800 y 390×844): mapa con y sin nacidos fuera de Colombia, lista por lugar y vuelo; audio medido con un analizador: no se crea contexto antes del gesto, fundido de entrada, atenuación con nota de voz, pop y suspensión al apagar.
 
 ## Pendientes para fases siguientes
 
 - **(Fase 8) Rendimiento:** la escena 3D sigue renderizando detrás del mapa de orígenes; pausar el `Canvas` mientras está abierto ahorraría batería en celular.
+- **(Fase 8) Accesibilidad del pájaro:** es decorativo (no lleva información), así que no necesita equivalente en la lista accesible; confirmarlo al hacerla.
 - **(Fase 8) Lista accesible:** incluir los lugares de nacimiento (el mapa ya es navegable con teclado, pero la lista accesible debería tenerlos también).
 
 ## Criterios de terminado

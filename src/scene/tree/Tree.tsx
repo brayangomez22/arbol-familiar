@@ -6,6 +6,7 @@ import { growthSchedule } from '@/layout/growth';
 import { measureReach, swayWeight } from '@/layout/reach';
 import { timelineSchedule } from '@/layout/timelineGrowth';
 import type { TreeLayout } from '@/layout/types';
+import { Bird } from '../bird/Bird';
 import { IntroDirector } from '../intro/IntroDirector';
 import { SelectionDirector } from '../selection/SelectionDirector';
 import type { FamilyTime } from '../timeline/familyTime';
@@ -107,6 +108,7 @@ export function Tree({ layout, labels, time }: TreeProps) {
         timeline={timeline}
         lives={time.lives}
       />
+      <Bird layout={layout} reach={reach} />
       <SelectionDirector layout={layout} reach={reach} branches={branches} />
       <IntroDirector layout={layout} schedule={schedule} />
       <TimelineDirector time={time} />
