@@ -4,6 +4,8 @@ export interface FamilySummary {
   readonly title: string;
   readonly people: number;
   readonly generations: number;
+  /** Years from the first person on record to today. */
+  readonly years: number;
 }
 
 interface TitleCardProps {
@@ -22,6 +24,7 @@ export function TitleCard({ summary }: TitleCardProps) {
       <p className={styles.subtitle}>
         {plural(summary.people, 'persona', 'personas')} ·{' '}
         {plural(summary.generations, 'generación', 'generaciones')}
+        {summary.years > 0 && ` · ${plural(summary.years, 'año', 'años')} de historia`}
       </p>
     </header>
   );

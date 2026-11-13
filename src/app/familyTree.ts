@@ -29,13 +29,6 @@ export const fruitLabels: ReadonlyMap<PersonId, string> = new Map(
 
 const index = indexFamily(family);
 
-/** What the title card shows. Generations count from the root couple (generation 0). */
-export const familySummary = {
-  title: family.meta.title,
-  people: family.people.size,
-  generations: Math.max(...[...family.people.keys()].map((id) => generationOf(index, id))) + 1,
-} as const;
-
 const currentYear = new Date().getFullYear();
 const lives = lifelines(index, currentYear);
 
@@ -45,6 +38,17 @@ export const familyTime: FamilyTime = {
   range: timelineRange(lives, currentYear),
   birthdaysOn: (today) => birthdaysOn(family, today).map((person) => person.id),
 };
+
+/**
+ * What the title card shows. Generations count from the root couple (generation 0); the history
+ * runs from the first person on the timeline to this year.
+ */
+export const familySummary = {
+  title: family.meta.title,
+  people: family.people.size,
+  generations: Math.max(...[...family.people.keys()].map((id) => generationOf(index, id))) + 1,
+  years: familyTime.range.last - familyTime.range.first,
+} as const;
 
 const fruitX = new Map(familyLayout.fruits.map((fruit) => [fruit.personId, fruit.position.x]));
 
