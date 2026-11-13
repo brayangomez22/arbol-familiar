@@ -1,0 +1,10 @@
+/* Small caps label at the top of each part of the panel. */
+.title {
+  margin: 0 0 10px;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-ink-soft);
+}

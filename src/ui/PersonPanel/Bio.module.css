@@ -1,0 +1,17 @@
+.bio {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.04rem;
+  font-variation-settings: 'opsz' 14;
+  line-height: 1.62;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.bio::first-letter {
+  float: left;
+  margin: 0.06em 0.08em 0 0;
+  font-size: 3.1em;
+  font-weight: 600;
+  line-height: 0.82;
+}

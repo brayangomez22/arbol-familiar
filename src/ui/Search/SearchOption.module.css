@@ -1,0 +1,35 @@
+.option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.option[aria-selected='true'] {
+  background: color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+
+.name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  font-weight: 500;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nickname {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 400;
+  color: var(--color-ink-soft);
+}
+
+.years {
+  flex: none;
+  font-size: 0.76rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-soft);
+}

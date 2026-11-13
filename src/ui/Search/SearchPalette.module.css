@@ -1,0 +1,106 @@
+/* Catches clicks outside the palette; the tree stays fully visible. */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+}
+
+/* Centered in the part of the view the person panel leaves free. */
+.palette {
+  position: fixed;
+  top: max(72px, env(safe-area-inset-top));
+  left: calc((100vw - var(--occluded-right, 0px)) / 2);
+  z-index: 4;
+  width: min(520px, calc(100vw - var(--occluded-right, 0px) - 32px));
+  translate: -50% 0;
+  overflow: hidden;
+  border: var(--border-card);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--color-paper) 96%, transparent);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+  animation: drop var(--duration-ui-fade) var(--ease-out);
+}
+
+.field {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 14px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+
+.field svg {
+  flex: none;
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: var(--color-ink-soft);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  height: 52px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: var(--color-ink);
+  font: 400 1.05rem var(--font-body);
+}
+
+.input::placeholder {
+  color: var(--color-ink-soft);
+}
+
+.input::-webkit-search-cancel-button {
+  display: none;
+}
+
+.key {
+  padding: 2px 6px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 18%, transparent);
+  border-radius: 4px;
+  font: 500 0.68rem var(--font-body);
+  color: var(--color-ink-soft);
+}
+
+.results {
+  max-height: min(380px, 50dvh);
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.results:empty {
+  display: none;
+}
+
+.message {
+  margin: 0;
+  padding: 14px 16px 16px;
+  font-size: 0.86rem;
+  color: var(--color-ink-soft);
+}
+
+@keyframes drop {
+  from {
+    opacity: 0;
+    translate: -50% -8px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .palette {
+    animation: none;
+  }
+}
+
+@media (pointer: coarse) {
+  .key {
+    display: none;
+  }
+}

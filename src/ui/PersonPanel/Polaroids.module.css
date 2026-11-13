@@ -1,0 +1,17 @@
+/* Overlapping like prints dropped on a table; scrolls sideways when there are many. */
+.pile {
+  display: flex;
+  margin: 0 -22px;
+  padding: 8px 22px 14px;
+  overflow-x: auto;
+  list-style: none;
+  scrollbar-width: none;
+}
+
+.item {
+  flex: none;
+}
+
+.item + .item {
+  margin-left: -26px;
+}

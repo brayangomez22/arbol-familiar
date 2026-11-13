@@ -1,0 +1,37 @@
+.button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 5px 11px 5px 9px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 16%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-ink);
+  font: 500 0.76rem/1.2 var(--font-body);
+  cursor: pointer;
+  transition: background 150ms var(--ease-out);
+}
+
+.button:hover {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.button[data-status='copied'] {
+  background: color-mix(in srgb, var(--color-ink) 9%, transparent);
+}
+
+.button svg {
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}

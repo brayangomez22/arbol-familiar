@@ -1,11 +1,21 @@
-/* Bottom right, one column: replay apart on top, then the zoom group. */
+/* Bottom right, one column: search and replay apart on top, then the zoom group. Steps aside
+   (left of the side panel, above the sheet) while a person's panel is open. */
 .column {
   --controls-gap: 8px;
 
   position: fixed;
-  right: max(16px, env(safe-area-inset-right));
-  bottom: max(16px, env(safe-area-inset-bottom));
+  right: calc(max(16px, env(safe-area-inset-right)) + var(--occluded-right, 0px));
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + var(--occluded-bottom, 0px));
   display: flex;
   flex-direction: column;
   gap: calc(var(--controls-gap) * 3);
+  transition:
+    right var(--duration-ui-fade) var(--ease-out),
+    bottom var(--duration-ui-fade) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .column {
+    transition: none;
+  }
 }

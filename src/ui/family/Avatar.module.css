@@ -8,10 +8,14 @@
   background:
     radial-gradient(
       circle at 68% 28%,
-      color-mix(in srgb, var(--fruit) 45%, white) 0 8%,
+      color-mix(in srgb, var(--fruit) 45%, var(--color-polaroid)) 0 8%,
       transparent 42%
     ),
-    radial-gradient(circle at 40% 40%, var(--fruit), color-mix(in srgb, var(--fruit) 70%, black));
+    radial-gradient(
+      circle at 40% 40%,
+      var(--fruit),
+      color-mix(in srgb, var(--fruit) 70%, var(--color-ink))
+    );
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--color-ink) 18%, transparent),
     0 2px 6px color-mix(in srgb, var(--color-ink) 18%, transparent);
@@ -34,6 +38,6 @@
   font-weight: 600;
   letter-spacing: 0.02em;
   color: var(--color-paper);
-  text-shadow: 0 1px 1px color-mix(in srgb, black 25%, transparent);
+  text-shadow: 0 1px 1px color-mix(in srgb, var(--color-ink) 35%, transparent);
   user-select: none;
 }

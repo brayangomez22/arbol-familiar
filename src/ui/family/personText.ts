@@ -71,3 +71,9 @@ export function yearsText(person: Person): string | null {
 export function placeText(place: Place): string {
   return `${place.name}, ${place.region ?? place.country}`;
 }
+
+/** Caption and year of a photo, without repeating a year the caption already says ("Finca, 1970"). */
+export function photoCaption(caption: string | undefined, year: number | undefined): string | null {
+  if (year === undefined || caption?.includes(String(year))) return caption ?? null;
+  return caption === undefined ? String(year) : `${caption} · ${year}`;
+}

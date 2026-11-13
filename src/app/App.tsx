@@ -2,7 +2,8 @@ import { lazy, Suspense } from 'react';
 import { readLayoutDebugOptions } from '@/scene/debug/layoutDebugOptions';
 import { Experience } from '@/scene/Experience';
 import { Overlay } from '@/ui/Overlay';
-import { familyLayout, familySummary, fruitLabels } from './familyTree';
+import { familyDirectory, familyLayout, familySummary, fruitLabels } from './familyTree';
+import { useHashSelection } from './routing';
 
 // Loaded on demand so the developer view never weighs on the real site.
 const LayoutDebug = lazy(() =>
@@ -10,6 +11,7 @@ const LayoutDebug = lazy(() =>
 );
 
 export function App() {
+  useHashSelection(familyDirectory.isPerson);
   const layoutDebug = readLayoutDebugOptions(window.location.search);
   if (layoutDebug) {
     return (
@@ -21,7 +23,7 @@ export function App() {
   return (
     <>
       <Experience layout={familyLayout} labels={fruitLabels} />
-      <Overlay summary={familySummary} />
+      <Overlay summary={familySummary} family={familyDirectory} />
     </>
   );
 }

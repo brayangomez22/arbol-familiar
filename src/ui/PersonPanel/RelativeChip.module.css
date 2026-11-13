@@ -1,0 +1,47 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 4px 12px 4px 4px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 12%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-paper) 50%, var(--color-polaroid));
+  color: var(--color-ink);
+  font: 500 0.84rem/1.2 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    background 150ms var(--ease-out),
+    translate 150ms var(--ease-out);
+}
+
+.chip:hover {
+  background: var(--color-polaroid);
+  translate: 0 -1px;
+}
+
+.chip:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.years {
+  flex: none;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .chip:hover {
+    translate: none;
+  }
+}

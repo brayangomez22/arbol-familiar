@@ -1,0 +1,95 @@
+.panel {
+  position: fixed;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--border-card);
+  background: color-mix(in srgb, var(--color-paper) 95%, transparent);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
+}
+
+/* Wide screens: a column on the right that slides in from the edge. */
+.side {
+  top: max(var(--panel-margin), env(safe-area-inset-top));
+  right: max(var(--panel-margin), env(safe-area-inset-right));
+  bottom: max(var(--panel-margin), env(safe-area-inset-bottom));
+  width: var(--panel-width);
+  border-radius: var(--radius-card);
+  transition:
+    translate var(--duration-ui-fade) var(--ease-out),
+    opacity var(--duration-ui-fade) var(--ease-out),
+    visibility 0s;
+}
+
+.side[data-open='false'] {
+  translate: calc(100% + var(--panel-margin) * 2) 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    translate var(--duration-ui-fade) var(--ease-in),
+    opacity var(--duration-ui-fade) var(--ease-in),
+    visibility 0s var(--duration-ui-fade);
+}
+
+/* Phones: a sheet pulled up from the bottom, resting at half height. */
+.sheet {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  height: var(--sheet-peek);
+  border-bottom: 0;
+  border-radius: 20px 20px 0 0;
+  padding-bottom: env(safe-area-inset-bottom);
+  transition:
+    height var(--duration-ui-fade) var(--ease-out),
+    translate var(--duration-ui-fade) var(--ease-out),
+    visibility 0s;
+}
+
+.sheet[data-size='full'] {
+  height: var(--sheet-full);
+}
+
+.sheet[data-open='false'] {
+  translate: 0 100%;
+  visibility: hidden;
+  transition:
+    translate var(--duration-ui-fade) var(--ease-in),
+    visibility 0s var(--duration-ui-fade);
+}
+
+.sheet[data-dragging] {
+  transition: none;
+}
+
+/* Says who was selected to screen readers, also when moving with the arrows. */
+.announcer {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .side,
+  .side[data-open='false'],
+  .sheet,
+  .sheet[data-open='false'] {
+    translate: none;
+    transition:
+      opacity var(--duration-ui-fade) linear,
+      visibility 0s;
+  }
+
+  .side[data-open='false'],
+  .sheet[data-open='false'] {
+    opacity: 0;
+    transition:
+      opacity var(--duration-ui-fade) linear,
+      visibility 0s var(--duration-ui-fade);
+  }
+}

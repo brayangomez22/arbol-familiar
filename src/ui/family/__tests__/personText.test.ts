@@ -1,7 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { parsePartialDate } from '@/domain/dates';
 import type { PartialDate, Person } from '@/domain/types';
-import { ageText, initials, lifeDatesText, placeText, spanishDate, yearsText } from '../personText';
+import {
+  ageText,
+  initials,
+  lifeDatesText,
+  photoCaption,
+  placeText,
+  spanishDate,
+  yearsText,
+} from '../personText';
 
 function date(text: string): PartialDate {
   const parsed = parsePartialDate(text);
@@ -79,5 +87,15 @@ describe('short texts', () => {
     expect(placeText({ ...place, name: 'Cali', region: 'Valle del Cauca' })).toBe(
       'Cali, Valle del Cauca',
     );
+  });
+});
+
+describe('photoCaption', () => {
+  it('adds the year unless the caption already has it', () => {
+    expect(photoCaption('La boda', 1962)).toBe('La boda · 1962');
+    expect(photoCaption('Finca, 1970', 1970)).toBe('Finca, 1970');
+    expect(photoCaption(undefined, 1970)).toBe('1970');
+    expect(photoCaption('Retrato', undefined)).toBe('Retrato');
+    expect(photoCaption(undefined, undefined)).toBeNull();
   });
 });

@@ -1,0 +1,103 @@
+.top {
+  position: relative;
+  flex: none;
+  padding: 22px 56px 16px 22px;
+  border-bottom: 1px solid color-mix(in srgb, var(--color-ink) 8%, transparent);
+}
+
+/* The top of the bottom sheet is what the finger drags. */
+.grip {
+  padding-top: 26px;
+  touch-action: none;
+  user-select: none;
+}
+
+.handle {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  translate: -50% 0;
+  width: 72px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: grab;
+}
+
+.handle::before {
+  content: '';
+  display: block;
+  width: 40px;
+  height: 4px;
+  margin: 9px auto 0;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-ink) 25%, transparent);
+}
+
+.close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-ink-soft);
+  cursor: pointer;
+  transition: background 150ms var(--ease-out);
+}
+
+.grip .close {
+  top: 20px;
+}
+
+.close:hover {
+  background: color-mix(in srgb, var(--color-ink) 7%, transparent);
+  color: var(--color-ink);
+}
+
+.close svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.handle:focus-visible,
+.close:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 20px 22px 28px;
+}
+
+.hint {
+  margin: auto 0 0;
+  font-size: 0.72rem;
+  color: var(--color-ink-soft);
+}
+
+.hint kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 1px 4px;
+  border: 1px solid color-mix(in srgb, var(--color-ink) 18%, transparent);
+  border-radius: 4px;
+  font: inherit;
+  text-align: center;
+}

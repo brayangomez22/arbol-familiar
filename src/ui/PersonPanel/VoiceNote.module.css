@@ -1,0 +1,71 @@
+.caption {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-style: italic;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.play {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  cursor: pointer;
+}
+
+.play svg {
+  width: 16px;
+  height: 16px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.play:focus-visible,
+.wave:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+/* Bars before the progress are ink, the rest a soft trace. */
+.wave {
+  --progress: 0;
+
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 36px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.bar {
+  flex: 1;
+  height: calc(var(--peak) * 100%);
+  border-radius: 2px;
+  /* Already played (its start is behind the progress) is full ink: a step, not a fade. */
+  --played: clamp(0, (var(--progress) - var(--at)) * 1000, 1);
+
+  background: color-mix(in srgb, var(--color-ink) calc(22% + 78% * var(--played)), transparent);
+}
+
+.clock {
+  flex: none;
+  font-size: 0.72rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ink-soft);
+}

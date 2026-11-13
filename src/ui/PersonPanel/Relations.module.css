@@ -1,0 +1,23 @@
+.groups {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+}
+
+.group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+}
+
+.label {
+  flex: 0 0 100%;
+  font-size: 0.76rem;
+  color: var(--color-ink-soft);
+}
+
+.item {
+  margin: 0;
+}

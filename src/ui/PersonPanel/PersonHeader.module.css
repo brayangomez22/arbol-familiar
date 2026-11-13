@@ -1,0 +1,59 @@
+.header {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.text {
+  min-width: 0;
+}
+
+.name {
+  margin: 2px 0 0;
+  font-size: clamp(1.55rem, 1.3rem + 0.8vw, 1.95rem);
+  font-weight: 600;
+  font-variation-settings: 'opsz' 72;
+  line-height: 1.08;
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.nickname {
+  margin: 2px 0 0;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--color-ink-soft);
+}
+
+.line {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 6px 0 0;
+  font-size: 0.84rem;
+  color: var(--color-ink-soft);
+}
+
+.age {
+  margin: 1px 0 0;
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.pin {
+  flex: none;
+  width: 14px;
+  height: 14px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
