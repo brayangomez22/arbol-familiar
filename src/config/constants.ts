@@ -984,3 +984,86 @@ export const PERSON_PANEL = {
 export const SEARCH = {
   maxResults: 8,
 } as const;
+
+/**
+ * The origins map. Distances are SVG units of each panel (the main map and the small world map);
+ * angles and margins around the land are in degrees.
+ */
+export const ORIGINS_MAP = {
+  /** Places in this country go on the main map; the rest, on the world map beside it. */
+  homeCountry: 'Colombia',
+  home: {
+    width: 560,
+    /** Sea left around the land and the places, in degrees. */
+    padding: 1.4,
+  },
+  world: {
+    width: 360,
+    lng: [-170, 180] as const,
+    lat: [-56, 82] as const,
+  },
+  place: {
+    /** Dot radius: base plus this much per square root of the people born there. */
+    radius: 5,
+    radiusPerPerson: 3.2,
+    /** The world map is drawn smaller: its dots shrink by this factor. */
+    worldScale: 0.7,
+    /** Past this fraction of the width, the name prefers the left of the dot. */
+    labelFlipAt: 0.72,
+    /** Height of a place's name, its gap to the dot, and the width of a letter (fraction of size). */
+    labelSize: 17,
+    labelGap: 6,
+    labelCharWidth: 0.56,
+  },
+  route: {
+    /** How far a migration bows from the straight line, as a fraction of its length. */
+    bend: 0.22,
+    /** Each further line between the same two places bows this much more, so none overlap. */
+    bendStep: 0.6,
+  },
+  animation: {
+    /** Seconds a migration line takes to draw, and the wait between generations. */
+    draw: 1.4,
+    generationStagger: 0.45,
+    /** Seconds a spark takes to travel a line, from parent to child. */
+    travel: 3.2,
+  },
+} as const;
+
+/** Ambient sound: music, wind and a soft pop on selecting someone. Volumes 0–1, times in seconds. */
+export const AUDIO = {
+  storageKey: 'arbol-familiar:audio',
+  music: {
+    /** Inside public/. */
+    src: 'audio/ambient.mp3',
+    /**
+     * The loop played over and over. The file is periodic (see scripts/generate-ambient-music.ts),
+     * so any window one period long loops without a seam, whatever the encoder adds at the start.
+     */
+    loopStart: 1,
+    loopEnd: 49,
+    volume: 0.55,
+  },
+  wind: {
+    volume: 0.05,
+    /** Band of the filtered noise, in Hz, and how slowly (Hz) it sways. */
+    frequency: 520,
+    sway: 220,
+    swayRate: 0.07,
+    gustRate: 0.045,
+    /** How much the gusts move its volume, as a fraction of it. */
+    gustDepth: 0.6,
+  },
+  pop: {
+    volume: 0.16,
+    /** MIDI notes it picks from, by person: D major pentatonic, the key of the music. */
+    notes: [74, 76, 78, 81, 83, 86] as const,
+    rise: 0.035,
+    decay: 0.22,
+  },
+  fadeIn: 2.5,
+  fadeOut: 1.2,
+  /** Music and wind drop to this while a voice note plays, and take this long to get there. */
+  duckLevel: 0.12,
+  duckTime: 0.6,
+} as const;

@@ -1,0 +1,61 @@
+.route {
+  transition: opacity 200ms var(--ease-out);
+}
+
+.dimmed {
+  opacity: 0.15;
+}
+
+.halo,
+.line {
+  fill: none;
+  stroke-linecap: round;
+}
+
+/* A paper edge, so a line reads over coasts, rivers and other lines. */
+.halo {
+  stroke: var(--color-polaroid);
+  opacity: 0;
+  animation: appear var(--draw) var(--ease-out) var(--delay) forwards;
+}
+
+.line {
+  stroke: var(--route);
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: draw var(--draw) var(--ease-out) var(--delay) forwards;
+}
+
+/* Hidden at the start of the line until its first trip begins. */
+.spark {
+  fill: var(--color-polaroid);
+  stroke: var(--route);
+  stroke-width: 1.4;
+  opacity: 0;
+  animation: appear 0.3s linear calc(var(--delay) + var(--draw)) forwards;
+}
+
+@keyframes draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes appear {
+  to {
+    opacity: 0.85;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .halo,
+  .line {
+    animation: none;
+    stroke-dashoffset: 0;
+    opacity: 0.85;
+  }
+
+  .route {
+    transition: none;
+  }
+}

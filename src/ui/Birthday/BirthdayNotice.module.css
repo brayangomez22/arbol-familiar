@@ -67,7 +67,8 @@
 
 @media (max-width: 720px) {
   .notice {
-    top: calc(max(16px, env(safe-area-inset-top)) + 96px);
+    /* Under the title card and the map button. */
+    top: calc(max(16px, env(safe-area-inset-top)) + 146px);
     left: max(16px, env(safe-area-inset-left));
     transform: none;
   }

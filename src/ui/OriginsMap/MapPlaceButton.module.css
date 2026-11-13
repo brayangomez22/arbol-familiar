@@ -1,0 +1,103 @@
+/* Centered on its point of the map; the button is the dot, with room around it for a finger. */
+.place {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: 0;
+  height: 0;
+  transition: opacity 200ms var(--ease-out);
+}
+
+.dimmed {
+  opacity: 0.45;
+}
+
+.button {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: max(var(--size), 32px);
+  height: max(var(--size), 32px);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-ink);
+  cursor: pointer;
+  translate: -50% -50%;
+  pointer-events: auto;
+}
+
+.button:focus-visible {
+  outline: none;
+}
+
+.dot {
+  display: grid;
+  place-items: center;
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 38% 32%,
+    color-mix(in srgb, var(--map-place) 65%, var(--map-place-text)),
+    var(--map-place) 60%
+  );
+  box-shadow:
+    0 0 0 2px var(--map-place-text),
+    0 0 0 3px color-mix(in srgb, var(--color-ink) 35%, transparent),
+    0 3px 8px color-mix(in srgb, var(--color-ink) 30%, transparent);
+  color: var(--map-place-text);
+  font: 600 max(10px, calc(var(--size) * 0.5)) / 1 var(--font-body);
+  font-variant-numeric: tabular-nums;
+  transition: transform 160ms var(--ease-out);
+}
+
+.button:hover .dot,
+.button[aria-pressed='true'] .dot {
+  transform: scale(1.15);
+}
+
+.button:focus-visible .dot {
+  box-shadow:
+    0 0 0 2px var(--map-place-text),
+    0 0 0 4px var(--color-ink);
+}
+
+/* Names in the serif of the titles, with a paper halo so they read over lines and coasts. */
+.name {
+  position: absolute;
+  top: 50%;
+  translate: 0 -50%;
+  /* Scales with the map, as the layout measured it; never below what reads on a phone. */
+  font: 600 max(11px, var(--label)) / 1 var(--font-display);
+  white-space: nowrap;
+  text-shadow:
+    0 0 3px var(--color-polaroid),
+    0 0 6px var(--color-polaroid),
+    0 0 1px var(--color-polaroid);
+  pointer-events: none;
+}
+
+.right .name {
+  left: calc(50% + max(var(--size), 16px) / 2 + 6px);
+}
+
+.left .name {
+  right: calc(50% + max(var(--size), 16px) / 2 + 6px);
+}
+
+.button[aria-pressed='true'] .name {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .place,
+  .dot {
+    transition: none;
+  }
+}

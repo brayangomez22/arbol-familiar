@@ -215,3 +215,19 @@ export const fonts = {
   display: "'Fraunces Variable', 'Georgia', serif",
   body: "'Inter Variable', system-ui, sans-serif",
 } as const;
+
+/** The origins map: an old paper chart in the colors of the tree. */
+export const originsMapPalette = {
+  sea: '#dde8e3',
+  /** Ripples along the coast and the names of the seas. */
+  seaInk: '#6f8f94',
+  land: '#f0dfbd',
+  landShade: '#dcc195',
+  coast: '#7a5a40',
+  river: '#86aab2',
+  mountain: '#8a6a4c',
+  /** Lines of each generation of children, by order of generation (the first are the root's). */
+  generations: ['#c8664a', '#d9a441', '#8e4a63', '#3f7f7a', '#5d6fa3'],
+  place: '#b9563c',
+  placeText: '#fffcf5',
+} as const;

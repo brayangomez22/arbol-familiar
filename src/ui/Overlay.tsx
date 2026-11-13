@@ -5,6 +5,8 @@ import { BirthdayNotice } from './Birthday/BirthdayNotice';
 import { Controls } from './Controls/Controls';
 import { FamilyContext, type FamilyDirectory } from './family/familyDirectory';
 import { SkipIntroButton } from './Intro/SkipIntroButton';
+import { OriginsMap } from './OriginsMap/OriginsMap';
+import { OriginsMapButton } from './OriginsMap/OriginsMapButton';
 import styles from './Overlay.module.css';
 import { PersonPanel } from './PersonPanel/PersonPanel';
 import { SearchPalette } from './Search/SearchPalette';
@@ -25,10 +27,14 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
   const panelOpen = useAppStore((state) => state.selectedPersonId !== null);
   const inset = useAppStore((state) => state.viewInset);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [mapOpen, setMapOpen] = useState(false);
   const openSearch = useCallback(() => {
     setSearchOpen(true);
   }, []);
-  useSearchShortcut(ready && !searchOpen, openSearch);
+  const closeMap = useCallback(() => {
+    setMapOpen(false);
+  }, []);
+  useSearchShortcut(ready && !searchOpen && !mapOpen, openSearch);
 
   // What the open panel covers, so the floating buttons and the search move out of its way.
   const occluded = {
@@ -43,7 +49,14 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
         style={occluded}
         aria-hidden={!ready}
       >
-        <TitleCard summary={summary} />
+        <div className={styles.corner}>
+          <TitleCard summary={summary} />
+          <OriginsMapButton
+            onClick={() => {
+              setMapOpen(true);
+            }}
+          />
+        </div>
         {ambientPicker && <AmbientPicker />}
         <BirthdayNotice />
         <Timeline />
@@ -56,6 +69,7 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
             }}
           />
         )}
+        {mapOpen && <OriginsMap onClose={closeMap} />}
       </div>
       <SkipIntroButton />
     </FamilyContext>

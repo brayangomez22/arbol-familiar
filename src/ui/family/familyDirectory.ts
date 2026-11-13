@@ -4,6 +4,7 @@ import type { Direction } from '@/domain/navigation';
 import type { SearchEntry } from '@/domain/search';
 import type { LifeStage, TimelineRange } from '@/domain/timeline';
 import type { PersonId } from '@/domain/types';
+import type { OriginsMapLayout } from '@/layout/originsMap';
 
 /** What the overlay knows about the family. Built once by app/, which also feeds the scene. */
 export interface FamilyDirectory {
@@ -17,6 +18,8 @@ export interface FamilyDirectory {
   readonly timeline: FamilyTimeline;
   /** Who celebrates a birthday on that day (local time), oldest first. */
   readonly birthdaysOn: (today: Date) => readonly Celebrant[];
+  /** Where everyone was born and how the family moved, laid out on the map. */
+  readonly originsMap: OriginsMapLayout;
 }
 
 export interface Celebrant {

@@ -1,0 +1,22 @@
+/* Keeps the drawing's proportions; the places' sizes are in container units, so they scale with it. */
+.frame {
+  position: relative;
+  aspect-ratio: var(--aspect);
+  container-type: inline-size;
+}
+
+.drawing {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.places {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}

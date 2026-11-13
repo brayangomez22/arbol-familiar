@@ -4,10 +4,12 @@ import { loadFamily } from '@/data/loadFamily';
 import { birthdaysOn } from '@/domain/birthdays';
 import { generationOf, indexFamily } from '@/domain/genealogy';
 import { relativeInDirection } from '@/domain/navigation';
+import { birthsByPlace, migrations } from '@/domain/origins';
 import { searchEntryOf } from '@/domain/search';
 import { censusAt, decadeMarks, lifelines, timelineRange } from '@/domain/timeline';
 import type { PersonId } from '@/domain/types';
 import { buildTreeLayout } from '@/layout/buildTreeLayout';
+import { buildOriginsMap } from '@/layout/originsMap';
 import type { FamilyTime } from '@/scene/timeline/familyTime';
 import { fruitColorIndex } from '@/scene/tree/fruitColor';
 import type { FamilyDirectory } from '@/ui/family/familyDirectory';
@@ -62,4 +64,9 @@ export const familyDirectory: FamilyDirectory = {
   },
   birthdaysOn: (today) =>
     birthdaysOn(family, today).map(({ id, firstName }) => ({ id, firstName })),
+  originsMap: buildOriginsMap({
+    places: family.places,
+    births: birthsByPlace(index),
+    migrations: migrations(index),
+  }),
 };

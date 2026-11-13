@@ -1,7 +1,4 @@
 .card {
-  position: fixed;
-  top: max(16px, env(safe-area-inset-top));
-  left: max(16px, env(safe-area-inset-left));
   padding: 14px 20px 12px;
   border: var(--border-card);
   border-radius: var(--radius-card);
