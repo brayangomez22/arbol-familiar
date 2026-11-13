@@ -146,5 +146,5 @@ function applyAmbientNumbers(phases: PhaseWeights, seasons: SeasonWeights): void
   ambientUniforms.uLeafDensity.value = leafDensity;
   ambientFrame.bloomIntensity = bloomIntensity;
   ambientFrame.bloomThreshold = bloomThreshold;
-  ambientFrame.blossomDensity = blossomDensity;
+  ambientUniforms.uBlossomDensity.value = blossomDensity;
 }

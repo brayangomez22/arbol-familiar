@@ -12,9 +12,12 @@ import type { FamilyTime } from '../timeline/familyTime';
 import { TimelineDirector } from '../timeline/TimelineDirector';
 import { BranchMesh, type BranchMeshHandle } from './BranchMesh';
 import type { WoodMeasure } from './branchGeometry';
+import { BirthdayBlossoms } from './BirthdayBlossoms';
+import type { BlossomTiming } from './Blossoms';
 import { CrownLeafFall } from './CrownLeafFall';
 import { Fruits } from './Fruits';
 import { Leaves } from './Leaves';
+import { SeasonBlossoms } from './SeasonBlossoms';
 
 interface TreeProps {
   readonly layout: TreeLayout;
@@ -54,6 +57,10 @@ export function Tree({ layout, labels, time }: TreeProps) {
     () => ({ reachAt: () => 0, swayOf: () => 0, growAt: (_, u) => u * INTRO.growth.rootDuration }),
     [],
   );
+  const blossomTiming = useMemo<BlossomTiming>(
+    () => ({ reach, schedule, timeline }),
+    [reach, schedule, timeline],
+  );
   const branches = useRef<BranchMeshHandle>(null);
 
   return (
@@ -72,6 +79,13 @@ export function Tree({ layout, labels, time }: TreeProps) {
         reach={reach}
         schedule={schedule}
         timeline={timeline}
+      />
+      <SeasonBlossoms clusters={layout.leafClusters} timing={blossomTiming} />
+      <BirthdayBlossoms
+        fruits={layout.fruits}
+        branches={layout.branches}
+        timing={blossomTiming}
+        time={time}
       />
       <CrownLeafFall clusters={layout.leafClusters} branches={layout.branches} />
       <Fruits

@@ -1,6 +1,7 @@
 import { dayPalette } from '@/config/theme';
 import familyJson from '@/data/family.json';
 import { loadFamily } from '@/data/loadFamily';
+import { birthdaysOn } from '@/domain/birthdays';
 import { generationOf, indexFamily } from '@/domain/genealogy';
 import { relativeInDirection } from '@/domain/navigation';
 import { searchEntryOf } from '@/domain/search';
@@ -37,7 +38,11 @@ const currentYear = new Date().getFullYear();
 const lives = lifelines(index, currentYear);
 
 /** When each person appears on the timeline, and the years it spans. */
-export const familyTime: FamilyTime = { lives, range: timelineRange(lives, currentYear) };
+export const familyTime: FamilyTime = {
+  lives,
+  range: timelineRange(lives, currentYear),
+  birthdaysOn: (today) => birthdaysOn(family, today).map((person) => person.id),
+};
 
 const fruitX = new Map(familyLayout.fruits.map((fruit) => [fruit.personId, fruit.position.x]));
 

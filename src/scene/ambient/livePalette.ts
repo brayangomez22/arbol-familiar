@@ -59,6 +59,7 @@ type NumberUniform =
   | 'uMemorialGlow'
   | 'uHaloOpacity'
   | 'uLeafDensity'
+  | 'uBlossomDensity'
   | 'uFireflies'
   | 'uStars'
   | 'uSunStrength';
@@ -72,6 +73,8 @@ export const ambientUniforms: Readonly<Record<NumberUniform, { value: number }>>
   uMemorialGlow: { value: FRUIT_MESH.deceasedGlow },
   uHaloOpacity: { value: DAY_CYCLE.looks.day.haloOpacity },
   uLeafDensity: { value: SEASON_LOOK.summer.leafDensity },
+  /** Share of the crown's spring flowers that are open. */
+  uBlossomDensity: { value: SEASON_LOOK.summer.blossomDensity },
   uFireflies: { value: 0 },
   uStars: { value: 0 },
   uSunPosition: { value: new Vector2(...DAY_CYCLE.looks.day.sunPosition) },
@@ -79,14 +82,9 @@ export const ambientUniforms: Readonly<Record<NumberUniform, { value: number }>>
 };
 
 /** What JS (not shaders) reads from the current ambient: postprocessing and particle counts. */
-export const ambientFrame: {
-  bloomIntensity: number;
-  bloomThreshold: number;
-  blossomDensity: number;
-} = {
+export const ambientFrame: { bloomIntensity: number; bloomThreshold: number } = {
   bloomIntensity: DAY_CYCLE.looks.day.bloomIntensity,
   bloomThreshold: DAY_CYCLE.looks.day.bloomThreshold,
-  blossomDensity: 0,
 };
 
 /** Each palette as Colors, built once, so blending allocates nothing per frame. */

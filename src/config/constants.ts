@@ -874,6 +874,38 @@ export interface SeasonLook {
   readonly chill: number;
 }
 
+/** Flowers: scattered over the crown in spring, covering a branch on someone's birthday. */
+export const BLOSSOMS = {
+  season: {
+    perCluster: 14,
+    size: 0.55,
+    sizeJitter: 0.3,
+    shell: [0.65, 1] as const,
+    depthScale: 0.6,
+  },
+  birthday: {
+    count: 46,
+    size: 0.6,
+    sizeJitter: 0.3,
+    from: 0.35,
+    spread: 0.7,
+    aroundFruit: 0.35,
+    fruitRing: [1.15, 2.1] as const,
+  },
+  bloom: {
+    /** Seconds from the first flower of a branch opening to the last. */
+    spread: 2.2,
+    /** Seconds one flower takes to open, and its overshoot (back easing). */
+    open: 0.5,
+    overshoot: 1.8,
+    /** The birthday bloom waits this long after the tree is on screen, so it is seen. */
+    delay: 0.8,
+  },
+  /** How much darker the petals are at their center, and how much of the edge is inked. */
+  petalShade: 0.18,
+  edgeMix: 0.45,
+} as const;
+
 /** The family timeline: the tree as it was in a chosen year. */
 export const TIMELINE = {
   /** Years a person's branch takes to grow, ending the year they are born. */
