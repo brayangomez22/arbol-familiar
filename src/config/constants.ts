@@ -1082,3 +1082,19 @@ export const PHOTO = {
   /** Seconds of the white flash when the picture is taken. */
   flash: 0.45,
 } as const;
+
+/** A hidden signature carved in the bark, only readable with the camera all the way in. */
+export const SIGNATURE = {
+  lines: ['Hecho con amor', 'por Brayan, 2026'] as const,
+  /** Height on the trunk, 0 = ground, 1 = top: over the root couple's branches, clear of the UI. */
+  at: 0.55,
+  fontSize: 0.13,
+  lineHeight: 1.15,
+  /** Sits this far out of the bark, so it never flickers into it. */
+  lift: 0.015,
+  /** Camera distance where it starts to show, and where it is fully there (minDistance is 7). */
+  revealStart: 9.5,
+  revealEnd: 7.8,
+  opacity: 0.8,
+  fadeRate: 4,
+} as const;

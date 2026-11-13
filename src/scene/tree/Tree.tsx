@@ -10,6 +10,7 @@ import { IntroDirector } from '../intro/IntroDirector';
 import { SelectionDirector } from '../selection/SelectionDirector';
 import type { FamilyTime } from '../timeline/familyTime';
 import { TimelineDirector } from '../timeline/TimelineDirector';
+import { BarkSignature } from './BarkSignature';
 import { BranchMesh, type BranchMeshHandle } from './BranchMesh';
 import type { WoodMeasure } from './branchGeometry';
 import { BirthdayBlossoms } from './BirthdayBlossoms';
@@ -63,6 +64,7 @@ export function Tree({ layout, labels, time }: TreeProps) {
     [reach, schedule, timeline],
   );
   const branches = useRef<BranchMeshHandle>(null);
+  const trunk = layout.branches.find((branch) => branch.kind === 'trunk');
 
   return (
     <>
@@ -74,6 +76,7 @@ export function Tree({ layout, labels, time }: TreeProps) {
         wood={wood}
         sap
       />
+      {trunk && <BarkSignature trunk={trunk} />}
       <Leaves
         clusters={layout.leafClusters}
         fruits={layout.fruits}
