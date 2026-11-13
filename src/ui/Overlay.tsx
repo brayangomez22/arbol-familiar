@@ -1,6 +1,7 @@
 import { useCallback, useState, type CSSProperties } from 'react';
 import { useAppStore } from '@/state/store';
 import { AmbientPicker } from './AmbientPicker/AmbientPicker';
+import { BirthdayNotice } from './Birthday/BirthdayNotice';
 import { Controls } from './Controls/Controls';
 import { FamilyContext, type FamilyDirectory } from './family/familyDirectory';
 import { SkipIntroButton } from './Intro/SkipIntroButton';
@@ -44,6 +45,7 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
       >
         <TitleCard summary={summary} />
         {ambientPicker && <AmbientPicker />}
+        <BirthdayNotice />
         <Timeline />
         <Controls onSearch={openSearch} />
         <PersonPanel enabled={ready} />

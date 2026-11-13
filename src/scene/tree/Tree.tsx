@@ -17,6 +17,7 @@ import type { BlossomTiming } from './Blossoms';
 import { CrownLeafFall } from './CrownLeafFall';
 import { Fruits } from './Fruits';
 import { Leaves } from './Leaves';
+import { MemorialLeafFall } from './MemorialLeafFall';
 import { SeasonBlossoms } from './SeasonBlossoms';
 
 interface TreeProps {
@@ -88,6 +89,12 @@ export function Tree({ layout, labels, time }: TreeProps) {
         time={time}
       />
       <CrownLeafFall clusters={layout.leafClusters} branches={layout.branches} />
+      <MemorialLeafFall
+        clusters={layout.leafClusters}
+        branches={layout.branches}
+        fruits={layout.fruits}
+        lives={time.lives}
+      />
       <Fruits
         fruits={layout.fruits}
         branches={layout.branches}

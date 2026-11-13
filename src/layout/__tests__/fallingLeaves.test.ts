@@ -4,12 +4,14 @@ import familyJson from '@/data/family.json';
 import { loadFamily } from '@/data/loadFamily';
 import { buildTreeLayout } from '../buildTreeLayout';
 import {
+  clustersNear,
   createLeafPose,
   leafFallPose,
   planLeafFall,
   type FallSurroundings,
   type LeafFall,
 } from '../fallingLeaves';
+import type { LeafCluster } from '../types';
 import { normalize, vec3 } from '../vec';
 
 const layout = buildTreeLayout(loadFamily(familyJson));
@@ -110,5 +112,28 @@ describe('leafFallPose', () => {
       expect(Math.abs(b.pitch - a.pitch)).toBeLessThan(maxMove);
       expect(Math.abs(b.spin - a.spin)).toBeLessThan(maxMove);
     }
+  });
+});
+
+describe('clustersNear', () => {
+  const cluster = (branchId: string, x: number): LeafCluster => ({
+    branchId,
+    branchT: 0.5,
+    position: vec3(x, 0, 0),
+    radius: 1,
+    density: 1,
+  });
+  const clusters = [cluster('a', 0), cluster('b', 5), cluster('b', 6), cluster('c', 20)];
+
+  it('takes the clusters of the branch itself', () => {
+    expect(clustersNear(clusters, 'b', vec3(100, 0, 0), 1).map((c) => c.position.x)).toEqual([
+      5, 6,
+    ]);
+  });
+
+  it('falls back to the nearest clusters when the branch has none', () => {
+    expect(clustersNear(clusters, 'trunk', vec3(4, 0, 0), 2).map((c) => c.position.x)).toEqual([
+      5, 6,
+    ]);
   });
 });

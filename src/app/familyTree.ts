@@ -60,4 +60,6 @@ export const familyDirectory: FamilyDirectory = {
     marks: decadeMarks(familyTime.range),
     censusAt: (year) => censusAt(lives, year),
   },
+  birthdaysOn: (today) =>
+    birthdaysOn(family, today).map(({ id, firstName }) => ({ id, firstName })),
 };

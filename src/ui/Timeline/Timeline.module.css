@@ -41,8 +41,10 @@
 .census {
   margin: 2px 0 0;
   font-size: 0.78rem;
+  font-weight: 500;
   letter-spacing: 0.02em;
-  color: var(--color-ink-soft);
+  /* Full ink, not the soft one: it sits on the night sky as often as on the day's. */
+  color: var(--color-ink);
 }
 
 .stack {

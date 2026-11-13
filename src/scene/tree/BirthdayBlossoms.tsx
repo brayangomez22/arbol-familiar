@@ -53,6 +53,9 @@ export function BirthdayBlossoms({ fruits, branches, timing, time }: BirthdayBlo
         edge: livePalette.outline,
         density: { value: 1 },
         bloomTime: { value: -BLOSSOMS.bloom.delay },
+        pull: BLOSSOMS.birthday.pull,
+        // The celebration never steps back, even when someone else is selected.
+        focus: false,
       }),
     [],
   );

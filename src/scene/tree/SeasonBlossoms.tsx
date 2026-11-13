@@ -28,6 +28,8 @@ export function SeasonBlossoms({ clusters, timing }: SeasonBlossomsProps) {
         edge: livePalette.outline,
         density: ambientUniforms.uBlossomDensity,
         bloomTime: ALL_OPEN,
+        pull: BLOSSOMS.season.pull,
+        focus: true,
       }),
     [],
   );

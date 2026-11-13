@@ -17,6 +17,8 @@ uniform float uBloomSpread;
 /** Seconds a flower takes to open, and how far it overshoots (back easing). */
 uniform float uBloomOpen;
 uniform float uBloomOvershoot;
+/** World units toward the camera, so the crown's leaves don't bury the flowers. */
+uniform float uPull;
 
 varying vec2 vUv;
 
@@ -41,6 +43,7 @@ void main() {
   corner = vec2(c * corner.x - s * corner.y, s * corner.x + c * corner.y);
   vec4 viewPosition = viewMatrix * center;
   viewPosition.xy += corner;
+  viewPosition.z += uPull;
   gl_Position = projectionMatrix * viewPosition;
   vUv = uv;
 }

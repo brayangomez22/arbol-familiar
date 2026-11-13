@@ -15,20 +15,23 @@ export interface BlossomMaterialOptions {
   readonly density: { value: number };
   /** Seconds since the bloom began: a shared uniform, or far in the future (all open). */
   readonly bloomTime: { value: number };
+  /** World units the flowers are drawn toward the camera. */
+  readonly pull: number;
+  /** Steps back with the tree when someone is selected (season flowers, not a birthday's). */
+  readonly focus: boolean;
 }
 
 /**
  * Small five-petal flowers for an InstancedMesh (see blossom.vert.glsl for the attributes each
- * instance carries). They ride the wind, grow with the intro and the timeline, and step back with
- * the tree when someone is selected.
+ * instance carries). They ride the wind and grow with the intro and the timeline.
  */
 export class BlossomMaterial extends ShaderMaterial {
-  constructor({ petals, heart, edge, density, bloomTime }: BlossomMaterialOptions) {
+  constructor({ petals, heart, edge, density, bloomTime, pull, focus }: BlossomMaterialOptions) {
     super({
       vertexShader: withGrowth(withWind(vertexShader)),
       fragmentShader: withFocus(fragmentShader),
       side: DoubleSide,
-      defines: { USE_FOCUS: '' },
+      defines: focus ? { USE_FOCUS: '' } : {},
       uniforms: {
         ...windUniforms,
         ...growthUniforms,
@@ -43,6 +46,7 @@ export class BlossomMaterial extends ShaderMaterial {
         uEdgeColor: { value: edge },
         uPetalShade: { value: BLOSSOMS.petalShade },
         uEdgeMix: { value: BLOSSOMS.edgeMix },
+        uPull: { value: pull },
       },
     });
   }

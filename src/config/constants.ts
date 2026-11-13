@@ -737,7 +737,7 @@ export const INTRO_DUST = {
  * air at once comes from quality.ts; each of those slots waits, drops one leaf, and waits again.
  */
 export const FALLING_LEAVES = {
-  seed: 'falling-leaf',
+  seed: 'falling-leaf' as string,
   /** Seconds a slot waits before its first leaf, spread across the slots so they never fall together. */
   firstWait: [4, 22] as const,
   /** Seconds between one leaf touching down and the next one letting go, in the same slot. */
@@ -770,6 +770,24 @@ export const FALLING_LEAVES = {
 } as const;
 
 export type FallingLeavesConfig = Widen<typeof FALLING_LEAVES>;
+
+/**
+ * Now and then a golden leaf lets go near someone who has passed: rare and slow, a remembrance,
+ * not a sad note. One in the air at most.
+ */
+export const MEMORIAL_LEAVES = {
+  slots: 1,
+  /** With no clusters on their own branch, the leaf comes from this many nearest ones. */
+  nearestClusters: 2,
+  fall: {
+    ...FALLING_LEAVES,
+    seed: 'memorial-leaf',
+    firstWait: [8, 24] as const,
+    wait: [40, 90] as const,
+    speed: [0.8, 1.1] as const,
+    catchAir: 1.8,
+  },
+} as const;
 
 /**
  * Light through the day, by the visitor's local time. Between two stops the look blends; two stops
@@ -878,19 +896,23 @@ export interface SeasonLook {
 export const BLOSSOMS = {
   season: {
     perCluster: 14,
-    size: 0.55,
+    size: 0.6,
     sizeJitter: 0.3,
     shell: [0.65, 1] as const,
     depthScale: 0.6,
+    /** World units each flower is drawn toward the camera, so leaves don't bury it. */
+    pull: 0.3,
   },
   birthday: {
-    count: 46,
-    size: 0.6,
+    count: 80,
+    size: 0.85,
     sizeJitter: 0.3,
     from: 0.35,
     spread: 0.7,
     aroundFruit: 0.35,
     fruitRing: [1.15, 2.1] as const,
+    /** Pulled well in front of the crown: they are the point of the day. */
+    pull: 1.4,
   },
   bloom: {
     /** Seconds from the first flower of a branch opening to the last. */

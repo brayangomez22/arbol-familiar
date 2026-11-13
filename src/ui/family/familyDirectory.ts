@@ -15,6 +15,13 @@ export interface FamilyDirectory {
   readonly relativeInDirection: (id: PersonId, direction: Direction) => PersonId | undefined;
   readonly isPerson: (id: string) => boolean;
   readonly timeline: FamilyTimeline;
+  /** Who celebrates a birthday on that day (local time), oldest first. */
+  readonly birthdaysOn: (today: Date) => readonly Celebrant[];
+}
+
+export interface Celebrant {
+  readonly id: PersonId;
+  readonly firstName: string;
 }
 
 /** The years the timeline slider spans, its decade marks, and who is there in a given year. */

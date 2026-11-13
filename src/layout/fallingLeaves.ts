@@ -193,3 +193,24 @@ function randomDirection(u: number, v: number): Vec3 {
   const angle = v * Math.PI * 2;
   return vec3(ring * Math.cos(angle), ring * Math.sin(angle), z);
 }
+
+/**
+ * The clusters on the branch a fruit hangs from, or else the `fallback` nearest to it: where a
+ * leaf can let go "near" someone.
+ */
+export function clustersNear(
+  clusters: readonly LeafCluster[],
+  branchId: string,
+  position: Vec3,
+  fallback: number,
+): LeafCluster[] {
+  const own = clusters.filter((cluster) => cluster.branchId === branchId);
+  if (own.length > 0) return own;
+  const distance = (cluster: LeafCluster) =>
+    Math.hypot(
+      cluster.position.x - position.x,
+      cluster.position.y - position.y,
+      cluster.position.z - position.z,
+    );
+  return [...clusters].sort((a, b) => distance(a) - distance(b)).slice(0, fallback);
+}
