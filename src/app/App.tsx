@@ -9,6 +9,7 @@ import {
   familyTime,
   fruitLabels,
 } from './familyTree';
+import { useAmbientParamsSync, wantsAmbientPicker } from './ambientParams';
 import { useHashSelection } from './routing';
 
 // Loaded on demand so the developer view never weighs on the real site.
@@ -18,6 +19,7 @@ const LayoutDebug = lazy(() =>
 
 export function App() {
   useHashSelection(familyDirectory.isPerson);
+  useAmbientParamsSync();
   const layoutDebug = readLayoutDebugOptions(window.location.search);
   if (layoutDebug) {
     return (
@@ -29,7 +31,11 @@ export function App() {
   return (
     <>
       <Experience layout={familyLayout} labels={fruitLabels} time={familyTime} />
-      <Overlay summary={familySummary} family={familyDirectory} />
+      <Overlay
+        summary={familySummary}
+        family={familyDirectory}
+        ambientPicker={wantsAmbientPicker(window.location.search)}
+      />
     </>
   );
 }

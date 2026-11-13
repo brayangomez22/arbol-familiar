@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import {
-  Color,
   Euler,
   InstancedBufferAttribute,
   Matrix4,
@@ -11,11 +10,11 @@ import {
 } from 'three';
 import { GRASS_MESH, SCENERY, WIND } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
-import { dayPalette } from '@/config/theme';
 import { placeGrass, type GrassBlade } from '@/layout/terrain';
 import type { Vec3 } from '@/layout/types';
 import { useAppStore } from '@/state/store';
-import { LeafMaterial } from '../materials/LeafMaterial';
+import { livePalette } from '../ambient/livePalette';
+import { FOLIAGE_TONES, LeafMaterial } from '../materials/LeafMaterial';
 
 interface GrassProps {
   /** The hilltop: where the trunk meets the ground. */
@@ -28,12 +27,11 @@ const ignoreRaycast = () => null;
 export function Grass({ top }: GrassProps) {
   const count = useAppStore((state) => QUALITY[state.qualityTier].grassBlades);
   const blades = useMemo(
-    () =>
-      placeGrass(count, top, dayPalette.grass.length, SCENERY.hill, SCENERY.grass, SCENERY.seed),
+    () => placeGrass(count, top, FOLIAGE_TONES, SCENERY.hill, SCENERY.grass, SCENERY.seed),
     [count, top],
   );
   const geometry = useMemo(() => buildBladeGeometry(blades), [blades]);
-  const material = useMemo(() => new LeafMaterial(dayPalette, GRASS_MESH), []);
+  const material = useMemo(() => new LeafMaterial(livePalette, livePalette.grass, GRASS_MESH), []);
   useEffect(
     () => () => {
       geometry.dispose();
@@ -68,10 +66,13 @@ function buildBladeGeometry(blades: readonly GrassBlade[]): PlaneGeometry {
   const normals = new Float32Array(blades.length * 3);
   // Every blade sways alike; its yaw is a free random phase (unused while grass doesn't flutter).
   const sway = new Float32Array(blades.length * 2);
-  blades.forEach(({ shadeNormal, yaw }, i) => {
+  const colorIndex = new Float32Array(blades.length);
+  blades.forEach(({ shadeNormal, yaw, colorIndex: tone }, i) => {
     normals.set([shadeNormal.x, shadeNormal.y, shadeNormal.z], i * 3);
     sway.set([WIND.grassWeight, yaw], i * 2);
+    colorIndex[i] = tone;
   });
+  geometry.setAttribute('aColorIndex', new InstancedBufferAttribute(colorIndex, 1));
   geometry.setAttribute('aShadeNormal', new InstancedBufferAttribute(normals, 3));
   geometry.setAttribute('aSway', new InstancedBufferAttribute(sway, 2));
   return geometry;
@@ -84,17 +85,13 @@ function writeInstances(mesh: InstancedMesh, blades: readonly GrassBlade[]): voi
   const rotation = new Quaternion();
   // Yaw first, then the lean within the blade's own plane.
   const euler = new Euler(0, 0, 0, 'YXZ');
-  const colors = dayPalette.grass.map((hex) => new Color(hex));
 
   blades.forEach((blade, i) => {
     position.set(blade.position.x, blade.position.y, blade.position.z);
     rotation.setFromEuler(euler.set(0, blade.yaw, blade.lean));
     scale.setScalar(blade.height);
     mesh.setMatrixAt(i, matrix.compose(position, rotation, scale));
-    const color = colors[blade.colorIndex];
-    if (color) mesh.setColorAt(i, color);
   });
   mesh.instanceMatrix.needsUpdate = true;
-  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   mesh.computeBoundingSphere();
 }

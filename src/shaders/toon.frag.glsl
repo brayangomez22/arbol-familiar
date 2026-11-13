@@ -1,5 +1,7 @@
 uniform vec3 uBaseColor;
-uniform vec3 uShadeColor;
+/** The shadow leans from the base color toward this tint by uShadeMix. */
+uniform vec3 uShadeTint;
+uniform float uShadeMix;
 uniform vec3 uGrooveColor;
 uniform float uBarkStreaks;
 uniform float uBarkWarp;
@@ -51,12 +53,13 @@ void main() {
   #ifdef USE_GROWTH
   if (vGrowthAge < 0.0) discard;
   #endif
+  vec3 shadeColor = mix(uBaseColor, uShadeTint, uShadeMix);
   vec3 normal = normalize(vWorldNormal);
   if (!gl_FrontFacing) normal = -normal;
   vec3 viewDirection = normalize(cameraPosition - vWorldPosition);
 
   float lit = toonLit(normal);
-  vec3 color = toonRamp(uBaseColor, uShadeColor, lit);
+  vec3 color = toonRamp(uBaseColor, shadeColor, lit);
   color = mix(color, uGrooveColor, barkGroove(vUv) * vBark * uBarkStrength);
   color += toonRim(normal, viewDirection, lit);
   color += uBaseColor * uGlow;
@@ -70,7 +73,7 @@ void main() {
   float behind = uSapFront - vReach;
   float head = onLineage * uSapIntensity * exp(-(behind * behind) / (uSapHead * uSapHead));
   float trail = onLineage * uSapIntensity * uSapTrail * smoothstep(0.0, uSapHead, behind);
-  vec3 sapColor = toonRamp(uSapColor, mix(uSapColor, uShadeColor, uSapShadeMix), lit);
+  vec3 sapColor = toonRamp(uSapColor, mix(uSapColor, shadeColor, uSapShadeMix), lit);
   color += uSapColor * trail;
   color = mix(color, sapColor, head) + uSapColor * head * uSapShine;
   focused = onLineage;

@@ -3,7 +3,7 @@ import { useEffect, useMemo } from 'react';
 import { BufferGeometry, Float32BufferAttribute } from 'three';
 import { SCENERY } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
-import { dayPalette } from '@/config/theme';
+import { livePalette } from '../ambient/livePalette';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { placePollen, type PollenMote } from '@/layout/scenery';
 import type { Bounds } from '@/layout/types';
@@ -27,7 +27,7 @@ export function Pollen({ bounds }: PollenProps) {
     () => buildPollenGeometry(placePollen(count, bounds, SCENERY.pollen, SCENERY.seed)),
     [count, bounds],
   );
-  const material = useMemo(() => new PollenMaterial(dayPalette), []);
+  const material = useMemo(() => new PollenMaterial(livePalette), []);
   useEffect(() => {
     material.setViewport(viewportHeight, fov);
   }, [material, viewportHeight, fov]);

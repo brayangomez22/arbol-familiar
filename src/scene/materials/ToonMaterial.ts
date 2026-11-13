@@ -1,16 +1,17 @@
-import { Color, ShaderMaterial, type ColorRepresentation } from 'three';
+import { ShaderMaterial, type Color } from 'three';
 import { SELECTION, TOON } from '@/config/constants';
-import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/toon.frag.glsl?raw';
 import vertexShader from '@/shaders/toon.vert.glsl?raw';
+import type { LivePalette } from '../ambient/livePalette';
 import { growthUniforms, withGrowth } from '../intro/growthUniforms';
 import { focusUniforms, withFocus } from '../selection/focusUniforms';
 import { windUniforms, withWind } from '../wind/windUniforms';
 import { toonUniforms, withToonShading } from './toonUniforms';
 
 export interface ToonMaterialOptions {
-  readonly color: ColorRepresentation;
-  readonly palette: Palette;
+  /** A color of the live palette (shared, never copied), so it changes with the hour. */
+  readonly color: Color;
+  readonly palette: LivePalette;
   /** Draws grooves along meshes that carry a `bark` attribute (see branchGeometry.ts). */
   readonly bark?: boolean;
   /**
@@ -32,8 +33,11 @@ export interface ToonMaterialOptions {
    * `aBornYear` (see branchGeometry.ts).
    */
   readonly growth?: boolean;
-  /** Light of its own, as a fraction of its color added on top of the shading. */
-  readonly glow?: number;
+  /**
+   * Light of its own, as a fraction of its color added on top of the shading. A uniform object
+   * to share one that changes (lanterns at night).
+   */
+  readonly glow?: number | { value: number };
 }
 
 /** The sap uniforms a selection animates. */
@@ -61,7 +65,6 @@ export class ToonMaterial extends ShaderMaterial {
     growth = false,
     glow = 0,
   }: ToonMaterialOptions) {
-    const base = new Color(color);
     const sapUniforms: SapUniforms = { uSapFront: { value: 0 }, uSapIntensity: { value: 0 } };
     super({
       vertexShader: withGrowth(withWind(vertexShader)),
@@ -82,16 +85,17 @@ export class ToonMaterial extends ShaderMaterial {
         uSapTrail: { value: SELECTION.sap.trail },
         uSapShine: { value: SELECTION.sap.shine },
         uSapShadeMix: { value: SELECTION.sap.shadeMix },
-        uSapColor: { value: new Color(palette.sap) },
+        uSapColor: { value: palette.sap },
         ...toonUniforms(palette),
-        uBaseColor: { value: base },
-        uShadeColor: { value: base.clone().lerp(new Color(palette.shade), TOON.shadeMix) },
-        uGrooveColor: { value: new Color(palette.trunkShadow) },
+        uBaseColor: { value: color },
+        uShadeTint: { value: palette.shade },
+        uShadeMix: { value: TOON.shadeMix },
+        uGrooveColor: { value: palette.trunkShadow },
         uBarkStreaks: { value: TOON.bark.streaks },
         uBarkWarp: { value: TOON.bark.warp },
         uBarkStrength: { value: bark ? TOON.bark.strength : 0 },
         uRimStrength: { value: rim ? TOON.rimStrength : 0 },
-        uGlow: { value: glow },
+        uGlow: typeof glow === 'number' ? { value: glow } : glow,
       },
     });
     this.sap = sapUniforms;

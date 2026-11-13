@@ -1,5 +1,6 @@
 import { useCallback, useState, type CSSProperties } from 'react';
 import { useAppStore } from '@/state/store';
+import { AmbientPicker } from './AmbientPicker/AmbientPicker';
 import { Controls } from './Controls/Controls';
 import { FamilyContext, type FamilyDirectory } from './family/familyDirectory';
 import { SkipIntroButton } from './Intro/SkipIntroButton';
@@ -13,10 +14,12 @@ import { TitleCard, type FamilySummary } from './TitleCard/TitleCard';
 interface OverlayProps {
   readonly summary: FamilySummary;
   readonly family: FamilyDirectory;
+  /** The hidden season and time picker, for `?season=` / `?time=` links. */
+  readonly ambientPicker: boolean;
 }
 
 /** Everything drawn in DOM over the canvas. Hidden until the intro is over. */
-export function Overlay({ summary, family }: OverlayProps) {
+export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
   const ready = useAppStore((state) => state.introPhase === 'done');
   const panelOpen = useAppStore((state) => state.selectedPersonId !== null);
   const inset = useAppStore((state) => state.viewInset);
@@ -40,6 +43,7 @@ export function Overlay({ summary, family }: OverlayProps) {
         aria-hidden={!ready}
       >
         <TitleCard summary={summary} />
+        {ambientPicker && <AmbientPicker />}
         <Timeline />
         <Controls onSearch={openSearch} />
         <PersonPanel enabled={ready} />

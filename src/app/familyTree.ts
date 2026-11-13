@@ -45,7 +45,8 @@ const fruitX = new Map(familyLayout.fruits.map((fruit) => [fruit.personId, fruit
 export const familyDirectory: FamilyDirectory = {
   index,
   searchEntries: [...family.people.values()].map(searchEntryOf),
-  fruitColorOf: (id) => dayPalette.fruits[fruitColorIndex(id, dayPalette)] ?? dayPalette.trunk,
+  fruitColorOf: (id) =>
+    dayPalette.fruits[fruitColorIndex(id, dayPalette.fruits.length)] ?? dayPalette.trunk,
   relativeInDirection: (id, direction) =>
     relativeInDirection(index, id, direction, (relativeId) => fruitX.get(relativeId) ?? 0),
   isPerson: (id) => family.people.has(id),

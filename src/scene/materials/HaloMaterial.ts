@@ -1,14 +1,16 @@
-import { Color, ShaderMaterial, type ColorRepresentation } from 'three';
+import { ShaderMaterial, type Color } from 'three';
 import fragmentShader from '@/shaders/halo.frag.glsl?raw';
 import vertexShader from '@/shaders/halo.vert.glsl?raw';
 
 export interface HaloMaterialOptions {
-  readonly color: ColorRepresentation;
-  readonly opacity: number;
+  /** Live palette colors, shared by reference. */
+  readonly color: Color;
+  /** A shared uniform, so the night can make every halo stronger at once. */
+  readonly opacity: { value: number };
   /** How far behind the object's center the glow sits, in units of the object's scale. */
   readonly depthOffset: number;
   /** What the halo becomes at full glow (hover, selection): warmer, stronger and a bit larger. */
-  readonly glowColor: ColorRepresentation;
+  readonly glowColor: Color;
   readonly glowOpacity: number;
   /** Extra size at full glow, as a fraction of the resting size. */
   readonly glowGrowth: number;
@@ -33,10 +35,10 @@ export class HaloMaterial extends ShaderMaterial {
       transparent: true,
       depthWrite: false,
       uniforms: {
-        uColor: { value: new Color(color) },
-        uOpacity: { value: opacity },
+        uColor: { value: color },
+        uOpacity: opacity,
         uDepthOffset: { value: depthOffset },
-        uGlowColor: { value: new Color(glowColor) },
+        uGlowColor: { value: glowColor },
         uGlowOpacity: { value: glowOpacity },
         uGlowGrowth: { value: glowGrowth },
         uGlow: { value: 0 },

@@ -1,9 +1,9 @@
 import { useThree } from '@react-three/fiber';
 import { useEffect, useImperativeHandle, useMemo, type Ref } from 'react';
-import { Vector2 } from 'three';
+import { Vector2, type Color } from 'three';
 import { TOON } from '@/config/constants';
-import { dayPalette } from '@/config/theme';
 import type { BranchSegment } from '@/layout/types';
+import { livePalette } from '../ambient/livePalette';
 import { OutlineMaterial } from '../materials/OutlineMaterial';
 import { ToonMaterial, type SapUniforms } from '../materials/ToonMaterial';
 import { buildBranchGeometry, setSapLimits, type WoodMeasure } from './branchGeometry';
@@ -16,7 +16,8 @@ export interface BranchMeshHandle {
 
 interface BranchMeshProps {
   readonly segments: readonly BranchSegment[];
-  readonly color: string;
+  /** A live palette color. */
+  readonly color: Color;
   /** Reach, wind weight and growth time along the wood. */
   readonly wood: WoodMeasure;
   /** Can carry the selection's sap (the branches, not the roots). */
@@ -31,7 +32,7 @@ export function BranchMesh({ segments, color, wood, sap = false, ref }: BranchMe
     () =>
       new ToonMaterial({
         color,
-        palette: dayPalette,
+        palette: livePalette,
         bark: true,
         wind: true,
         focus: true,
@@ -43,7 +44,7 @@ export function BranchMesh({ segments, color, wood, sap = false, ref }: BranchMe
   const outline = useMemo(
     () =>
       new OutlineMaterial({
-        color: dayPalette.outline,
+        color: livePalette.outline,
         thickness: TOON.outline.branchThickness,
         wind: true,
         growth: true,

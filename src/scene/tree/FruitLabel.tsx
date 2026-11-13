@@ -3,7 +3,7 @@ import { useFrame } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import { Vector3, type Group, type Material, type Object3D } from 'three';
 import { FRUIT_LABEL } from '@/config/constants';
-import { dayPalette } from '@/config/theme';
+import { livePalette } from '../ambient/livePalette';
 import { damp } from '../damp';
 import { isGrown } from '../intro/growthUniforms';
 import type { LabelAlign } from './labelAlignment';
@@ -85,9 +85,10 @@ export function FruitLabel({
         textAlign={align}
         // A name running right starts a little left of the fruit's center, and vice versa.
         position-x={align === 'left' ? -insetX : align === 'right' ? insetX : 0}
-        color={dayPalette.ink}
+        // Live colors: light ink on a dark outline at night.
+        color={livePalette.ink}
         outlineWidth={FRUIT_LABEL.outlineWidth}
-        outlineColor={dayPalette.paper}
+        outlineColor={livePalette.paper}
       >
         {text}
       </Text>

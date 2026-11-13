@@ -1,18 +1,18 @@
 import { BlendFunction, Effect } from 'postprocessing';
-import { Color, Uniform } from 'three';
+import { Uniform } from 'three';
 import { POSTPROCESSING } from '@/config/constants';
-import type { Palette } from '@/config/theme';
+import type { LivePalette } from '../ambient/livePalette';
 import fragmentShader from '@/shaders/paper.frag.glsl?raw';
 
 /** Paper fibers, soft watercolor washes, grain and a warm vignette, in a single pass. */
 export class PaperEffect extends Effect {
-  constructor(palette: Palette) {
+  constructor(palette: LivePalette) {
     const { paper } = POSTPROCESSING;
     super('PaperEffect', fragmentShader, {
       blendFunction: BlendFunction.NORMAL,
       uniforms: new Map<string, Uniform>([
-        ['uPaperColor', new Uniform(new Color(palette.paper))],
-        ['uVignetteColor', new Uniform(new Color(palette.vignette))],
+        ['uPaperColor', new Uniform(palette.paper)],
+        ['uVignetteColor', new Uniform(palette.vignette)],
         ['uPixelRatio', new Uniform(1)],
         ['uFiberScale', new Uniform(paper.fiberScale)],
         ['uFiberStrength', new Uniform(paper.fiberStrength)],

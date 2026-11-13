@@ -1,13 +1,13 @@
 import { useEffect, useMemo } from 'react';
 import { MeshBasicMaterial, PlaneGeometry } from 'three';
 import { FRUIT_LABEL, FRUIT_MESH, INTRO, WIND } from '@/config/constants';
-import { dayPalette } from '@/config/theme';
 import type { Lifeline } from '@/domain/timeline';
 import type { PersonId } from '@/domain/types';
 import type { GrowthSchedule } from '@/layout/growth';
 import { swayWeight, type TreeReach } from '@/layout/reach';
 import type { TimelineSchedule } from '@/layout/timelineGrowth';
 import type { BranchSegment, FruitPlacement } from '@/layout/types';
+import { ambientUniforms, livePalette } from '../ambient/livePalette';
 import { HaloMaterial } from '../materials/HaloMaterial';
 import { ToonMaterial } from '../materials/ToonMaterial';
 import { Fruit, type FruitResources } from './Fruit';
@@ -42,22 +42,33 @@ export function Fruits({
       body: buildLanternBody(),
       cap: buildLanternCap(),
       halo: new PlaneGeometry(FRUIT_MESH.haloSize, FRUIT_MESH.haloSize),
-      bodyMaterials: dayPalette.fruits.map(
-        (color) => new ToonMaterial({ color, palette: dayPalette, focus: true }),
+      // They light up as lanterns at night.
+      bodyMaterials: livePalette.fruits.map(
+        (color) =>
+          new ToonMaterial({
+            color,
+            palette: livePalette,
+            focus: true,
+            glow: ambientUniforms.uLanternGlow,
+          }),
       ),
       // Those who have passed: a soft gold that glows faintly from within.
       deceasedMaterial: new ToonMaterial({
-        color: dayPalette.deceasedFruit,
-        palette: dayPalette,
+        color: livePalette.deceasedFruit,
+        palette: livePalette,
         focus: true,
-        glow: FRUIT_MESH.deceasedGlow,
+        glow: ambientUniforms.uMemorialGlow,
       }),
-      capMaterial: new ToonMaterial({ color: dayPalette.trunk, palette: dayPalette, focus: true }),
+      capMaterial: new ToonMaterial({
+        color: livePalette.trunk,
+        palette: livePalette,
+        focus: true,
+      }),
       haloMaterial: new HaloMaterial({
-        color: dayPalette.halo,
-        opacity: FRUIT_MESH.haloOpacity,
+        color: livePalette.halo,
+        opacity: ambientUniforms.uHaloOpacity,
         depthOffset: FRUIT_MESH.haloDepthOffset,
-        glowColor: dayPalette.haloGlow,
+        glowColor: livePalette.haloGlow,
         glowOpacity: FRUIT_MESH.haloGlow.opacity,
         glowGrowth: FRUIT_MESH.haloGlow.growth,
       }),
@@ -114,7 +125,8 @@ export function Fruits({
   }, [fruits, branches, reach]);
 
   const lanterns = fruits.map((fruit) => {
-    const bodyMaterial = shared.bodyMaterials[fruitColorIndex(fruit.personId, dayPalette)];
+    const bodyMaterial =
+      shared.bodyMaterials[fruitColorIndex(fruit.personId, shared.bodyMaterials.length)];
     const source = sources.get(fruit.personId);
     if (!bodyMaterial || !source) return null;
     const resources: FruitResources = {

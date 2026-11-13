@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { dayPalette } from '@/config/theme';
+import { dayPalette, seasonPalettes } from '@/config/theme';
 import type { TreeLayout } from '@/layout/types';
 import { BoundsOutline } from './BoundsOutline';
 import { BranchLines } from './BranchLines';
@@ -15,7 +15,7 @@ interface LayoutDebugSceneProps {
 }
 
 export function LayoutDebugScene({ layout, labelRefs }: LayoutDebugSceneProps) {
-  const leafColor = dayPalette.leaves[0] ?? dayPalette.ink;
+  const leafColor = seasonPalettes.summer.leaves[0];
   return (
     <>
       <DebugCamera bounds={layout.bounds} />

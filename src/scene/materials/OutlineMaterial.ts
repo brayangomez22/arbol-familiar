@@ -1,11 +1,12 @@
-import { BackSide, Color, ShaderMaterial, Vector2, type ColorRepresentation } from 'three';
+import { BackSide, ShaderMaterial, Vector2, type Color } from 'three';
 import fragmentShader from '@/shaders/outline.frag.glsl?raw';
 import vertexShader from '@/shaders/outline.vert.glsl?raw';
 import { growthUniforms, withGrowth } from '../intro/growthUniforms';
 import { windUniforms, withWind } from '../wind/windUniforms';
 
 export interface OutlineMaterialOptions {
-  readonly color: ColorRepresentation;
+  /** A live palette color, shared by reference. */
+  readonly color: Color;
   /** Line width in drawing-buffer pixels. */
   readonly thickness: number;
   /** Follow the wind like a ToonMaterial with `wind`; the geometry must carry `aSway`. */
@@ -31,7 +32,7 @@ export class OutlineMaterial extends ShaderMaterial {
       uniforms: {
         ...windUniforms,
         ...growthUniforms,
-        uColor: { value: new Color(color) },
+        uColor: { value: color },
         uThickness: { value: thickness },
         uResolution: { value: new Vector2(1, 1) },
       },

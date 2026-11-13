@@ -1,4 +1,4 @@
-import { Color, ShaderMaterial, type ColorRepresentation } from 'three';
+import { ShaderMaterial, type Color } from 'three';
 import fragmentShader from '@/shaders/spark.frag.glsl?raw';
 import vertexShader from '@/shaders/spark.vert.glsl?raw';
 import type { SparkConfig } from '../tree/sparkPool';
@@ -9,7 +9,8 @@ import { pixelsPerUnit } from './pixelsPerUnit';
  * vanish, while a warm gold reads as light against it (and still does on the night sky).
  */
 export class SparkMaterial extends ShaderMaterial {
-  constructor(color: ColorRepresentation, config: SparkConfig) {
+  /** `color` is a live palette color, shared by reference. */
+  constructor(color: Color, config: SparkConfig) {
     super({
       vertexShader,
       fragmentShader,
@@ -25,7 +26,7 @@ export class SparkMaterial extends ShaderMaterial {
         uFadeIn: { value: config.fadeIn },
         uFadeOutStart: { value: config.fadeOutStart },
         uPixelsPerUnit: { value: 1 },
-        uColor: { value: new Color(color) },
+        uColor: { value: color },
         uOpacity: { value: config.opacity },
       },
     });

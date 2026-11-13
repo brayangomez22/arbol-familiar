@@ -1,5 +1,6 @@
 import { useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useImperativeHandle, useMemo, useRef, type Ref } from 'react';
+import type { Color } from 'three';
 import type { Vec3 } from '@/layout/types';
 import { SparkMaterial } from '../materials/SparkMaterial';
 import { SparkPool, type SparkConfig } from './sparkPool';
@@ -11,7 +12,7 @@ export interface SparkBurstHandle {
 
 interface SparkBurstProps {
   readonly config: SparkConfig;
-  readonly color: string;
+  readonly color: Color;
   readonly ref?: Ref<SparkBurstHandle>;
 }
 

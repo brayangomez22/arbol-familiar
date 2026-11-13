@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef } from 'react';
 import type { Group } from 'three';
 import { SCENERY } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
-import { dayPalette } from '@/config/theme';
+import { livePalette } from '../ambient/livePalette';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import { placeClouds } from '@/layout/scenery';
 import type { Bounds } from '@/layout/types';
@@ -29,7 +29,7 @@ export function Clouds({ bounds }: CloudsProps) {
       ),
     [clouds, segments],
   );
-  const material = useMemo(() => new CloudMaterial(dayPalette), []);
+  const material = useMemo(() => new CloudMaterial(livePalette), []);
   useEffect(
     () => () => {
       for (const geometry of geometries) geometry.dispose();

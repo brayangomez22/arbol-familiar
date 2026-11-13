@@ -6,6 +6,7 @@ import type { Animated } from '@/animation/selectionTimeline';
 import { INTRO, TOON } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
 import type { Vec3 } from '@/layout/types';
+import { livePalette } from '../ambient/livePalette';
 import { ToonMaterial } from '../materials/ToonMaterial';
 
 export interface SeedMotion {
@@ -33,7 +34,7 @@ export function Seed({ motion, ground }: SeedProps) {
     return sphere;
   }, []);
   const material = useMemo(
-    () => new ToonMaterial({ color: dayPalette.trunk, palette: dayPalette }),
+    () => new ToonMaterial({ color: livePalette.trunk, palette: livePalette }),
     [],
   );
   useEffect(

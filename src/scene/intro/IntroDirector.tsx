@@ -4,13 +4,13 @@ import { useLayoutEffect, useMemo, useRef } from 'react';
 import { flyCamera, type CameraPose } from '@/animation/cameraFly';
 import { BEFORE_SPROUT, introTimeline, type IntroTiming } from '@/animation/introTimeline';
 import { CAMERA, INTRO, INTRO_DUST, NAVIGATION } from '@/config/constants';
-import { dayPalette } from '@/config/theme';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import type { GrowthSchedule } from '@/layout/growth';
 import type { TreeLayout } from '@/layout/types';
 import { vec3 } from '@/layout/vec';
 import { hasSeenIntro, rememberIntroSeen } from '@/state/introMemory';
 import { useAppStore } from '@/state/store';
+import { livePalette } from '../ambient/livePalette';
 import { frameBounds } from '../camera/frameBounds';
 import { SparkBurst, type SparkBurstHandle } from '../tree/SparkBurst';
 import { FULLY_GROWN, growthUniforms } from './growthUniforms';
@@ -172,7 +172,7 @@ export function IntroDirector({ layout, schedule }: IntroDirectorProps) {
   return (
     <>
       <Seed motion={seedMotion} ground={ground} />
-      <SparkBurst ref={dust} config={INTRO_DUST} color={dayPalette.dust} />
+      <SparkBurst ref={dust} config={INTRO_DUST} color={livePalette.dust} />
     </>
   );
 }

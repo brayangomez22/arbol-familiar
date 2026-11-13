@@ -1,3 +1,5 @@
+import type { DayPhase, DayStop } from '@/domain/dayCycle';
+import type { Season } from '@/domain/seasons';
 /** World units: 1 unit ≈ the radius of a fruit. */
 export const CAMERA = {
   fov: 30,
@@ -240,9 +242,8 @@ export const FRUIT_MESH = {
   stemTaper: 0.7,
   stemHeight: 0.38,
   capSegments: 16,
-  /** Halo quad side, in fruit radii, and its peak opacity. */
+  /** Halo quad side, in fruit radii; its opacity depends on the hour (DAY_CYCLE.looks). */
   haloSize: 3.4,
-  haloOpacity: 0.55,
   /** How far behind the fruit (toward the far side, in fruit radii) the halo is drawn. */
   haloDepthOffset: 1.2,
   /** Scale of a hovered or selected fruit. */
@@ -490,16 +491,34 @@ export const SCENERY = {
     driftSpeed: 0.35,
     opacity: 0.75,
   },
+  /** At night, around the crown and low over the grass. */
+  fireflies: {
+    /** How many, as a fraction of the quality tier's particles. */
+    share: 0.15,
+    padding: 3,
+    /** Share of them that stay low, over the grass. */
+    lowShare: 0.4,
+    lowHeight: 2.5,
+    size: 0.9,
+    sizeJitter: 0.35,
+    /** Lazy loops: amplitude (world units) and speed (radians per second). */
+    driftAmplitude: 1.2,
+    driftSpeed: 0.22,
+    /** Each one glows and goes dark at its own pace (radians per second). */
+    blinkSpeed: [0.6, 1.4],
+    /** Higher makes the glow shorter and the dark longer. */
+    blinkSharpness: 3,
+  },
 } as const;
 
 export type SceneryConfig = Widen<typeof SCENERY>;
 
 /** Screen-space sky behind everything. */
 export const SKY = {
-  /** Where the sun glow sits on screen (0–1 from the bottom left), how wide and how strong. */
-  sunPosition: [0.78, 0.82] as const,
+  /** How wide the sun glow is; where it sits and how strong depend on the hour (DAY_CYCLE). */
   sunRadius: 0.45,
-  sunStrength: 0.35,
+  /** Stars: share of the grid cells that hold one, cells per screen height, and their radius in cells. */
+  stars: { density: 0.12, scale: 70, size: 0.09 },
   /** Bottom of the gradient (horizon color) and where it reaches the top color. */
   gradientStart: 0.15,
   gradientEnd: 1,
@@ -508,12 +527,8 @@ export const SKY = {
 /** Finishing passes; which ones run depends on quality.ts. */
 export const POSTPROCESSING = {
   bloom: {
-    /**
-     * Day: above the paper-white of clouds and label outlines, so only real highlights glow a
-     * little. Night (phase 6) turns it up for the lanterns.
-     */
-    intensity: 0.2,
-    threshold: 0.95,
+    // Intensity and threshold follow the hour (DAY_CYCLE.looks): by day only real highlights
+    // glow a little, above the paper-white of clouds and labels; at night the lanterns do.
     smoothing: 0.2,
     radius: 0.6,
   },
@@ -755,6 +770,109 @@ export const FALLING_LEAVES = {
 } as const;
 
 export type FallingLeavesConfig = Widen<typeof FALLING_LEAVES>;
+
+/**
+ * Light through the day, by the visitor's local time. Between two stops the look blends; two stops
+ * of the same phase hold it. The colors of each phase are in theme.ts (dayPhasePalettes).
+ */
+export const DAY_CYCLE = {
+  stops: [
+    { hour: 5, phase: 'night' },
+    { hour: 6.25, phase: 'dawn' },
+    { hour: 8, phase: 'day' },
+    { hour: 16.75, phase: 'day' },
+    { hour: 18, phase: 'dusk' },
+    { hour: 19.25, phase: 'night' },
+  ] satisfies readonly DayStop[],
+  /** How fast (1/s) the scene moves toward a new look: a forced change takes a few seconds. */
+  transitionRate: 0.9,
+  /** How often the clock is read again, in milliseconds. */
+  clockInterval: 30_000,
+  looks: {
+    dawn: {
+      foliageShadeMix: 0.22,
+      lanternGlow: 0.15,
+      fireflies: 0,
+      stars: 0.15,
+      sunPosition: [0.18, 0.34],
+      sunStrength: 0.55,
+      haloOpacity: 0.55,
+      bloomIntensity: 0.25,
+      bloomThreshold: 0.92,
+    },
+    day: {
+      foliageShadeMix: 0,
+      lanternGlow: 0,
+      fireflies: 0,
+      stars: 0,
+      sunPosition: [0.78, 0.82],
+      sunStrength: 0.35,
+      haloOpacity: 0.55,
+      bloomIntensity: 0.2,
+      bloomThreshold: 0.95,
+    },
+    dusk: {
+      foliageShadeMix: 0.3,
+      lanternGlow: 0.35,
+      fireflies: 0.35,
+      stars: 0.1,
+      sunPosition: [0.84, 0.3],
+      sunStrength: 0.6,
+      haloOpacity: 0.7,
+      bloomIntensity: 0.45,
+      bloomThreshold: 0.85,
+    },
+    night: {
+      foliageShadeMix: 0.62,
+      lanternGlow: 0.5,
+      fireflies: 1,
+      stars: 1,
+      // The moon.
+      sunPosition: [0.22, 0.8],
+      sunStrength: 0.3,
+      haloOpacity: 0.95,
+      bloomIntensity: 0.9,
+      bloomThreshold: 0.7,
+    },
+  } satisfies Record<DayPhase, DayLook>,
+} as const;
+
+export interface DayLook {
+  /** How far leaves and grass lean toward the palette's foliageShade. */
+  readonly foliageShadeMix: number;
+  /** Light of their own on the fruits: lanterns at night. */
+  readonly lanternGlow: number;
+  /** 0–1: how many fireflies are out. */
+  readonly fireflies: number;
+  /** 0–1: how bright the stars are. */
+  readonly stars: number;
+  /** Where the sun (or moon) glows on screen, 0–1 from the bottom left, and how strong. */
+  readonly sunPosition: readonly [number, number];
+  readonly sunStrength: number;
+  readonly haloOpacity: number;
+  readonly bloomIntensity: number;
+  readonly bloomThreshold: number;
+}
+
+/** What each season does beyond its colors (seasonPalettes in theme.ts). */
+export const SEASON_LOOK = {
+  spring: { leafDensity: 1, fallWait: 1, blossomDensity: 0.55, chill: 0 },
+  summer: { leafDensity: 1, fallWait: 1, blossomDensity: 0, chill: 0 },
+  // More leaves let go: the wait between two falls in a slot is a third of the usual.
+  autumn: { leafDensity: 0.9, fallWait: 0.3, blossomDensity: 0, chill: 0 },
+  winter: { leafDensity: 0.45, fallWait: 1.6, blossomDensity: 0, chill: 0.3 },
+} as const satisfies Record<Season, SeasonLook>;
+
+export interface SeasonLook {
+  /** Fraction of the leaves on the tree. */
+  readonly leafDensity: number;
+  /** Multiplies the wait between falling leaves: below 1, more of them. */
+  readonly fallWait: number;
+  /** Fraction of the leaf clusters that carry blossoms. */
+  readonly blossomDensity: number;
+  /** How far sky and hills lean toward the season's chill color. */
+  readonly chill: number;
+}
 
 /** The family timeline: the tree as it was in a chosen year. */
 export const TIMELINE = {

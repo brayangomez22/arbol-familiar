@@ -1,18 +1,18 @@
-import { Color, ShaderMaterial, Vector2 } from 'three';
+import { ShaderMaterial, Vector2 } from 'three';
 import { SCENERY, TOON } from '@/config/constants';
-import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/cloud.frag.glsl?raw';
 import vertexShader from '@/shaders/cloud.vert.glsl?raw';
+import type { LivePalette } from '../ambient/livePalette';
 
 /** Flat clouds: every puff gets a crescent of shade away from the sun, and the base is shaded. */
 export class CloudMaterial extends ShaderMaterial {
-  constructor(palette: Palette) {
+  constructor(palette: LivePalette) {
     super({
       vertexShader,
       fragmentShader,
       uniforms: {
-        uColor: { value: new Color(palette.cloud) },
-        uShadeColor: { value: new Color(palette.cloudShade) },
+        uColor: { value: palette.cloud },
+        uShadeColor: { value: palette.cloudShade },
         // The sun as seen on the screen plane.
         uSunDirection: {
           value: new Vector2(TOON.sunDirection[0], TOON.sunDirection[1]).normalize(),

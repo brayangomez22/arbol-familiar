@@ -1,7 +1,8 @@
+import { useFrame } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
-import { BufferGeometry, Color, Float32BufferAttribute, MeshBasicMaterial } from 'three';
+import { BufferGeometry, Float32BufferAttribute, MeshBasicMaterial } from 'three';
 import { SCENERY, TOON } from '@/config/constants';
-import { dayPalette } from '@/config/theme';
+import { livePalette } from '../ambient/livePalette';
 import { buildRidges, type Ridge } from '@/layout/scenery';
 import type { Bounds } from '@/layout/types';
 
@@ -17,13 +18,8 @@ export function Ridges({ bounds }: RidgesProps) {
     () =>
       buildRidges(bounds, SCENERY.ridges, SCENERY.seed).map((ridge) => ({
         geometry: buildRidgeGeometry(ridge),
-        material: new MeshBasicMaterial({
-          // Starts from the tone the toon ramp gives the sunlit plain, so the plain runs into the
-          // ridges without a seam, then fades toward the horizon with distance.
-          color: new Color(dayPalette.hill)
-            .lerp(new Color(dayPalette.light), TOON.highlightMix)
-            .lerp(new Color(dayPalette.sky.horizon), ridge.fog),
-        }),
+        fog: ridge.fog,
+        material: new MeshBasicMaterial(),
       })),
     [bounds],
   );
@@ -36,6 +32,18 @@ export function Ridges({ bounds }: RidgesProps) {
     },
     [parts],
   );
+  // Starts from the tone the toon ramp gives the sunlit plain, so the plain runs into the ridges
+  // without a seam, then fades toward the horizon with distance. Mixed again every frame from
+  // the live palette, so the ridges follow the light of the hour.
+  useFrame(() => {
+    for (const { material, fog } of parts) {
+      material.color
+        .copy(livePalette.hill)
+        .lerp(livePalette.light, TOON.highlightMix)
+        .lerp(livePalette.sky.horizon, fog);
+    }
+  });
+
   return parts.map(({ geometry, material }, i) => (
     <mesh key={i} geometry={geometry} material={material} raycast={ignoreRaycast} />
   ));

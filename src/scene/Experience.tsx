@@ -2,10 +2,11 @@ import { Canvas } from '@react-three/fiber';
 import { cssEase } from '@/animation/easings';
 import { CAMERA, TIMING } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
-import { dayPalette } from '@/config/theme';
 import type { PersonId } from '@/domain/types';
 import type { TreeLayout } from '@/layout/types';
 import { useAppStore } from '@/state/store';
+import { AmbientDirector } from './ambient/AmbientDirector';
+import { livePalette } from './ambient/livePalette';
 import { CanvasControls } from './camera/CanvasControls';
 import { CanvasCursor } from './camera/CanvasCursor';
 import { Effects } from './effects/Effects';
@@ -52,7 +53,9 @@ export function Experience({ layout, labels, time }: ExperienceProps) {
         if (event.type === 'click') selectPerson(null);
       }}
     >
-      <color attach="background" args={[dayPalette.sky.horizon]} />
+      {/* The live color itself: the background follows the horizon without being set again. */}
+      <primitive attach="background" object={livePalette.sky.horizon} />
+      <AmbientDirector />
       <Wind />
       <Scenery layout={layout} />
       <Tree layout={layout} labels={labels} time={time} />

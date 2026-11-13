@@ -3,7 +3,7 @@ import { SCENERY } from '@/config/constants';
 import familyJson from '@/data/family.json';
 import { loadFamily } from '@/data/loadFamily';
 import { buildTreeLayout } from '../buildTreeLayout';
-import { buildRidges, placeClouds, placePollen } from '../scenery';
+import { buildRidges, placeClouds, placeFireflies, placePollen } from '../scenery';
 import { groundHeight, groundNormal, placeGrass } from '../terrain';
 import { length, vec3 } from '../vec';
 
@@ -92,5 +92,28 @@ describe('placePollen', () => {
       expect(mote.position.x).toBeGreaterThanOrEqual(bounds.min.x - SCENERY.pollen.padding);
       expect(mote.position.x).toBeLessThanOrEqual(bounds.max.x + SCENERY.pollen.padding);
     }
+  });
+});
+
+describe('placeFireflies', () => {
+  const config = SCENERY.fireflies;
+
+  it('is deterministic, above the ground and around the tree', () => {
+    const flies = placeFireflies(120, bounds, config, seed);
+    expect(placeFireflies(120, bounds, config, seed)).toEqual(flies);
+    for (const fly of flies) {
+      expect(fly.position.y).toBeGreaterThanOrEqual(0);
+      expect(fly.position.x).toBeGreaterThanOrEqual(bounds.min.x - config.padding);
+      expect(fly.position.x).toBeLessThanOrEqual(bounds.max.x + config.padding);
+      expect(fly.blink).toBeGreaterThanOrEqual(config.blinkSpeed[0]);
+      expect(fly.blink).toBeLessThanOrEqual(config.blinkSpeed[1]);
+    }
+  });
+
+  it('keeps a share of them low over the grass', () => {
+    const flies = placeFireflies(400, bounds, config, seed);
+    const floor = Math.max(bounds.min.y, 0);
+    const low = flies.filter((fly) => fly.position.y <= floor + config.lowHeight).length;
+    expect(low / flies.length).toBeGreaterThan(config.lowShare * 0.8);
   });
 });

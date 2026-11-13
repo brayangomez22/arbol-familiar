@@ -1,6 +1,5 @@
 import { useEffect, useLayoutEffect, useMemo, useRef } from 'react';
 import {
-  Color,
   InstancedBufferAttribute,
   Matrix4,
   PlaneGeometry,
@@ -10,14 +9,15 @@ import {
 } from 'three';
 import { INTRO, LAYOUT, LEAF_MESH, TIMELINE, WIND } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
-import { dayPalette } from '@/config/theme';
 import { placeLeaves, type LeafInstance } from '@/layout/leafInstances';
 import type { GrowthSchedule } from '@/layout/growth';
 import { swayWeight, type TreeReach } from '@/layout/reach';
 import type { TimelineSchedule } from '@/layout/timelineGrowth';
+import { createRandom } from '@/layout/random';
 import type { FruitPlacement, LeafCluster } from '@/layout/types';
 import { useAppStore } from '@/state/store';
-import { LeafMaterial } from '../materials/LeafMaterial';
+import { livePalette } from '../ambient/livePalette';
+import { FOLIAGE_TONES, LeafMaterial } from '../materials/LeafMaterial';
 
 interface LeavesProps {
   readonly clusters: readonly LeafCluster[];
@@ -34,7 +34,7 @@ interface LeavesProps {
 export function Leaves({ clusters, fruits, reach, schedule, timeline }: LeavesProps) {
   const leavesPerCluster = useAppStore((state) => QUALITY[state.qualityTier].leavesPerCluster);
   const leaves = useMemo(
-    () => placeLeaves(clusters, fruits, leavesPerCluster, dayPalette.leaves.length, LAYOUT.leaf),
+    () => placeLeaves(clusters, fruits, leavesPerCluster, FOLIAGE_TONES, LAYOUT.leaf),
     [clusters, fruits, leavesPerCluster],
   );
   const geometry = useMemo(() => {
@@ -63,7 +63,12 @@ export function Leaves({ clusters, fruits, reach, schedule, timeline }: LeavesPr
     );
   }, [leaves, clusters, reach, schedule, timeline]);
   const material = useMemo(
-    () => new LeafMaterial(dayPalette, LEAF_MESH, { focus: true, growth: true }),
+    () =>
+      new LeafMaterial(livePalette, livePalette.leaves, LEAF_MESH, {
+        focus: true,
+        growth: true,
+        density: true,
+      }),
     [],
   );
   useEffect(
@@ -114,10 +119,17 @@ function buildLeafGeometry(
   geometry.translate(0, 1 / 2, 0);
   const normals = new Float32Array(leaves.length * 3);
   const sway = new Float32Array(leaves.length * 2);
-  leaves.forEach(({ shadeNormal, clusterIndex, spin }, i) => {
+  const colorIndex = new Float32Array(leaves.length);
+  // Which leaves winter takes first: a fixed, seeded order, so the same ones go every year.
+  const rng = createRandom('leaf-rank');
+  const rank = Float32Array.from(leaves, () => rng.next());
+  leaves.forEach(({ shadeNormal, clusterIndex, spin, colorIndex: tone }, i) => {
     normals.set([shadeNormal.x, shadeNormal.y, shadeNormal.z], i * 3);
     sway.set([clusterWeights[clusterIndex] ?? 0, spin], i * 2);
+    colorIndex[i] = tone;
   });
+  geometry.setAttribute('aColorIndex', new InstancedBufferAttribute(colorIndex, 1));
+  geometry.setAttribute('aRank', new InstancedBufferAttribute(rank, 1));
   geometry.setAttribute('aShadeNormal', new InstancedBufferAttribute(normals, 3));
   geometry.setAttribute('aSway', new InstancedBufferAttribute(sway, 2));
   geometry.setAttribute('aGrowAt', new InstancedBufferAttribute(Float32Array.from(growAt), 1));
@@ -133,7 +145,6 @@ function writeInstances(mesh: InstancedMesh, leaves: readonly LeafInstance[]): v
   const align = new Quaternion();
   const spin = new Quaternion();
   const forward = new Vector3(0, 0, 1);
-  const colors = dayPalette.leaves.map((hex) => new Color(hex));
 
   leaves.forEach((leaf, i) => {
     facing.set(leaf.facing.x, leaf.facing.y, leaf.facing.z);
@@ -143,10 +154,7 @@ function writeInstances(mesh: InstancedMesh, leaves: readonly LeafInstance[]): v
     position.set(leaf.position.x, leaf.position.y, leaf.position.z);
     scale.setScalar(leaf.size);
     mesh.setMatrixAt(i, matrix.compose(position, align, scale));
-    const color = colors[leaf.colorIndex];
-    if (color) mesh.setColorAt(i, color);
   });
   mesh.instanceMatrix.needsUpdate = true;
-  if (mesh.instanceColor) mesh.instanceColor.needsUpdate = true;
   mesh.computeBoundingSphere();
 }

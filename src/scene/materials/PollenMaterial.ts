@@ -1,13 +1,13 @@
-import { Color, ShaderMaterial } from 'three';
+import { ShaderMaterial } from 'three';
 import { SCENERY } from '@/config/constants';
-import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/pollen.frag.glsl?raw';
 import vertexShader from '@/shaders/pollen.vert.glsl?raw';
+import type { LivePalette } from '../ambient/livePalette';
 import { pixelsPerUnit } from './pixelsPerUnit';
 
 /** Soft round specks that float on their own in the vertex shader; JS only advances the clock. */
 export class PollenMaterial extends ShaderMaterial {
-  constructor(palette: Palette) {
+  constructor(palette: LivePalette) {
     super({
       vertexShader,
       fragmentShader,
@@ -19,7 +19,7 @@ export class PollenMaterial extends ShaderMaterial {
         uAmplitude: { value: SCENERY.pollen.driftAmplitude },
         uSpeed: { value: SCENERY.pollen.driftSpeed },
         uPixelsPerUnit: { value: 1 },
-        uColor: { value: new Color(palette.pollen) },
+        uColor: { value: palette.pollen },
         uOpacity: { value: SCENERY.pollen.opacity },
       },
     });

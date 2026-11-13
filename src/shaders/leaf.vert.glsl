@@ -1,4 +1,12 @@
 attribute vec3 aShadeNormal;
+/** Per instance: which of the live colors it takes. */
+attribute float aColorIndex;
+uniform vec3 uColors[FOLIAGE_TONES];
+#ifdef USE_DENSITY
+/** Per instance, 0–1: leaves whose rank is above the density are gone (winter). */
+attribute float aRank;
+uniform float uLeafDensity;
+#endif
 /** Per instance: wind weight, and a phase so neighbors don't flutter in step. */
 attribute vec2 aSway;
 
@@ -33,6 +41,9 @@ void main() {
   // Opens from its stem (the instance origin), so a leaf grows out of the twig.
   local *= unfold(growthAge(aGrowAt, aBornYear));
   #endif
+  #ifdef USE_DENSITY
+  local *= 1.0 - smoothstep(uLeafDensity, uLeafDensity + 0.08, aRank);
+  #endif
   vec4 worldPosition = instanceToWorld * vec4(local, 1.0);
 
   // The field is sampled once per instance, at its stem, so a leaf moves as one piece with its
@@ -46,7 +57,7 @@ void main() {
 
   vWorldPosition = worldPosition.xyz;
   vShadeNormal = normalize(mat3(modelMatrix) * aShadeNormal);
-  vColor = instanceColor;
+  vColor = uColors[int(aColorIndex + 0.5)];
   vUv = uv;
   gl_Position = projectionMatrix * viewMatrix * worldPosition;
 }

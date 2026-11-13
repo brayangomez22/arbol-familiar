@@ -1,7 +1,7 @@
 import { useThree } from '@react-three/fiber';
 import { useEffect, useMemo } from 'react';
 import { PlaneGeometry } from 'three';
-import { dayPalette } from '@/config/theme';
+import { livePalette } from '../ambient/livePalette';
 import { SkyMaterial } from '../materials/SkyMaterial';
 
 const ignoreRaycast = () => null;
@@ -10,7 +10,7 @@ const ignoreRaycast = () => null;
 export function Sky() {
   const aspect = useThree((state) => state.size.width / state.size.height);
   const geometry = useMemo(() => new PlaneGeometry(2, 2), []);
-  const material = useMemo(() => new SkyMaterial(dayPalette), []);
+  const material = useMemo(() => new SkyMaterial(livePalette), []);
   useEffect(() => {
     material.setAspect(aspect);
   }, [material, aspect]);

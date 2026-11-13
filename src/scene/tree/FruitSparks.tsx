@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Vector3 } from 'three';
 import { HOVER_SPARKS } from '@/config/constants';
-import { dayPalette } from '@/config/theme';
+import { livePalette } from '../ambient/livePalette';
 import type { PersonId } from '@/domain/types';
 import { useReducedMotion } from '@/hooks/useReducedMotion';
 import type { Vec3 } from '@/layout/types';
@@ -47,5 +47,5 @@ export function FruitSparks({ sources }: FruitSparksProps) {
     [sources, reducedMotion, sway],
   );
 
-  return <SparkBurst ref={burst} config={HOVER_SPARKS} color={dayPalette.spark} />;
+  return <SparkBurst ref={burst} config={HOVER_SPARKS} color={livePalette.spark} />;
 }

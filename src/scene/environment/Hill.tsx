@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { PlaneGeometry } from 'three';
 import { SCENERY } from '@/config/constants';
-import { dayPalette } from '@/config/theme';
+import { livePalette } from '../ambient/livePalette';
 import { groundHeight } from '@/layout/terrain';
 import type { Vec3 } from '@/layout/types';
 import { ToonMaterial } from '../materials/ToonMaterial';
@@ -17,7 +17,7 @@ const ignoreRaycast = () => null;
 export function Hill({ top }: HillProps) {
   const geometry = useMemo(() => buildHillGeometry(top), [top]);
   const material = useMemo(
-    () => new ToonMaterial({ color: dayPalette.hill, palette: dayPalette, rim: false }),
+    () => new ToonMaterial({ color: livePalette.hill, palette: livePalette, rim: false }),
     [],
   );
   useEffect(

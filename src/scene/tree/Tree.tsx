@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
 import { INTRO, TIMELINE, WIND } from '@/config/constants';
-import { dayPalette } from '@/config/theme';
+import { livePalette } from '../ambient/livePalette';
 import type { PersonId } from '@/domain/types';
 import { growthSchedule } from '@/layout/growth';
 import { measureReach, swayWeight } from '@/layout/reach';
@@ -12,7 +12,7 @@ import type { FamilyTime } from '../timeline/familyTime';
 import { TimelineDirector } from '../timeline/TimelineDirector';
 import { BranchMesh, type BranchMeshHandle } from './BranchMesh';
 import type { WoodMeasure } from './branchGeometry';
-import { FallingLeaves } from './FallingLeaves';
+import { CrownLeafFall } from './CrownLeafFall';
 import { Fruits } from './Fruits';
 import { Leaves } from './Leaves';
 
@@ -58,11 +58,11 @@ export function Tree({ layout, labels, time }: TreeProps) {
 
   return (
     <>
-      <BranchMesh segments={layout.roots} color={dayPalette.trunkShadow} wood={roots} />
+      <BranchMesh segments={layout.roots} color={livePalette.trunkShadow} wood={roots} />
       <BranchMesh
         ref={branches}
         segments={layout.branches}
-        color={dayPalette.trunk}
+        color={livePalette.trunk}
         wood={wood}
         sap
       />
@@ -73,7 +73,7 @@ export function Tree({ layout, labels, time }: TreeProps) {
         schedule={schedule}
         timeline={timeline}
       />
-      <FallingLeaves clusters={layout.leafClusters} branches={layout.branches} />
+      <CrownLeafFall clusters={layout.leafClusters} branches={layout.branches} />
       <Fruits
         fruits={layout.fruits}
         branches={layout.branches}

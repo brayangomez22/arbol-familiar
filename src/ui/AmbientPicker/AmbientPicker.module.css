@@ -1,0 +1,49 @@
+/* Top right, out of the way of the title card: a small developer-ish tool, still on paper. */
+.card {
+  position: fixed;
+  top: max(16px, env(safe-area-inset-top));
+  right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: calc(100vw - 32px);
+  padding: 10px 12px;
+  border: var(--border-card);
+  border-radius: var(--radius-card);
+  background: var(--color-card);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(6px);
+  font-size: 0.75rem;
+}
+
+.row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.label {
+  min-width: 4.5em;
+  color: var(--color-ink-soft);
+}
+
+.choice {
+  padding: 4px 9px;
+  border: var(--border-card);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--color-ink);
+  font: inherit;
+  cursor: pointer;
+}
+
+.choice[aria-pressed='true'] {
+  background: var(--color-ink);
+  color: var(--color-paper);
+}
+
+.choice:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}

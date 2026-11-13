@@ -130,3 +130,41 @@ export function placePollen(
     phase: rng.next() * Math.PI * 2,
   }));
 }
+
+export interface Firefly {
+  readonly position: Vec3;
+  readonly size: number;
+  readonly phase: number;
+  /** Radians per second of its glow. */
+  readonly blink: number;
+}
+
+/**
+ * Fireflies in the crown's box, and some low over the grass, where they gather on real summer
+ * nights. Seeded, so the same ones come out every night.
+ */
+export function placeFireflies(
+  count: number,
+  bounds: Bounds,
+  config: SceneryConfig['fireflies'],
+  seed: string,
+): Firefly[] {
+  const rng = createRandom(seed, 'fireflies');
+  const { min, max } = bounds;
+  const pad = config.padding;
+  const [slowest, fastest] = config.blinkSpeed;
+  return Array.from({ length: count }, () => {
+    const low = rng.next() < config.lowShare;
+    const floor = Math.max(min.y, 0);
+    return {
+      position: vec3(
+        rng.range(min.x - pad, max.x + pad),
+        low ? rng.range(floor, floor + config.lowHeight) : rng.range(floor, max.y + pad),
+        rng.range(min.z - pad, max.z + pad),
+      ),
+      size: 1 + rng.signed() * config.sizeJitter,
+      phase: rng.next() * Math.PI * 2,
+      blink: rng.range(slowest, fastest),
+    };
+  });
+}

@@ -1,5 +1,7 @@
 import { create, type StateCreator } from 'zustand';
 import { DEFAULT_QUALITY_TIER, type QualityTier } from '@/config/quality';
+import type { DayPhase } from '@/domain/dayCycle';
+import type { Season } from '@/domain/seasons';
 import type { PersonId } from '@/domain/types';
 
 export interface SelectionSlice {
@@ -16,6 +18,14 @@ export interface TimelineSlice {
   timelinePlaying: boolean;
   setTimelineYear: (year: number | null) => void;
   setTimelinePlaying: (playing: boolean) => void;
+}
+
+/** Season and time of day forced from the URL (?season=, ?time=); null follows the clock. */
+export interface AmbientSlice {
+  seasonOverride: Season | null;
+  dayPhaseOverride: DayPhase | null;
+  setSeasonOverride: (season: Season | null) => void;
+  setDayPhaseOverride: (phase: DayPhase | null) => void;
 }
 
 export interface QualitySlice {
@@ -68,6 +78,7 @@ export interface CameraSlice {
 
 export type AppState = SelectionSlice &
   TimelineSlice &
+  AmbientSlice &
   QualitySlice &
   AudioSlice &
   IntroSlice &
@@ -94,6 +105,17 @@ const createTimelineSlice: Slice<TimelineSlice> = (set) => ({
   },
   setTimelinePlaying: (playing) => {
     set({ timelinePlaying: playing });
+  },
+});
+
+const createAmbientSlice: Slice<AmbientSlice> = (set) => ({
+  seasonOverride: null,
+  dayPhaseOverride: null,
+  setSeasonOverride: (season) => {
+    set({ seasonOverride: season });
+  },
+  setDayPhaseOverride: (phase) => {
+    set({ dayPhaseOverride: phase });
   },
 });
 
@@ -150,6 +172,7 @@ const createCameraSlice: Slice<CameraSlice> = (set, get) => ({
 export const useAppStore = create<AppState>()((...args) => ({
   ...createSelectionSlice(...args),
   ...createTimelineSlice(...args),
+  ...createAmbientSlice(...args),
   ...createQualitySlice(...args),
   ...createAudioSlice(...args),
   ...createIntroSlice(...args),

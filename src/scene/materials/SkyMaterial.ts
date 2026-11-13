@@ -1,24 +1,32 @@
-import { Color, ShaderMaterial, Vector2 } from 'three';
+import { ShaderMaterial } from 'three';
 import { SKY } from '@/config/constants';
-import type { Palette } from '@/config/theme';
 import fragmentShader from '@/shaders/sky.frag.glsl?raw';
 import vertexShader from '@/shaders/sky.vert.glsl?raw';
+import { ambientUniforms, type LivePalette } from '../ambient/livePalette';
 
-/** Screen-space sky: vertical gradient plus a round sun glow that stays round at any aspect. */
+/**
+ * Screen-space sky: vertical gradient plus a round sun (or moon) glow that stays round at any
+ * aspect, and stars that come out at night.
+ */
 export class SkyMaterial extends ShaderMaterial {
-  constructor(palette: Palette) {
+  constructor(palette: LivePalette) {
     super({
       vertexShader,
       fragmentShader,
       depthTest: false,
       depthWrite: false,
       uniforms: {
-        uTopColor: { value: new Color(palette.sky.top) },
-        uHorizonColor: { value: new Color(palette.sky.horizon) },
-        uSunColor: { value: new Color(palette.sunGlow) },
-        uSunPosition: { value: new Vector2(...SKY.sunPosition) },
+        uTopColor: { value: palette.sky.top },
+        uHorizonColor: { value: palette.sky.horizon },
+        uSunColor: { value: palette.sunGlow },
+        uSunPosition: ambientUniforms.uSunPosition,
         uSunRadius: { value: SKY.sunRadius },
-        uSunStrength: { value: SKY.sunStrength },
+        uSunStrength: ambientUniforms.uSunStrength,
+        uStarColor: { value: palette.stars },
+        uStars: ambientUniforms.uStars,
+        uStarDensity: { value: SKY.stars.density },
+        uStarScale: { value: SKY.stars.scale },
+        uStarSize: { value: SKY.stars.size },
         uGradientStart: { value: SKY.gradientStart },
         uGradientEnd: { value: SKY.gradientEnd },
         uAspect: { value: 1 },
