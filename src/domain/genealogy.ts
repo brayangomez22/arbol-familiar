@@ -156,3 +156,34 @@ function breadthFirst(
   }
   return result;
 }
+
+/**
+ * Everyone sharing at least one parent with the person, including half-siblings, union by union
+ * in birth order.
+ */
+export function siblingsOf(index: FamilyIndex, id: PersonId): readonly PersonId[] {
+  const siblings = new Set<PersonId>();
+  for (const parentId of parentsOf(index, id)) {
+    for (const childId of childrenOf(index, parentId)) {
+      if (childId !== id) siblings.add(childId);
+    }
+  }
+  return [...siblings];
+}
+
+export interface Relatives {
+  readonly parents: readonly PersonId[];
+  readonly partners: readonly PersonId[];
+  readonly children: readonly PersonId[];
+  readonly siblings: readonly PersonId[];
+}
+
+export function relativesOf(index: FamilyIndex, id: PersonId): Relatives {
+  getPerson(index, id);
+  return {
+    parents: parentsOf(index, id),
+    partners: partnersOf(index, id),
+    children: childrenOf(index, id),
+    siblings: siblingsOf(index, id),
+  };
+}

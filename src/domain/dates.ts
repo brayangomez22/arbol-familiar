@@ -107,3 +107,24 @@ export function isAliveAt(person: Person, year: number): boolean {
   const deathYear = person.death?.date?.year;
   return deathYear === undefined || year <= deathYear;
 }
+
+export interface Lifespan {
+  /** Completed years: today for living people, at death for deceased ones. */
+  readonly years: number;
+  /** False when a missing month or day means it could be one year less. */
+  readonly exact: boolean;
+}
+
+export function lifespanOf(person: Person, today: Date): Lifespan | null {
+  const birth = person.birth?.date;
+  const end = person.death ? person.death.date : partialDateFromDate(today);
+  if (!birth || !end) return null;
+  return { years: yearsBetween(birth, end), exact: isAnniversaryKnown(birth, end) };
+}
+
+/** Whether we can tell if the anniversary of `from` had already come by `to` that year. */
+function isAnniversaryKnown(from: PartialDate, to: PartialDate): boolean {
+  if (from.month === undefined || to.month === undefined) return false;
+  if (from.month !== to.month) return true;
+  return from.day !== undefined && to.day !== undefined;
+}

@@ -5,6 +5,7 @@ import {
   formatPartialDate,
   isAliveAt,
   isBirthday,
+  lifespanOf,
   parsePartialDate,
   yearsBetween,
 } from '../dates';
@@ -121,5 +122,43 @@ describe('isAliveAt', () => {
   it('treats unknown dates permissively', () => {
     expect(isAliveAt(person('x'), 1800)).toBe(true);
     expect(isAliveAt(person('x', { death: {} }), 3000)).toBe(true);
+  });
+});
+
+describe('lifespanOf', () => {
+  const today = new Date(2026, 10, 12);
+
+  it('is exact when both full dates are known', () => {
+    const someone = person('a', { birth: { date: date('1990-11-13') } });
+    expect(lifespanOf(someone, today)).toEqual({ years: 35, exact: true });
+  });
+
+  it('is exact when the months differ even without days', () => {
+    const someone = person('a', { birth: { date: date('1941-09') } });
+    expect(lifespanOf(someone, today)).toEqual({ years: 85, exact: true });
+  });
+
+  it('is approximate when a month or day that matters is missing', () => {
+    expect(lifespanOf(person('a', { birth: { date: date('1968') } }), today)).toEqual({
+      years: 58,
+      exact: false,
+    });
+    expect(lifespanOf(person('a', { birth: { date: date('1990-11') } }), today)).toEqual({
+      years: 36,
+      exact: false,
+    });
+  });
+
+  it('measures deceased people up to their death', () => {
+    const someone = person('a', {
+      birth: { date: date('1938-05-12') },
+      death: { date: date('2015') },
+    });
+    expect(lifespanOf(someone, today)).toEqual({ years: 77, exact: false });
+  });
+
+  it('is unknown without birth date, or for a death without date', () => {
+    expect(lifespanOf(person('a'), today)).toBeNull();
+    expect(lifespanOf(person('a', { birth: { date: date('1950') }, death: {} }), today)).toBeNull();
   });
 });
