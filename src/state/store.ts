@@ -1,5 +1,6 @@
 import { create, type StateCreator } from 'zustand';
 import { DEFAULT_QUALITY_TIER, type QualityTier } from '@/config/quality';
+import { loadAudioPreference, saveAudioPreference } from './audioMemory';
 import type { DayPhase } from '@/domain/dayCycle';
 import type { Season } from '@/domain/seasons';
 import type { PersonId } from '@/domain/types';
@@ -127,10 +128,12 @@ const createQualitySlice: Slice<QualitySlice> = (set) => ({
 });
 
 const createAudioSlice: Slice<AudioSlice> = (set) => ({
-  // Off by default: sound must never start without the visitor asking for it.
-  audioEnabled: false,
+  // Off unless the visitor left it on. Even then nothing sounds before their first click or key
+  // (see audio/AudioDirector): browsers forbid it, and it would be rude anyway.
+  audioEnabled: loadAudioPreference(),
   voiceNotePlaying: false,
   setAudioEnabled: (enabled) => {
+    saveAudioPreference(enabled);
     set({ audioEnabled: enabled });
   },
   setVoiceNotePlaying: (playing) => {

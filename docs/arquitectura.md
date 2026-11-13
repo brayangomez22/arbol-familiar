@@ -54,6 +54,8 @@ arbol-familiar/
    │  ├─ buildTreeLayout.ts       # punto de entrada: Family ➜ TreeLayout
    │  ├─ branchShape.ts           # curvas orgánicas, ángulos, ramificación
    │  ├─ thickness.ts             # radio por nº de descendientes (modelo de tuberías)
+   │  ├─ originsMap.ts            # lugares y migraciones ➜ mapa 2D (proyección, curvas, etiquetas)
+   │  ├─ geo/                     # contornos dibujados a mano: Colombia y continentes
    │  └─ __tests__/
    ├─ scene/                      # React Three Fiber
    │  ├─ Experience.tsx           # <Canvas>, luces, entorno, árbol, efectos
@@ -64,6 +66,7 @@ arbol-familiar/
    │  └─ materials/               # materiales toon y shader materials
    ├─ shaders/                    # .glsl (wind, growth, sap, toon, paper)
    ├─ animation/                  # timelines GSAP (intro, cameraFly) y easings
+   ├─ audio/                      # Web Audio: música, viento y pop; AudioDirector lo maneja desde state/
    ├─ ui/                         # componentes DOM del overlay
    │  ├─ PersonPanel/
    │  ├─ Search/

@@ -1,4 +1,5 @@
 import { lazy, Suspense } from 'react';
+import { AudioDirector } from '@/audio/AudioDirector';
 import { readLayoutDebugOptions } from '@/scene/debug/layoutDebugOptions';
 import { Experience } from '@/scene/Experience';
 import { Overlay } from '@/ui/Overlay';
@@ -31,6 +32,7 @@ export function App() {
   return (
     <>
       <Experience layout={familyLayout} labels={fruitLabels} time={familyTime} />
+      <AudioDirector />
       <Overlay
         summary={familySummary}
         family={familyDirectory}
