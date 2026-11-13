@@ -254,6 +254,8 @@ export const FRUIT_MESH = {
   scaleSpring: { stiffness: 260, dampingRatio: 0.6 },
   /** A hovered or selected fruit's halo: peak opacity, how much it grows and how fast (1/s). */
   haloGlow: { opacity: 1, growth: 0.35, rate: 9 },
+  /** Faint light of their own on the fruits of those who have passed. */
+  deceasedGlow: 0.14,
 } as const;
 
 /** Specks of light that rise from a fruit when the pointer reaches it. */
@@ -753,6 +755,25 @@ export const FALLING_LEAVES = {
 } as const;
 
 export type FallingLeavesConfig = Widen<typeof FALLING_LEAVES>;
+
+/** The family timeline: the tree as it was in a chosen year. */
+export const TIMELINE = {
+  /** Years a person's branch takes to grow, ending the year they are born. */
+  growYears: 3,
+  /** Seconds of intro growth one year stands for, so wood swells and leaves unfold alike. */
+  secondsPerYear: 0.6,
+  /** How fast (1/s) the tree catches up with the year picked on the slider. */
+  followRate: 5,
+  /** One year every this many milliseconds while ▶ plays. */
+  playStepMs: 150,
+  /** Leaves of a cluster open over this many years once its point of the branch exists. */
+  leafSpreadYears: 0.8,
+  /**
+   * A year on the slider shows the tree this far into it: everyone born that year is already
+   * there, and nobody born the next one yet.
+   */
+  yearProgress: 0.9,
+} as const;
 
 /** Seconds. */
 export const TIMING = {

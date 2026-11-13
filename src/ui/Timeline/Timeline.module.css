@@ -1,0 +1,220 @@
+/* Along the bottom, between the left edge and the controls column; steps aside with the panel
+   just as the controls do. */
+.dock {
+  --controls-room: 76px;
+
+  position: fixed;
+  left: max(16px, env(safe-area-inset-left));
+  right: calc(
+    max(16px, env(safe-area-inset-right)) + var(--controls-room) + var(--occluded-right, 0px)
+  );
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + var(--occluded-bottom, 0px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  transition:
+    right var(--duration-ui-fade) var(--ease-out),
+    bottom var(--duration-ui-fade) var(--ease-out);
+}
+
+/* Over the start of the bar, where the years begin: clear of the trunk at the center. */
+.year {
+  padding-left: 14px;
+  transition: opacity var(--duration-ui-fade) var(--ease-out);
+}
+
+.resting {
+  opacity: 0;
+}
+
+.yearNumber {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(2.4rem, 1.6rem + 3vw, 4.2rem);
+  font-weight: 600;
+  font-variant-numeric: lining-nums tabular-nums;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.census {
+  margin: 2px 0 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  color: var(--color-ink-soft);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: min(100%, 560px);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 18px 8px 8px;
+  border: var(--border-card);
+  border-radius: 999px;
+  background: var(--color-card);
+  box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+}
+
+.play {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  cursor: pointer;
+  transition: transform 150ms ease;
+}
+
+.play:hover {
+  transform: scale(1.06);
+}
+
+.play:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+.play svg {
+  width: 18px;
+  height: 18px;
+  fill: currentColor;
+  stroke: currentColor;
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.track {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 16px;
+}
+
+/* The track fills with ink up to the year shown, like a thread that has been spun so far. */
+.slider {
+  --track: color-mix(in srgb, var(--color-ink) 16%, transparent);
+
+  display: block;
+  width: 100%;
+  height: 24px;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+  appearance: none;
+}
+
+.slider::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--color-ink) var(--progress),
+    var(--track) var(--progress)
+  );
+}
+
+.slider::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: linear-gradient(
+    to right,
+    var(--color-ink) var(--progress),
+    var(--track) var(--progress)
+  );
+}
+
+.slider::-webkit-slider-thumb {
+  width: 18px;
+  height: 18px;
+  margin-top: -7px;
+  border: 3px solid var(--color-paper);
+  border-radius: 50%;
+  background: var(--color-ink);
+  box-shadow: var(--shadow-soft);
+  appearance: none;
+}
+
+.slider::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  border: 3px solid var(--color-paper);
+  border-radius: 50%;
+  background: var(--color-ink);
+  box-shadow: var(--shadow-soft);
+}
+
+.slider:focus-visible {
+  outline: none;
+}
+
+.slider:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.slider:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+/* Decade ticks under the track, inset by half a thumb so they line up with where it stops. */
+.marks {
+  position: absolute;
+  inset: auto 9px 0;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  pointer-events: none;
+}
+
+.mark {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 0.66rem;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  color: var(--color-ink-soft);
+}
+
+.mark::before {
+  content: '';
+  display: block;
+  width: 1px;
+  height: 4px;
+  margin: 0 auto 2px;
+  background: currentColor;
+  opacity: 0.6;
+}
+
+/* On narrow screens, every other decade keeps its tick but drops its number. */
+@media (max-width: 560px) {
+  .minor span {
+    visibility: hidden;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dock,
+  .year,
+  .play {
+    transition: none;
+  }
+}

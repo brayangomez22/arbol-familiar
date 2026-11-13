@@ -10,6 +10,7 @@ import { CanvasControls } from './camera/CanvasControls';
 import { CanvasCursor } from './camera/CanvasCursor';
 import { Effects } from './effects/Effects';
 import { Scenery } from './environment/Scenery';
+import type { FamilyTime } from './timeline/familyTime';
 import { Tree } from './tree/Tree';
 import { Wind } from './wind/Wind';
 
@@ -17,9 +18,11 @@ interface ExperienceProps {
   readonly layout: TreeLayout;
   /** Display name of each person, as shown under their fruit. */
   readonly labels: ReadonlyMap<PersonId, string>;
+  /** When each person appears and leaves, for the timeline. */
+  readonly time: FamilyTime;
 }
 
-export function Experience({ layout, labels }: ExperienceProps) {
+export function Experience({ layout, labels, time }: ExperienceProps) {
   const qualityTier = useAppStore((state) => state.qualityTier);
   const selectPerson = useAppStore((state) => state.selectPerson);
   // Hidden until the intro decides whether to play: without it, the tree simply fades in.
@@ -52,7 +55,7 @@ export function Experience({ layout, labels }: ExperienceProps) {
       <color attach="background" args={[dayPalette.sky.horizon]} />
       <Wind />
       <Scenery layout={layout} />
-      <Tree layout={layout} labels={labels} />
+      <Tree layout={layout} labels={labels} time={time} />
       <CanvasControls bounds={layout.bounds} />
       <CanvasCursor />
       <Effects />

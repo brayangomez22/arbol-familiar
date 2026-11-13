@@ -8,8 +8,9 @@ uniform float uSwayAnchor;
 uniform float uFlutter;
 uniform float uFlutterFrequency;
 #ifdef USE_GROWTH
-/** Per instance: when the leaf starts to unfold (seconds of growth). */
+/** Per instance: when the leaf starts to unfold (seconds of growth, and year on the timeline). */
 attribute float aGrowAt;
+attribute float aBornYear;
 /** Seconds to unfold, and how far it overshoots before settling (back easing). */
 uniform float uLeafUnfold;
 uniform float uLeafOvershoot;
@@ -30,7 +31,7 @@ void main() {
   vec3 local = position;
   #ifdef USE_GROWTH
   // Opens from its stem (the instance origin), so a leaf grows out of the twig.
-  local *= unfold(uGrowth - aGrowAt);
+  local *= unfold(growthAge(aGrowAt, aBornYear));
   #endif
   vec4 worldPosition = instanceToWorld * vec4(local, 1.0);
 

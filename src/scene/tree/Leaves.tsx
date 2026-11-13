@@ -8,12 +8,13 @@ import {
   Vector3,
   type InstancedMesh,
 } from 'three';
-import { INTRO, LAYOUT, LEAF_MESH, WIND } from '@/config/constants';
+import { INTRO, LAYOUT, LEAF_MESH, TIMELINE, WIND } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
 import { dayPalette } from '@/config/theme';
 import { placeLeaves, type LeafInstance } from '@/layout/leafInstances';
 import type { GrowthSchedule } from '@/layout/growth';
 import { swayWeight, type TreeReach } from '@/layout/reach';
+import type { TimelineSchedule } from '@/layout/timelineGrowth';
 import type { FruitPlacement, LeafCluster } from '@/layout/types';
 import { useAppStore } from '@/state/store';
 import { LeafMaterial } from '../materials/LeafMaterial';
@@ -23,12 +24,14 @@ interface LeavesProps {
   readonly fruits: readonly FruitPlacement[];
   /** Gives each leaf the wind weight of the point its cluster grows from. */
   readonly reach: TreeReach;
-  /** When each cluster's leaves open in the intro. */
+  /** When each cluster's leaves open in the intro… */
   readonly schedule: GrowthSchedule;
+  /** …and from which year of the family timeline. */
+  readonly timeline: TimelineSchedule;
 }
 
 /** Every leaf of the tree in one instanced draw call. How many depends on the quality tier. */
-export function Leaves({ clusters, fruits, reach, schedule }: LeavesProps) {
+export function Leaves({ clusters, fruits, reach, schedule, timeline }: LeavesProps) {
   const leavesPerCluster = useAppStore((state) => QUALITY[state.qualityTier].leavesPerCluster);
   const leaves = useMemo(
     () => placeLeaves(clusters, fruits, leavesPerCluster, dayPalette.leaves.length, LAYOUT.leaf),
@@ -38,16 +41,27 @@ export function Leaves({ clusters, fruits, reach, schedule }: LeavesProps) {
     const clusterWeights = clusters.map(({ branchId, branchT }) =>
       swayWeight(reach.atParameter(branchId, branchT), reach.max, WIND.weightExponent),
     );
-    // Once the growth passes a cluster, its leaves open from the center outward.
-    const growAt = leaves.map(({ clusterIndex, position }) => {
+    // Once the growth passes a cluster, its leaves open from the center outward: in the intro,
+    // and as the timeline reaches the year that point of the branch exists.
+    const outward = leaves.map(({ clusterIndex, position }) => {
       const cluster = clusters[clusterIndex];
       if (!cluster) return 0;
       const { x, y, z } = cluster.position;
-      const out = Math.hypot(position.x - x, position.y - y, position.z - z) / cluster.radius;
-      return schedule.atParameter(cluster.branchId, cluster.branchT) + out * INTRO.leaves.spread;
+      return Math.hypot(position.x - x, position.y - y, position.z - z) / cluster.radius;
     });
-    return buildLeafGeometry(leaves, clusterWeights, growAt);
-  }, [leaves, clusters, reach, schedule]);
+    const timeOf = (at: (branchId: string, t: number) => number, spread: number): number[] =>
+      leaves.map(({ clusterIndex }, i) => {
+        const cluster = clusters[clusterIndex];
+        if (!cluster) return 0;
+        return at(cluster.branchId, cluster.branchT) + (outward[i] ?? 0) * spread;
+      });
+    return buildLeafGeometry(
+      leaves,
+      clusterWeights,
+      timeOf((id, t) => schedule.atParameter(id, t), INTRO.leaves.spread),
+      timeOf((id, t) => timeline.atParameter(id, t), TIMELINE.leafSpreadYears),
+    );
+  }, [leaves, clusters, reach, schedule, timeline]);
   const material = useMemo(
     () => new LeafMaterial(dayPalette, LEAF_MESH, { focus: true, growth: true }),
     [],
@@ -94,6 +108,7 @@ function buildLeafGeometry(
   leaves: readonly LeafInstance[],
   clusterWeights: readonly number[],
   growAt: readonly number[],
+  bornYear: readonly number[],
 ): PlaneGeometry {
   const geometry = new PlaneGeometry(LEAF_MESH.aspect, 1);
   geometry.translate(0, 1 / 2, 0);
@@ -106,6 +121,7 @@ function buildLeafGeometry(
   geometry.setAttribute('aShadeNormal', new InstancedBufferAttribute(normals, 3));
   geometry.setAttribute('aSway', new InstancedBufferAttribute(sway, 2));
   geometry.setAttribute('aGrowAt', new InstancedBufferAttribute(Float32Array.from(growAt), 1));
+  geometry.setAttribute('aBornYear', new InstancedBufferAttribute(Float32Array.from(bornYear), 1));
   return geometry;
 }
 

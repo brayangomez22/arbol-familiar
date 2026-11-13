@@ -4,13 +4,14 @@ import { Suspense, useMemo, useRef } from 'react';
 import { Vector3, type BufferGeometry, type Group, type Material } from 'three';
 import { FRUIT_LABEL, FRUIT_MESH, NAVIGATION, TOON, WIND } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
+import { lifeStageAt, type Lifeline } from '@/domain/timeline';
 import type { FruitPlacement, Vec3 } from '@/layout/types';
 import { useAppStore } from '@/state/store';
 import { damp } from '../damp';
 import type { HaloMaterial } from '../materials/HaloMaterial';
 import type { ToonMaterial } from '../materials/ToonMaterial';
 import { stepSpring, type SpringState } from '../spring';
-import { growthUniforms } from '../intro/growthUniforms';
+import { isGrown } from '../intro/growthUniforms';
 import { windSway } from '../wind/windField';
 import { windFrame } from '../wind/windUniforms';
 import { FruitLabel } from './FruitLabel';
@@ -20,6 +21,8 @@ import type { LabelAlign } from './labelAlignment';
 export interface FruitResources {
   readonly bodyGeometry: BufferGeometry;
   readonly bodyMaterial: ToonMaterial;
+  /** Body of someone who has died (in the year the timeline shows). */
+  readonly deceasedMaterial: ToonMaterial;
   readonly capGeometry: BufferGeometry;
   readonly capMaterial: ToonMaterial;
   readonly haloGeometry: BufferGeometry;
@@ -38,6 +41,9 @@ interface FruitProps {
   readonly swayWeight: number;
   /** Growth time (seconds) at which it pops in the intro. */
   readonly bornAt: number;
+  /** Year from which it hangs on the family timeline: when the person is born and the tip is there. */
+  readonly appearYear: number;
+  readonly lifeline: Lifeline | undefined;
 }
 
 // The halo is decoration: it must never catch the pointer meant for a fruit behind it.
@@ -56,6 +62,8 @@ export function Fruit({
   swayAnchor,
   swayWeight,
   bornAt,
+  appearYear,
+  lifeline,
 }: FruitProps) {
   const { personId, position, size } = fruit;
   const holder = useRef<Group>(null);
@@ -64,7 +72,11 @@ export function Fruit({
   const scale = useRef<SpringState>({ value: size, velocity: 0 });
   const glow = useRef(0);
   // The halo material is shared: each fruit sets its own glow right before its halo is drawn.
-  const { haloMaterial, bodyMaterial, capMaterial } = resources;
+  const deceased = useAppStore(
+    (state) => lifeline !== undefined && lifeStageAt(lifeline, state.timelineYear) === 'deceased',
+  );
+  const { haloMaterial, capMaterial } = resources;
+  const bodyMaterial = deceased ? resources.deceasedMaterial : resources.bodyMaterial;
   const applyGlow = useMemo(
     () => () => {
       haloMaterial.setGlow(glow.current);
@@ -99,7 +111,7 @@ export function Fruit({
     holder.current.position.set(position.x, position.y, position.z).add(sway);
     // Pushed sideways, a hanging lantern swings its bottom downwind.
     current.rotation.z = sway.x * WIND.fruitTilt;
-    const born = growthUniforms.uGrowth.value >= bornAt;
+    const born = isGrown(bornAt, appearYear);
     const target = born ? size * (highlighted ? FRUIT_MESH.highlightScale : 1) : 0;
     if (born) {
       // The same spring as the hover: from nothing it overshoots a little, a small pop.
@@ -143,7 +155,7 @@ export function Fruit({
         />
         <mesh
           geometry={resources.bodyGeometry}
-          material={resources.bodyMaterial}
+          material={bodyMaterial}
           onBeforeRender={applyBodyFocus}
         >
           <Outlines
@@ -174,6 +186,7 @@ export function Fruit({
           alwaysVisible={alwaysLabeled}
           highlighted={highlighted}
           bornAt={bornAt}
+          appearYear={appearYear}
         />
       </Suspense>
     </group>

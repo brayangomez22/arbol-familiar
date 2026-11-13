@@ -12,7 +12,10 @@ export interface SelectionSlice {
 export interface TimelineSlice {
   /** null means "today": the whole tree is shown. */
   timelineYear: number | null;
+  /** ▶ is running through the years. */
+  timelinePlaying: boolean;
   setTimelineYear: (year: number | null) => void;
+  setTimelinePlaying: (playing: boolean) => void;
 }
 
 export interface QualitySlice {
@@ -85,8 +88,12 @@ const createSelectionSlice: Slice<SelectionSlice> = (set) => ({
 
 const createTimelineSlice: Slice<TimelineSlice> = (set) => ({
   timelineYear: null,
+  timelinePlaying: false,
   setTimelineYear: (year) => {
     set({ timelineYear: year });
+  },
+  setTimelinePlaying: (playing) => {
+    set({ timelinePlaying: playing });
   },
 });
 

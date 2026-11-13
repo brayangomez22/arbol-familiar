@@ -27,8 +27,13 @@ export interface ToonMaterialOptions {
    * branchGeometry.ts) and JS drives the uniforms in `sap`.
    */
   readonly sap?: boolean;
-  /** Grows in the intro; the geometry must carry `aAxis` and `aGrowAt` (see branchGeometry.ts). */
+  /**
+   * Grows in the intro and on the timeline; the geometry must carry `aAxis`, `aGrowAt` and
+   * `aBornYear` (see branchGeometry.ts).
+   */
   readonly growth?: boolean;
+  /** Light of its own, as a fraction of its color added on top of the shading. */
+  readonly glow?: number;
 }
 
 /** The sap uniforms a selection animates. */
@@ -54,6 +59,7 @@ export class ToonMaterial extends ShaderMaterial {
     focus = false,
     sap = false,
     growth = false,
+    glow = 0,
   }: ToonMaterialOptions) {
     const base = new Color(color);
     const sapUniforms: SapUniforms = { uSapFront: { value: 0 }, uSapIntensity: { value: 0 } };
@@ -85,6 +91,7 @@ export class ToonMaterial extends ShaderMaterial {
         uBarkWarp: { value: TOON.bark.warp },
         uBarkStrength: { value: bark ? TOON.bark.strength : 0 },
         uRimStrength: { value: rim ? TOON.rimStrength : 0 },
+        uGlow: { value: glow },
       },
     });
     this.sap = sapUniforms;

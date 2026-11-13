@@ -2,9 +2,11 @@ import { useEffect, useMemo } from 'react';
 import { MeshBasicMaterial, PlaneGeometry } from 'three';
 import { FRUIT_LABEL, FRUIT_MESH, INTRO, WIND } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
+import type { Lifeline } from '@/domain/timeline';
 import type { PersonId } from '@/domain/types';
 import type { GrowthSchedule } from '@/layout/growth';
 import { swayWeight, type TreeReach } from '@/layout/reach';
+import type { TimelineSchedule } from '@/layout/timelineGrowth';
 import type { BranchSegment, FruitPlacement } from '@/layout/types';
 import { HaloMaterial } from '../materials/HaloMaterial';
 import { ToonMaterial } from '../materials/ToonMaterial';
@@ -19,12 +21,22 @@ interface FruitsProps {
   readonly branches: readonly BranchSegment[];
   readonly labels: ReadonlyMap<PersonId, string>;
   readonly reach: TreeReach;
-  /** Fruits pop when the growth reaches their branch tip. */
+  /** Fruits pop when the growth reaches their branch tip, in the intro and on the timeline. */
   readonly schedule: GrowthSchedule;
+  readonly timeline: TimelineSchedule;
+  readonly lives: ReadonlyMap<PersonId, Lifeline>;
 }
 
 /** All the people. Geometries are shared, and there is one material per theme fruit color. */
-export function Fruits({ fruits, branches, labels, reach, schedule }: FruitsProps) {
+export function Fruits({
+  fruits,
+  branches,
+  labels,
+  reach,
+  schedule,
+  timeline,
+  lives,
+}: FruitsProps) {
   const shared = useMemo(
     () => ({
       body: buildLanternBody(),
@@ -33,6 +45,13 @@ export function Fruits({ fruits, branches, labels, reach, schedule }: FruitsProp
       bodyMaterials: dayPalette.fruits.map(
         (color) => new ToonMaterial({ color, palette: dayPalette, focus: true }),
       ),
+      // Those who have passed: a soft gold that glows faintly from within.
+      deceasedMaterial: new ToonMaterial({
+        color: dayPalette.deceasedFruit,
+        palette: dayPalette,
+        focus: true,
+        glow: FRUIT_MESH.deceasedGlow,
+      }),
       capMaterial: new ToonMaterial({ color: dayPalette.trunk, palette: dayPalette, focus: true }),
       haloMaterial: new HaloMaterial({
         color: dayPalette.halo,
@@ -59,6 +78,7 @@ export function Fruits({ fruits, branches, labels, reach, schedule }: FruitsProp
       shared.cap.dispose();
       shared.halo.dispose();
       for (const material of shared.bodyMaterials) material.dispose();
+      shared.deceasedMaterial.dispose();
       shared.capMaterial.dispose();
       shared.haloMaterial.dispose();
       shared.labelMaterial.dispose();
@@ -100,6 +120,7 @@ export function Fruits({ fruits, branches, labels, reach, schedule }: FruitsProp
     const resources: FruitResources = {
       bodyGeometry: shared.body,
       bodyMaterial,
+      deceasedMaterial: shared.deceasedMaterial,
       capGeometry: shared.cap,
       capMaterial: shared.capMaterial,
       haloGeometry: shared.halo,
@@ -119,6 +140,11 @@ export function Fruits({ fruits, branches, labels, reach, schedule }: FruitsProp
           schedule.atFraction(fruit.anchorBranchId, 1) +
           (fruit.kind === 'graft' ? INTRO.fruit.graftDelay : INTRO.fruit.delay)
         }
+        lifeline={lives.get(fruit.personId)}
+        appearYear={Math.max(
+          lives.get(fruit.personId)?.appearYear ?? -Infinity,
+          timeline.atFraction(fruit.anchorBranchId, 1),
+        )}
         alwaysLabeled={
           (generationOf.get(fruit.anchorBranchId) ?? 0) <= FRUIT_LABEL.alwaysVisibleGenerations
         }

@@ -2,7 +2,13 @@ import { lazy, Suspense } from 'react';
 import { readLayoutDebugOptions } from '@/scene/debug/layoutDebugOptions';
 import { Experience } from '@/scene/Experience';
 import { Overlay } from '@/ui/Overlay';
-import { familyDirectory, familyLayout, familySummary, fruitLabels } from './familyTree';
+import {
+  familyDirectory,
+  familyLayout,
+  familySummary,
+  familyTime,
+  fruitLabels,
+} from './familyTree';
 import { useHashSelection } from './routing';
 
 // Loaded on demand so the developer view never weighs on the real site.
@@ -22,7 +28,7 @@ export function App() {
   }
   return (
     <>
-      <Experience layout={familyLayout} labels={fruitLabels} />
+      <Experience layout={familyLayout} labels={fruitLabels} time={familyTime} />
       <Overlay summary={familySummary} family={familyDirectory} />
     </>
   );

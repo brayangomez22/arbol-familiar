@@ -4,6 +4,8 @@ uniform vec3 uGrooveColor;
 uniform float uBarkStreaks;
 uniform float uBarkWarp;
 uniform float uBarkStrength;
+/** Light of its own (deceased fruits, lanterns at night), as a fraction of the base color. */
+uniform float uGlow;
 
 varying vec3 vWorldNormal;
 varying vec3 vWorldPosition;
@@ -57,6 +59,7 @@ void main() {
   vec3 color = toonRamp(uBaseColor, uShadeColor, lit);
   color = mix(color, uGrooveColor, barkGroove(vUv) * vBark * uBarkStrength);
   color += toonRim(normal, viewDirection, lit);
+  color += uBaseColor * uGlow;
 
   float focused = 0.0;
   #ifdef USE_SAP

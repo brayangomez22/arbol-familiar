@@ -9,13 +9,14 @@ attribute float aSway;
 #ifdef USE_GROWTH
 attribute vec3 aAxis;
 attribute float aGrowAt;
+attribute float aBornYear;
 varying float vGrowthAge;
 #endif
 
 void main() {
   vec3 grown = position;
   #ifdef USE_GROWTH
-  grown = growWood(position, aAxis, aGrowAt, vGrowthAge);
+  grown = growWood(position, aAxis, aGrowAt, aBornYear, vGrowthAge);
   #endif
   vec4 worldPosition = modelMatrix * vec4(grown, 1.0);
   #ifdef USE_WIND

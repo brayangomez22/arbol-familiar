@@ -7,6 +7,7 @@ import styles from './Overlay.module.css';
 import { PersonPanel } from './PersonPanel/PersonPanel';
 import { SearchPalette } from './Search/SearchPalette';
 import { useSearchShortcut } from './Search/useSearchShortcut';
+import { Timeline } from './Timeline/Timeline';
 import { TitleCard, type FamilySummary } from './TitleCard/TitleCard';
 
 interface OverlayProps {
@@ -39,6 +40,7 @@ export function Overlay({ summary, family }: OverlayProps) {
         aria-hidden={!ready}
       >
         <TitleCard summary={summary} />
+        <Timeline />
         <Controls onSearch={openSearch} />
         <PersonPanel enabled={ready} />
         {searchOpen && (

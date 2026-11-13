@@ -4,8 +4,10 @@ import { loadFamily } from '@/data/loadFamily';
 import { generationOf, indexFamily } from '@/domain/genealogy';
 import { relativeInDirection } from '@/domain/navigation';
 import { searchEntryOf } from '@/domain/search';
+import { censusAt, decadeMarks, lifelines, timelineRange } from '@/domain/timeline';
 import type { PersonId } from '@/domain/types';
 import { buildTreeLayout } from '@/layout/buildTreeLayout';
+import type { FamilyTime } from '@/scene/timeline/familyTime';
 import { fruitColorIndex } from '@/scene/tree/fruitColor';
 import type { FamilyDirectory } from '@/ui/family/familyDirectory';
 
@@ -31,6 +33,12 @@ export const familySummary = {
   generations: Math.max(...[...family.people.keys()].map((id) => generationOf(index, id))) + 1,
 } as const;
 
+const currentYear = new Date().getFullYear();
+const lives = lifelines(index, currentYear);
+
+/** When each person appears on the timeline, and the years it spans. */
+export const familyTime: FamilyTime = { lives, range: timelineRange(lives, currentYear) };
+
 const fruitX = new Map(familyLayout.fruits.map((fruit) => [fruit.personId, fruit.position.x]));
 
 /** The family as the overlay sees it: relations, search and the colors of the fruits. */
@@ -41,4 +49,9 @@ export const familyDirectory: FamilyDirectory = {
   relativeInDirection: (id, direction) =>
     relativeInDirection(index, id, direction, (relativeId) => fruitX.get(relativeId) ?? 0),
   isPerson: (id) => family.people.has(id),
+  timeline: {
+    range: familyTime.range,
+    marks: decadeMarks(familyTime.range),
+    censusAt: (year) => censusAt(lives, year),
+  },
 };

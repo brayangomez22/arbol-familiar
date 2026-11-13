@@ -16,6 +16,8 @@ varying float vSapLimit;
 /** Point on the branch's axis this vertex belongs to, and when it appears (seconds). */
 attribute vec3 aAxis;
 attribute float aGrowAt;
+/** Year on the family timeline from which this vertex exists. */
+attribute float aBornYear;
 varying float vGrowthAge;
 #endif
 
@@ -27,7 +29,7 @@ varying float vBark;
 void main() {
   vec3 grown = position;
   #ifdef USE_GROWTH
-  grown = growWood(position, aAxis, aGrowAt, vGrowthAge);
+  grown = growWood(position, aAxis, aGrowAt, aBornYear, vGrowthAge);
   #endif
   vec4 worldPosition = modelMatrix * vec4(grown, 1.0);
   #ifdef USE_WIND

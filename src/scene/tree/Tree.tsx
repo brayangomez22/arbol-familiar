@@ -1,12 +1,15 @@
 import { useMemo, useRef } from 'react';
-import { INTRO, WIND } from '@/config/constants';
+import { INTRO, TIMELINE, WIND } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
 import type { PersonId } from '@/domain/types';
 import { growthSchedule } from '@/layout/growth';
 import { measureReach, swayWeight } from '@/layout/reach';
+import { timelineSchedule } from '@/layout/timelineGrowth';
 import type { TreeLayout } from '@/layout/types';
 import { IntroDirector } from '../intro/IntroDirector';
 import { SelectionDirector } from '../selection/SelectionDirector';
+import type { FamilyTime } from '../timeline/familyTime';
+import { TimelineDirector } from '../timeline/TimelineDirector';
 import { BranchMesh, type BranchMeshHandle } from './BranchMesh';
 import type { WoodMeasure } from './branchGeometry';
 import { FallingLeaves } from './FallingLeaves';
@@ -17,21 +20,34 @@ interface TreeProps {
   readonly layout: TreeLayout;
   /** Display name of each person, as shown under their fruit. */
   readonly labels: ReadonlyMap<PersonId, string>;
+  readonly time: FamilyTime;
 }
 
-export function Tree({ layout, labels }: TreeProps) {
+export function Tree({ layout, labels, time }: TreeProps) {
   const reach = useMemo(() => measureReach(layout.branches, WIND.curveSamples), [layout.branches]);
   const schedule = useMemo(
     () => growthSchedule(layout.branches, reach, INTRO.growth),
     [layout.branches, reach],
+  );
+  const timeline = useMemo(
+    () =>
+      timelineSchedule(
+        layout.branches,
+        reach,
+        (id) => time.lives.get(id)?.appearYear,
+        time.range.first,
+        TIMELINE,
+      ),
+    [layout.branches, reach, time],
   );
   const wood = useMemo<WoodMeasure>(
     () => ({
       reachAt: (branchId, u) => reach.atFraction(branchId, u),
       swayOf: (value) => swayWeight(value, reach.max, WIND.weightExponent),
       growAt: (branchId, u) => schedule.atFraction(branchId, u),
+      bornYearAt: (branchId, u) => timeline.atFraction(branchId, u),
     }),
-    [reach, schedule],
+    [reach, schedule, timeline],
   );
   // Roots stay still in the ground, but spread out as the trunk sprouts.
   const roots = useMemo<WoodMeasure>(
@@ -55,6 +71,7 @@ export function Tree({ layout, labels }: TreeProps) {
         fruits={layout.fruits}
         reach={reach}
         schedule={schedule}
+        timeline={timeline}
       />
       <FallingLeaves clusters={layout.leafClusters} branches={layout.branches} />
       <Fruits
@@ -63,9 +80,12 @@ export function Tree({ layout, labels }: TreeProps) {
         labels={labels}
         reach={reach}
         schedule={schedule}
+        timeline={timeline}
+        lives={time.lives}
       />
       <SelectionDirector layout={layout} reach={reach} branches={branches} />
       <IntroDirector layout={layout} schedule={schedule} />
+      <TimelineDirector time={time} />
     </>
   );
 }

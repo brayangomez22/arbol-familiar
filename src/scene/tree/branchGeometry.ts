@@ -19,10 +19,15 @@ export interface WoodMeasure {
   readonly swayOf: (reach: number) => number;
   /** When the point at fraction `u` appears in the intro, in seconds of growth. */
   readonly growAt: (segmentId: string, u: number) => number;
+  /** Year on the family timeline from which that point exists; always, when left out. */
+  readonly bornYearAt?: (segmentId: string, u: number) => number;
 }
 
 /** Wood that never moves, carries no sap and is there from the first moment of growth. */
 const STILL: WoodMeasure = { reachAt: () => 0, swayOf: () => 0, growAt: () => 0 };
+
+/** Earlier than any year on the timeline. */
+const ALWAYS_THERE = -1e6;
 
 /** No lineage: the sap limit of every vertex is below any reach. */
 const OFF_LINEAGE = -1;
@@ -67,13 +72,15 @@ export function buildBranchGeometry(
     const vertexCount = tube.getAttribute('position').count;
     const tubeReach = new Float32Array(vertexCount);
     const tubeGrowth = new Float32Array(vertexCount);
+    const tubeBorn = new Float32Array(vertexCount);
     for (let ring = 0; ring <= rings; ring++) {
       const from = ring * ringSize;
       const to = (ring + 1) * ringSize;
       tubeReach.fill(wood.reachAt(segment.id, ring / rings), from, to);
       tubeGrowth.fill(wood.growAt(segment.id, ring / rings), from, to);
+      tubeBorn.fill(bornYearOf(wood, segment.id, ring / rings), from, to);
     }
-    withWood(tube, tubeReach, tubeGrowth, wood);
+    withWood(tube, tubeReach, tubeGrowth, tubeBorn, wood);
     const ends = [
       buildKnot(base, segment.radiusStart, detail, segment.id, 0, wood),
       buildKnot(tip, segment.radiusEnd, detail, segment.id, 1, wood),
@@ -171,18 +178,25 @@ function buildKnot(
     withBark(knot, 0),
     new Float32Array(count).fill(wood.reachAt(segmentId, u)),
     new Float32Array(count).fill(wood.growAt(segmentId, u)),
+    new Float32Array(count).fill(bornYearOf(wood, segmentId, u)),
     wood,
   );
+}
+
+function bornYearOf(wood: WoodMeasure, segmentId: string, u: number): number {
+  return wood.bornYearAt ? wood.bornYearAt(segmentId, u) : ALWAYS_THERE;
 }
 
 function withWood<T extends BufferGeometry>(
   geometry: T,
   reach: Float32Array,
   growAt: Float32Array,
+  bornYear: Float32Array,
   wood: WoodMeasure,
 ): T {
   geometry.setAttribute('aReach', new BufferAttribute(reach, 1));
   geometry.setAttribute('aGrowAt', new BufferAttribute(growAt, 1));
+  geometry.setAttribute('aBornYear', new BufferAttribute(bornYear, 1));
   geometry.setAttribute('aSway', new BufferAttribute(reach.map(wood.swayOf), 1));
   geometry.setAttribute(
     'aSapLimit',
