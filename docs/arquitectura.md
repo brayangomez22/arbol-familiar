@@ -34,10 +34,15 @@ arbol-familiar/
 │  └─ audio/                      # música ambiental
 ├─ scripts/
 │  └─ validate-family.ts          # pnpm validate:family
+├─ tooling/
+│  └─ familyData.ts               # plugin de Vite: elige familia/demo, valida en el build, meta y OG
+├─ .github/workflows/             # CI (lint, test, validate, builds) y despliegue de la demo
 └─ src/
    ├─ main.tsx
    ├─ app/
-   │  ├─ App.tsx                  # compone <Experience/> + <Overlay/>
+   │  ├─ App.tsx                  # compone <Experience/> + <Overlay/>, o la lista si no hay WebGL
+   │  ├─ familyData.ts            # `@family-data` ➜ Family (valida en dev; en prod confía en el build)
+   │  ├─ SceneErrorBoundary.tsx   # si la escena falla, muestra la lista accesible
    │  └─ routing.ts               # sincroniza persona seleccionada ↔ location.hash
    ├─ data/
    │  ├─ family.json              # ÚNICA fuente de contenido
@@ -62,7 +67,9 @@ arbol-familiar/
    │  ├─ camera/                  # CameraRig, controles pan/zoom, vuelos
    │  ├─ tree/                    # Trunk, Branch, Roots, Fruit, Leaves, Blossoms
    │  ├─ environment/             # Sky, Ground, Particles, Fireflies, DayNight
-   │  ├─ effects/                 # Postprocessing (bloom, DOF, viñeta, grano de papel)
+   │  ├─ effects/                 # Postprocessing (bloom, DOF, viñeta, grano de papel), lazy
+   │  ├─ quality/                 # QualityDirector: PerformanceMonitor ➜ tier de calidad
+   │  ├─ loading/                 # reporta useProgress al store para la pantalla de carga
    │  └─ materials/               # materiales toon y shader materials
    ├─ shaders/                    # .glsl (wind, growth, sap, toon, paper)
    ├─ animation/                  # timelines GSAP (intro, cameraFly) y easings
@@ -72,8 +79,8 @@ arbol-familiar/
    │  ├─ Search/
    │  ├─ Timeline/
    │  ├─ Controls/
-   │  ├─ Loader/
-   │  └─ AccessibleList/
+   │  ├─ Loader/                  # maneja la semilla estática de index.html (progreso real)
+   │  └─ AccessibleList/          # "Ver como lista" y página sin WebGL, con las mismas fichas
    ├─ state/
    │  └─ store.ts                 # slices: selection, timeline, quality, audio, intro
    ├─ hooks/                      # useReducedMotion, useQualityTier, useNow…
@@ -101,3 +108,11 @@ arbol-familiar/
 
 - `domain/` y `layout/`: tests unitarios obligatorios. En `layout/`, incluye tests de **determinismo** (mismo input ⇒ mismo output) y de **no superposición** de frutos.
 - `scene/` y `ui/`: verificación visual manual. Opcionalmente, capturas con Playwright en fases avanzadas.
+
+## Carga y rendimiento
+
+- **Primer pintado sin JavaScript:** la semilla que late está en `index.html` (CSS inline, colores y tiempos de `theme.ts`/`constants.ts` inyectados por `tooling/familyData.ts`). `ui/Loader/BootLoader` la llena con hitos reales (código, fuentes, `useProgress`, primer frame) y la retira cuando la semilla de la intro empieza a caer.
+- **Chunks:** `three`, `react` y `r3f` van en chunks de vendor cacheables. Postprocessing (`scene/effects/`) es lazy y solo se descarga en los tiers que lo usan; el mapa, el modo foto, el visor de fotos y la lista también son lazy.
+- **Sin zod en producción:** el build valida el `family.json` elegido y se detiene si falla; en producción `app/familyData.ts` solo lo convierte (`toDomainFamily`). En desarrollo se valida en cada recarga.
+- **Calidad adaptativa:** `state/qualityTier.ts` elige un tier inicial según el dispositivo (puntero táctil, núcleos, memoria) y `scene/quality/QualityDirector` lo ajusta con `PerformanceMonitor` (meta ≥ 45 fps). Un tier que ya fue lento no se vuelve a probar. `?quality=low|medium|high` lo fija.
+- **Pausa:** con el mapa o la lista abiertos (cubren todo), el `Canvas` pasa a `frameloop="never"`.

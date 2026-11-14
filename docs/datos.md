@@ -73,3 +73,7 @@ Todo el contenido vive en `src/data/family.json`. Es **plano y normalizado**: un
 - _"Agrega a Ana, hija de Lucía y Pedro, nacida el 3 de marzo de 2003 en Cali."_ ⇒ crear `ana-alvarez` en `people` y añadir su id a `children` de la unión de Lucía y Pedro, en orden de nacimiento. Si Cali no está en `places`, agregarlo.
 - _"Mateo se casó con Daniela."_ ⇒ crear a `daniela-…` y una unión nueva `u-mateo-daniela` con `children: []`.
 - _"Mi tío Jorge falleció en 2026."_ ⇒ agregar `death: { "date": "2026" }` a `jorge-gomez`.
+
+## Datos de la demo
+
+`src/data/demo/family.json` es una familia **ficticia** (la "Familia Moreno Luna") para la demo pública del portafolio (`pnpm build:demo`). Sigue exactamente este mismo modelo y reglas (`pnpm validate:demo`). No lleva fotos ni audios: la build demo excluye `public/media/people/` para que ninguna foto real se publique. Si cambias su forma, regenera `src/data/demo/og-image.jpg` (captura de 1200×630 del árbol).
