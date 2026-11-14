@@ -1,3 +1,4 @@
+/* The text buttons in the top-left corner, under the title card. */
 .button {
   display: inline-flex;
   align-items: center;
@@ -32,6 +33,7 @@
   stroke: currentColor;
   stroke-width: 1.8;
   stroke-linejoin: round;
+  stroke-linecap: round;
 }
 
 @media (prefers-reduced-motion: reduce) {

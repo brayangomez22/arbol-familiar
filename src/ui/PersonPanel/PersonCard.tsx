@@ -16,6 +16,8 @@ interface PersonCardProps {
   readonly onClose: () => void;
   /** Drag handlers for the top of the bottom sheet; none for the side panel. */
   readonly grip: SheetDragHandlers | undefined;
+  /** Shown inside the accessible list, where the tree's arrow-key shortcuts are off. */
+  readonly embedded?: boolean;
 }
 
 /** Everything about one person: who they are, their photos, story, voice and family. */
@@ -26,6 +28,7 @@ export function PersonCard({
   onToggleSize,
   onClose,
   grip,
+  embedded = false,
 }: PersonCardProps) {
   return (
     <>
@@ -57,7 +60,7 @@ export function PersonCard({
         {person.bio !== undefined && <Bio text={person.bio} />}
         {person.audio && <VoiceNote clip={person.audio} />}
         <Relations personId={person.id} />
-        {layout === 'side' && (
+        {layout === 'side' && !embedded && (
           <p className={styles.hint}>
             <kbd>←</kbd> <kbd>→</kbd> hermanos · <kbd>↑</kbd> padres · <kbd>↓</kbd> hijos ·{' '}
             <kbd>Esc</kbd> cerrar

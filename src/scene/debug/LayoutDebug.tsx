@@ -2,8 +2,7 @@ import { Canvas } from '@react-three/fiber';
 import { useMemo, useRef } from 'react';
 import { CAMERA } from '@/config/constants';
 import { dayPalette } from '@/config/theme';
-import familyJson from '@/data/family.json';
-import { loadFamily } from '@/data/loadFamily';
+import type { Family } from '@/domain/types';
 import { syntheticFamily } from '@/dev/syntheticFamily';
 import { buildTreeLayout } from '@/layout/buildTreeLayout';
 import { FruitLabels } from './FruitLabels';
@@ -12,10 +11,15 @@ import { LayoutDebugScene } from './LayoutDebugScene';
 import { LayoutStats } from './LayoutStats';
 
 /** Developer view (?debug=layout): the raw layout as lines and discs, to tune its shape. */
-export function LayoutDebug({ syntheticSize, seed, showLabels }: LayoutDebugOptions) {
+interface LayoutDebugProps extends LayoutDebugOptions {
+  /** The family the site shows, used unless a synthetic one is asked for. */
+  readonly realFamily: Family;
+}
+
+export function LayoutDebug({ syntheticSize, seed, showLabels, realFamily }: LayoutDebugProps) {
   const family = useMemo(
-    () => (syntheticSize === null ? loadFamily(familyJson) : syntheticFamily(syntheticSize, seed)),
-    [syntheticSize, seed],
+    () => (syntheticSize === null ? realFamily : syntheticFamily(syntheticSize, seed)),
+    [syntheticSize, seed, realFamily],
   );
   const layout = useMemo(() => buildTreeLayout(family), [family]);
   const labelRefs = useRef<(HTMLElement | null)[]>([]);

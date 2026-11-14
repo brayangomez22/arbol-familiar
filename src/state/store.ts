@@ -1,6 +1,7 @@
 import { create, type StateCreator } from 'zustand';
-import { DEFAULT_QUALITY_TIER, type QualityTier } from '@/config/quality';
+import type { QualityTier } from '@/config/quality';
 import { loadAudioPreference, saveAudioPreference } from './audioMemory';
+import { initialQualityTier, readDeviceHints, readQualityOverride } from './qualityTier';
 import type { DayPhase } from '@/domain/dayCycle';
 import type { Season } from '@/domain/seasons';
 import type { PersonId } from '@/domain/types';
@@ -31,6 +32,8 @@ export interface AmbientSlice {
 
 export interface QualitySlice {
   qualityTier: QualityTier;
+  /** Forced from the URL: the performance monitor must not change it. */
+  qualityPinned: boolean;
   setQualityTier: (tier: QualityTier) => void;
 }
 
@@ -43,6 +46,16 @@ export interface AudioSlice {
 }
 
 export type IntroPhase = 'pending' | 'playing' | 'done';
+
+/** What the loading screen measures before handing over to the intro. */
+export interface LoadingSlice {
+  /** Files loaded through three's loading manager (drei's useProgress), from 0 to 1. */
+  assetProgress: number;
+  /** The first real frame is on screen: shaders compiled and the intro (or the tree) running. */
+  sceneReady: boolean;
+  setAssetProgress: (progress: number) => void;
+  setSceneReady: () => void;
+}
 
 export interface IntroSlice {
   introPhase: IntroPhase;
@@ -89,7 +102,19 @@ export interface PhotoSlice {
   setPhoto: (photo: Blob | null) => void;
 }
 
+/** Views that cover the whole tree: while one is open the scene stops drawing. */
+export interface ViewSlice {
+  /** The origins map. */
+  mapOpen: boolean;
+  /** The accessible list of the family, instead of (or over) the 3D tree. */
+  listOpen: boolean;
+  setMapOpen: (open: boolean) => void;
+  setListOpen: (open: boolean) => void;
+}
+
 export type AppState = SelectionSlice &
+  ViewSlice &
+  LoadingSlice &
   TimelineSlice &
   AmbientSlice &
   QualitySlice &
@@ -133,8 +158,15 @@ const createAmbientSlice: Slice<AmbientSlice> = (set) => ({
   },
 });
 
+// Outside a browser (unit tests that import the store), nothing is known about the device.
+const initialQuality =
+  typeof window === 'undefined'
+    ? initialQualityTier({ coarsePointer: false }, null)
+    : initialQualityTier(readDeviceHints(), readQualityOverride(window.location.search));
+
 const createQualitySlice: Slice<QualitySlice> = (set) => ({
-  qualityTier: DEFAULT_QUALITY_TIER,
+  qualityTier: initialQuality.tier,
+  qualityPinned: initialQuality.pinned,
   setQualityTier: (tier) => {
     set({ qualityTier: tier });
   },
@@ -185,6 +217,28 @@ const createCameraSlice: Slice<CameraSlice> = (set, get) => ({
   },
 });
 
+const createLoadingSlice: Slice<LoadingSlice> = (set, get) => ({
+  assetProgress: 0,
+  sceneReady: false,
+  setAssetProgress: (progress) => {
+    set({ assetProgress: progress });
+  },
+  setSceneReady: () => {
+    if (!get().sceneReady) set({ sceneReady: true });
+  },
+});
+
+const createViewSlice: Slice<ViewSlice> = (set) => ({
+  mapOpen: false,
+  listOpen: false,
+  setMapOpen: (open) => {
+    set({ mapOpen: open });
+  },
+  setListOpen: (open) => {
+    set({ listOpen: open });
+  },
+});
+
 const createPhotoSlice: Slice<PhotoSlice> = (set, get) => ({
   photoMode: false,
   photoRequest: 0,
@@ -202,6 +256,8 @@ const createPhotoSlice: Slice<PhotoSlice> = (set, get) => ({
 
 export const useAppStore = create<AppState>()((...args) => ({
   ...createSelectionSlice(...args),
+  ...createViewSlice(...args),
+  ...createLoadingSlice(...args),
   ...createTimelineSlice(...args),
   ...createAmbientSlice(...args),
   ...createQualitySlice(...args),

@@ -33,9 +33,12 @@ export function OriginsMap({ onClose }: OriginsMapProps) {
   useEffect(() => {
     const element = dialog.current;
     if (!element) return;
+    // The dialog unmounts as it closes, so the browser cannot hand focus back by itself.
+    const returnFocus = document.activeElement;
     element.showModal();
     return () => {
       element.close();
+      if (returnFocus instanceof HTMLElement && returnFocus.isConnected) returnFocus.focus();
     };
   }, []);
 

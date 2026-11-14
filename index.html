@@ -2,11 +2,133 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Árbol Familiar · %FAMILY_TITLE%</title>
+    <meta name="description" content="%FAMILY_DESCRIPTION%" />
+    <meta name="theme-color" content="%THEME_COLOR%" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <title>Árbol Familiar · Familia Gómez</title>
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="es_CO" />
+    <meta property="og:title" content="Árbol Familiar · %FAMILY_TITLE%" />
+    <meta property="og:description" content="%FAMILY_DESCRIPTION%" />
+    <meta property="og:image" content="%OG_IMAGE%" />
+    <meta property="og:image:type" content="image/jpeg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta
+      property="og:image:alt"
+      content="Un árbol ilustrado con frutos de colores sobre una colina"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!--
+      The loading screen is plain HTML and CSS so it paints before any JavaScript arrives.
+      ui/Loader/BootLoader.tsx takes it over: real progress, then it fades as the intro begins.
+      Colors and fonts come from theme.ts through tooling/familyData.ts.
+    -->
+    <style>
+      :root {
+        %THEME_VARIABLES%;
+      }
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        background: var(--color-sky-horizon);
+      }
+      #boot-loader {
+        position: fixed;
+        inset: 0;
+        z-index: 10;
+        display: grid;
+        place-content: center;
+        justify-items: center;
+        gap: 18px;
+        background: linear-gradient(var(--color-sky-top), var(--color-sky-horizon) 70%);
+        color: var(--color-ink);
+        font-family: var(--font-display);
+        transition: opacity var(--loader-fade) var(--ease-out);
+      }
+      #boot-loader[data-state='done'] {
+        opacity: 0;
+        pointer-events: none;
+      }
+      #boot-loader svg {
+        width: 64px;
+        height: 64px;
+        animation: boot-beat var(--loader-beat) ease-in-out infinite;
+      }
+      #boot-loader .seed {
+        fill: var(--color-seed);
+      }
+      #boot-loader .sprout {
+        fill: none;
+        stroke: var(--color-trunk);
+        stroke-width: 3;
+        stroke-linecap: round;
+      }
+      #boot-loader p {
+        margin: 0;
+        font-size: 1.05rem;
+        font-weight: 500;
+      }
+      #boot-loader .track {
+        width: 160px;
+        height: 3px;
+        overflow: hidden;
+        border-radius: 2px;
+        background: color-mix(in srgb, var(--color-ink) 12%, transparent);
+      }
+      #boot-loader .fill {
+        height: 100%;
+        background: var(--color-trunk);
+        transform-origin: left;
+        transform: scaleX(var(--progress, var(--loader-initial)));
+        transition: transform calc(var(--loader-fade) / 2) var(--ease-out);
+      }
+      /* Two beats and a rest, like a heart, so it reads as alive rather than busy. */
+      @keyframes boot-beat {
+        0%,
+        40%,
+        100% {
+          transform: scale(1);
+        }
+        12%,
+        28% {
+          transform: scale(1.08);
+        }
+        20% {
+          transform: scale(1.02);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #boot-loader,
+        #boot-loader .fill {
+          transition: none;
+        }
+        #boot-loader svg {
+          animation: none;
+        }
+      }
+    </style>
   </head>
   <body>
+    <div
+      id="boot-loader"
+      role="progressbar"
+      aria-label="Cargando el árbol"
+      aria-valuemin="0"
+      aria-valuemax="100"
+    >
+      <svg viewBox="0 0 64 64" aria-hidden="true">
+        <path class="sprout" d="M32 22c0-6 3-10 9-12M32 20c-1-4-4-6-8-6" />
+        <path class="seed" d="M32 22c9 0 15 9 15 19S40 56 32 56 17 51 17 41s6-19 15-19z" />
+      </svg>
+      <p>Sembrando el árbol…</p>
+      <div class="track"><div class="fill"></div></div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

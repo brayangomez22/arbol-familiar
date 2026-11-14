@@ -1,19 +1,29 @@
-import { useCallback, useState, type CSSProperties } from 'react';
+import { lazy, Suspense, useCallback, useState, type CSSProperties } from 'react';
 import { useAppStore } from '@/state/store';
+import { ListViewButton } from './AccessibleList/ListViewButton';
 import { AmbientPicker } from './AmbientPicker/AmbientPicker';
 import { BirthdayNotice } from './Birthday/BirthdayNotice';
 import { Controls } from './Controls/Controls';
 import { FamilyContext, type FamilyDirectory } from './family/familyDirectory';
 import { SkipIntroButton } from './Intro/SkipIntroButton';
-import { OriginsMap } from './OriginsMap/OriginsMap';
 import { OriginsMapButton } from './OriginsMap/OriginsMapButton';
 import styles from './Overlay.module.css';
 import { PersonPanel } from './PersonPanel/PersonPanel';
-import { PhotoMode } from './PhotoMode/PhotoMode';
 import { SearchPalette } from './Search/SearchPalette';
 import { useSearchShortcut } from './Search/useSearchShortcut';
 import { Timeline } from './Timeline/Timeline';
 import { TitleCard, type FamilySummary } from './TitleCard/TitleCard';
+
+// Opened by a minority of visits, and only after the tree is up: each arrives on its own.
+const OriginsMap = lazy(() =>
+  import('./OriginsMap/OriginsMap').then((module) => ({ default: module.OriginsMap })),
+);
+const PhotoMode = lazy(() =>
+  import('./PhotoMode/PhotoMode').then((module) => ({ default: module.PhotoMode })),
+);
+const ListDialog = lazy(() =>
+  import('./AccessibleList/ListDialog').then((module) => ({ default: module.ListDialog })),
+);
 
 interface OverlayProps {
   readonly summary: FamilySummary;
@@ -28,15 +38,22 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
   const panelOpen = useAppStore((state) => state.selectedPersonId !== null);
   const inset = useAppStore((state) => state.viewInset);
   const photoMode = useAppStore((state) => state.photoMode);
+  const mapOpen = useAppStore((state) => state.mapOpen);
+  const setMapOpen = useAppStore((state) => state.setMapOpen);
+  const listOpen = useAppStore((state) => state.listOpen);
+  const setListOpen = useAppStore((state) => state.setListOpen);
   const [searchOpen, setSearchOpen] = useState(false);
-  const [mapOpen, setMapOpen] = useState(false);
   const openSearch = useCallback(() => {
     setSearchOpen(true);
   }, []);
   const closeMap = useCallback(() => {
     setMapOpen(false);
-  }, []);
-  useSearchShortcut(ready && !searchOpen && !mapOpen && !photoMode, openSearch);
+  }, [setMapOpen]);
+  const closeList = useCallback(() => {
+    setListOpen(false);
+  }, [setListOpen]);
+  const covered = mapOpen || listOpen;
+  useSearchShortcut(ready && !searchOpen && !covered && !photoMode, openSearch);
 
   // What the open panel covers, so the floating buttons and the search move out of its way.
   const occluded = {
@@ -49,9 +66,9 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
       <div
         className={`${styles.overlay} ${ready && !photoMode ? '' : styles.hidden}`}
         style={occluded}
-        aria-hidden={!ready || photoMode}
-        // In photo mode the UI is gone for the keyboard too, not just for the eyes.
-        inert={photoMode}
+        // Hidden during the intro and in photo mode: gone for the keyboard and screen readers
+        // too, not just for the eyes.
+        inert={!ready || photoMode}
       >
         <div className={styles.corner}>
           <TitleCard summary={summary} />
@@ -60,12 +77,14 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
               setMapOpen(true);
             }}
           />
+          <ListViewButton />
         </div>
         {ambientPicker && <AmbientPicker />}
         <BirthdayNotice />
         <Timeline />
         <Controls onSearch={openSearch} />
-        <PersonPanel enabled={ready} />
+        {/* Its shortcuts would also move the selection under the list. */}
+        <PersonPanel enabled={ready && !listOpen} />
         {searchOpen && (
           <SearchPalette
             onClose={() => {
@@ -73,9 +92,16 @@ export function Overlay({ summary, family, ambientPicker }: OverlayProps) {
             }}
           />
         )}
-        {mapOpen && <OriginsMap onClose={closeMap} />}
+        <Suspense fallback={null}>
+          {mapOpen && <OriginsMap onClose={closeMap} />}
+          {listOpen && <ListDialog onClose={closeList} />}
+        </Suspense>
       </div>
-      {photoMode && <PhotoMode title={summary.title} />}
+      {photoMode && (
+        <Suspense fallback={null}>
+          <PhotoMode title={summary.title} />
+        </Suspense>
+      )}
       <SkipIntroButton />
     </FamilyContext>
   );

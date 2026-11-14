@@ -22,7 +22,7 @@
     "noFallthroughCasesInSwitch": true,
     "erasableSyntaxOnly": true,
 
-    "paths": { "@/*": ["./src/*"] }
+    "paths": { "@/*": ["./src/*"], "@family-data": ["./src/data/family.json"] }
   },
   "include": ["src"]
 }

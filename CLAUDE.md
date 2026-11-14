@@ -12,24 +12,26 @@ Antes de trabajar en cualquier tarea, lee:
 ## Stack
 
 - Vite + React + TypeScript (`strict: true`, sin `any`).
-- three.js vía **React Three Fiber**, **@react-three/drei** y **@react-three/postprocessing**.
+- three.js vía **React Three Fiber** y **@react-three/drei**; efectos con **postprocessing** directo (sin el wrapper de React, que arrastraba código sin usar).
 - **GSAP** para timelines de animación (intro, vuelos de cámara).
 - **zustand** para estado global de UI/escena.
-- **zod** para validar `family.json` al cargar y por script.
+- **zod** para validar `family.json` por script, en cada build (si falla, no hay build) y al cargar en desarrollo. Producción no lo incluye.
 - **Vitest** para tests (obligatorio en `domain/` y `layout/`).
 - ESLint + Prettier. Gestor de paquetes: **pnpm**.
 - Instala siempre las versiones estables actuales y compatibles entre sí (revisa la compatibilidad React ↔ R3F ↔ drei antes de instalar).
 
-No hay backend. Todo el contenido vive en `src/data/family.json` y en `public/media/`.
+No hay backend. Todo el contenido vive en `src/data/family.json` y en `public/media/`. La demo pública usa `src/data/demo/family.json` (personas ficticias); nunca pongas datos reales ahí.
 
 ## Comandos
 
 ```bash
 pnpm dev              # servidor de desarrollo
-pnpm build            # build de producción (incluye typecheck)
+pnpm build            # build "familia" (datos reales; incluye typecheck y validación)
+pnpm build:demo       # build "demo" de portafolio (VITE_DATA=demo, datos ficticios, sin fotos)
 pnpm test             # vitest
 pnpm lint             # eslint
 pnpm validate:family  # valida family.json contra el esquema y reglas de integridad
+pnpm validate:demo    # lo mismo para src/data/demo/family.json
 ```
 
 Antes de dar una tarea por terminada: `pnpm lint && pnpm test && pnpm validate:family && pnpm build` deben pasar.

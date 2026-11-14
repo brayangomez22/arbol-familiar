@@ -20,7 +20,7 @@
     "noFallthroughCasesInSwitch": true,
     "erasableSyntaxOnly": true,
 
-    "paths": { "@/*": ["./src/*"] }
+    "paths": { "@/*": ["./src/*"], "@family-data": ["./src/data/family.json"] }
   },
-  "include": ["vite.config.ts", "eslint.config.ts", "scripts"]
+  "include": ["vite.config.ts", "eslint.config.ts", "scripts", "tooling"]
 }

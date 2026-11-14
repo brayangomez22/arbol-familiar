@@ -1,0 +1,279 @@
+{
+  "meta": {
+    "title": "Familia Moreno Luna",
+    "rootUnionId": "u-ramon-ines",
+    "updatedAt": "2026-11-13"
+  },
+  "places": {
+    "bucaramanga": {
+      "name": "Bucaramanga",
+      "region": "Santander",
+      "country": "Colombia",
+      "lat": 7.1193,
+      "lng": -73.1227
+    },
+    "pasto": {
+      "name": "Pasto",
+      "region": "Nariño",
+      "country": "Colombia",
+      "lat": 1.2136,
+      "lng": -77.2811
+    },
+    "cartagena": {
+      "name": "Cartagena",
+      "region": "Bolívar",
+      "country": "Colombia",
+      "lat": 10.391,
+      "lng": -75.4794
+    },
+    "barranquilla": {
+      "name": "Barranquilla",
+      "region": "Atlántico",
+      "country": "Colombia",
+      "lat": 10.9685,
+      "lng": -74.7813
+    },
+    "bogota": {
+      "name": "Bogotá",
+      "region": "Cundinamarca",
+      "country": "Colombia",
+      "lat": 4.711,
+      "lng": -74.0721
+    },
+    "lima": {
+      "name": "Lima",
+      "country": "Perú",
+      "lat": -12.0464,
+      "lng": -77.0428
+    }
+  },
+  "people": [
+    {
+      "id": "ramon-moreno",
+      "firstName": "Ramón",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "1934-03-19",
+        "placeId": "bucaramanga"
+      },
+      "nickname": "Don Ramón",
+      "death": {
+        "date": "2009",
+        "placeId": "bucaramanga"
+      },
+      "bio": "Relojero de oficio. Decía que un reloj, como una familia, solo funciona si cada pieza tiene su lugar."
+    },
+    {
+      "id": "ines-luna",
+      "firstName": "Inés",
+      "lastName": "Luna",
+      "birth": {
+        "date": "1937-10-02",
+        "placeId": "pasto"
+      },
+      "death": {
+        "date": "2020-01"
+      },
+      "bio": "Maestra rural durante treinta años. Sembró el guayabo del patio con cada uno de sus nietos."
+    },
+    {
+      "id": "alberto-moreno",
+      "firstName": "Alberto",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "1959-06-11",
+        "placeId": "bucaramanga"
+      },
+      "bio": "Ingeniero de caminos; conoce cada curva de la vía al mar."
+    },
+    {
+      "id": "gloria-pineda",
+      "firstName": "Gloria",
+      "lastName": "Pineda",
+      "birth": {
+        "date": "1961-02-27",
+        "placeId": "cartagena"
+      }
+    },
+    {
+      "id": "beatriz-moreno",
+      "firstName": "Beatriz",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "1962-12-08",
+        "placeId": "bucaramanga"
+      },
+      "bio": "Pintora. Sus acuarelas de la casa familiar cuelgan en todas las salas."
+    },
+    {
+      "id": "hugo-salas",
+      "firstName": "Hugo",
+      "lastName": "Salas",
+      "birth": {
+        "date": "1958",
+        "placeId": "lima"
+      }
+    },
+    {
+      "id": "fernando-moreno",
+      "firstName": "Fernando",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "1966-08-14",
+        "placeId": "bucaramanga"
+      },
+      "nickname": "Nando"
+    },
+    {
+      "id": "clara-ortiz",
+      "firstName": "Clara",
+      "lastName": "Ortiz",
+      "birth": {
+        "date": "1968-05-30",
+        "placeId": "barranquilla"
+      }
+    },
+    {
+      "id": "julian-moreno",
+      "firstName": "Julián",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "1986-01-21",
+        "placeId": "cartagena"
+      }
+    },
+    {
+      "id": "paula-herrera",
+      "firstName": "Paula",
+      "lastName": "Herrera",
+      "birth": {
+        "date": "1987-09-09",
+        "placeId": "bogota"
+      }
+    },
+    {
+      "id": "isabel-moreno",
+      "firstName": "Isabel",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "1990-04-17",
+        "placeId": "cartagena"
+      }
+    },
+    {
+      "id": "martin-salas",
+      "firstName": "Martín",
+      "lastName": "Salas",
+      "birth": {
+        "date": "1988-11-05",
+        "placeId": "lima"
+      }
+    },
+    {
+      "id": "renata-salas",
+      "firstName": "Renata",
+      "lastName": "Salas",
+      "birth": {
+        "date": "1993-07-23",
+        "placeId": "bucaramanga"
+      }
+    },
+    {
+      "id": "simon-moreno",
+      "firstName": "Simón",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "1995",
+        "placeId": "barranquilla"
+      }
+    },
+    {
+      "id": "lina-castro",
+      "firstName": "Lina",
+      "lastName": "Castro",
+      "birth": {
+        "date": "1996-02-14",
+        "placeId": "barranquilla"
+      }
+    },
+    {
+      "id": "antonia-moreno",
+      "firstName": "Antonia",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "2015-10-12",
+        "placeId": "bogota"
+      }
+    },
+    {
+      "id": "gabriel-moreno",
+      "firstName": "Gabriel",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "2018-03",
+        "placeId": "bogota"
+      }
+    },
+    {
+      "id": "olivia-salas",
+      "firstName": "Olivia",
+      "lastName": "Salas",
+      "birth": {
+        "date": "2022-08-01",
+        "placeId": "bucaramanga"
+      }
+    },
+    {
+      "id": "joaquin-moreno",
+      "firstName": "Joaquín",
+      "lastName": "Moreno",
+      "birth": {
+        "date": "2024",
+        "placeId": "barranquilla"
+      }
+    }
+  ],
+  "unions": [
+    {
+      "id": "u-ramon-ines",
+      "partners": ["ramon-moreno", "ines-luna"],
+      "children": ["alberto-moreno", "beatriz-moreno", "fernando-moreno"],
+      "since": "1957"
+    },
+    {
+      "id": "u-alberto-gloria",
+      "partners": ["alberto-moreno", "gloria-pineda"],
+      "children": ["julian-moreno", "isabel-moreno"],
+      "since": "1984"
+    },
+    {
+      "id": "u-beatriz-hugo",
+      "partners": ["beatriz-moreno", "hugo-salas"],
+      "children": ["martin-salas", "renata-salas"],
+      "since": "1987"
+    },
+    {
+      "id": "u-fernando-clara",
+      "partners": ["fernando-moreno", "clara-ortiz"],
+      "children": ["simon-moreno"],
+      "since": "1994"
+    },
+    {
+      "id": "u-julian-paula",
+      "partners": ["julian-moreno", "paula-herrera"],
+      "children": ["antonia-moreno", "gabriel-moreno"],
+      "since": "2013"
+    },
+    {
+      "id": "u-martin",
+      "partners": ["martin-salas"],
+      "children": ["olivia-salas"]
+    },
+    {
+      "id": "u-simon-lina",
+      "partners": ["simon-moreno", "lina-castro"],
+      "children": ["joaquin-moreno"],
+      "since": "2022"
+    }
+  ]
+}

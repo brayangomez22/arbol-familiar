@@ -1137,3 +1137,24 @@ export const BIRD = {
   hopHeight: 0.25,
   hopDuration: 0.3,
 } as const;
+
+/** The loading screen: static in index.html, driven by ui/Loader/BootLoader once the app runs. */
+export const LOADER = {
+  /** Seconds it takes to fade away as the intro's seed starts to fall. */
+  fade: 0.8,
+  /** Seconds of one heartbeat of the seed. */
+  beat: 1.6,
+  /** What the bar shows before any JavaScript runs, so it never looks stuck at zero. */
+  initial: 0.08,
+  /** Share of the bar each real milestone fills; they add up to 1. */
+  weights: {
+    /** The app's code downloaded and running: by far the biggest part. */
+    code: 0.55,
+    /** Display and body fonts ready. */
+    fonts: 0.1,
+    /** Files through three's loading manager (drei's useProgress). */
+    assets: 0.1,
+    /** Shaders compiled and the first frame drawn. */
+    scene: 0.25,
+  },
+} as const;

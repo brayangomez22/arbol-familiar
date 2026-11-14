@@ -1,11 +1,15 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import type { Person } from '@/domain/types';
 import { useFamily } from '../family/familyDirectory';
 import { fullName } from '../family/personText';
-import { PhotoViewer } from './PhotoViewer';
 import { Polaroid } from './Polaroid';
 import styles from './Polaroids.module.css';
 import sectionStyles from './Section.module.css';
+
+// Only needed once a photo is tapped.
+const PhotoViewer = lazy(() =>
+  import('./PhotoViewer').then((module) => ({ default: module.PhotoViewer })),
+);
 
 interface PolaroidsProps {
   readonly person: Person;
@@ -36,15 +40,17 @@ export function Polaroids({ person }: PolaroidsProps) {
         ))}
       </ul>
       {openIndex !== null && (
-        <PhotoViewer
-          photos={person.photos}
-          index={openIndex}
-          name={name}
-          onIndexChange={setOpenIndex}
-          onClose={() => {
-            setOpenIndex(null);
-          }}
-        />
+        <Suspense fallback={null}>
+          <PhotoViewer
+            photos={person.photos}
+            index={openIndex}
+            name={name}
+            onIndexChange={setOpenIndex}
+            onClose={() => {
+              setOpenIndex(null);
+            }}
+          />
+        </Suspense>
       )}
     </section>
   );

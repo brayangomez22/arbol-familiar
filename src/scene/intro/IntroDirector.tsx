@@ -45,6 +45,7 @@ export function IntroDirector({ layout, schedule }: IntroDirectorProps) {
     const store = useAppStore.getState();
     const motion = seedMotion.current;
     const showComplete = () => {
+      useAppStore.getState().setSceneReady();
       growthUniforms.uGrowth.value = FULLY_GROWN;
       motion.sink.value = 0;
       // Skipping already set it from the UI.
@@ -144,6 +145,8 @@ export function IntroDirector({ layout, schedule }: IntroDirectorProps) {
         requestAnimationFrame(startWhenWarm);
         return;
       }
+      // The loading screen steps aside exactly as the seed starts to fall.
+      useAppStore.getState().setSceneReady();
       timeline.play();
     };
     void gl.compileAsync(scene, viewCamera).then(startWhenWarm);

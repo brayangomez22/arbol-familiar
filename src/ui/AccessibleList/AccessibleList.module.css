@@ -1,0 +1,280 @@
+/* The family as nested lists on paper, with the card beside it (or instead of it, on phones). */
+
+.dialog,
+.page {
+  width: 100vw;
+  max-width: none;
+  height: 100dvh;
+  max-height: none;
+  margin: 0;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+  overflow: auto;
+  border: 0;
+  background: radial-gradient(
+    ellipse at 30% 20%,
+    var(--color-paper),
+    color-mix(in srgb, var(--color-paper) 80%, var(--color-sky-horizon))
+  );
+  color: var(--color-ink);
+}
+
+.dialog {
+  animation: unfold var(--duration-ui-fade) var(--ease-out);
+}
+
+.dialog::backdrop {
+  background: color-mix(in srgb, var(--color-ink) 25%, transparent);
+}
+
+.layout {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px 24px;
+  margin-bottom: 20px;
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.3rem);
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.lead {
+  max-width: 60ch;
+  margin: 6px 0 0;
+  font-size: 0.95rem;
+  line-height: 1.45;
+  color: var(--color-ink-soft);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 44px;
+  padding: 0 18px 0 14px;
+  border: var(--border-card);
+  border-radius: 999px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  font: 600 0.9rem var(--font-body);
+  cursor: pointer;
+  box-shadow: var(--shadow-soft);
+  transition: transform 150ms ease;
+}
+
+.back:hover {
+  transform: scale(1.03);
+}
+
+.back:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+
+.back svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  align-items: start;
+  gap: 24px;
+}
+
+/* --- The nested lists ------------------------------------------------------------------- */
+
+.tree,
+.children {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Each generation hangs from a thin branch line, like the tree it stands for. */
+.children {
+  margin: 4px 0 4px 15px;
+  padding-left: 14px;
+  border-left: 2px solid color-mix(in srgb, var(--color-ink) 14%, transparent);
+}
+
+.children > li {
+  margin: 2px 0;
+}
+
+.couple {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 0 30px;
+}
+
+/* The root couple: the trunk, both names at the same level. */
+.rootCouple {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin: 0;
+}
+
+.partner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+
+.with {
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+.person {
+  min-width: 0;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+  min-height: 44px;
+  padding: 8px 12px 8px 8px;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  background: none;
+  color: var(--color-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.person:hover {
+  background: color-mix(in srgb, var(--color-ink) 6%, transparent);
+}
+
+.person:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 1px;
+}
+
+.person[aria-current='true'] {
+  border-color: color-mix(in srgb, var(--color-ink) 18%, transparent);
+  background: var(--color-card);
+  box-shadow: var(--shadow-soft);
+}
+
+.dot {
+  align-self: center;
+  flex: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--fruit);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--color-ink) 20%, transparent);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.nickname {
+  font-style: italic;
+  color: var(--color-ink-soft);
+}
+
+.details {
+  flex-basis: 100%;
+  padding-left: 20px;
+  font-size: 0.85rem;
+  color: var(--color-ink-soft);
+}
+
+/* --- The card -------------------------------------------------------------------------- */
+
+.card {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+  border: var(--border-card);
+  border-radius: var(--radius-card);
+  background: color-mix(in srgb, var(--color-paper) 95%, transparent);
+  box-shadow: var(--shadow-soft);
+}
+
+.card:focus {
+  outline: none;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 2px;
+}
+
+.empty {
+  margin: 0;
+  padding: 24px;
+  color: var(--color-ink-soft);
+}
+
+/* Phones: one thing at a time. The card replaces the list; closing it brings the list back. */
+@media (max-width: 760px) {
+  .couple {
+    margin-left: 12px;
+  }
+
+  .children {
+    margin-left: 10px;
+    padding-left: 8px;
+  }
+
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .body[data-selected='false'] .card,
+  .body[data-selected='true'] .list {
+    display: none;
+  }
+
+  .card {
+    position: static;
+    max-height: none;
+  }
+}
+
+@keyframes unfold {
+  from {
+    opacity: 0;
+    scale: 0.98;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog {
+    animation: none;
+  }
+
+  .back {
+    transition: none;
+  }
+}

@@ -1,10 +1,9 @@
 import { dayPalette } from '@/config/theme';
-import familyJson from '@/data/family.json';
-import { loadFamily } from '@/data/loadFamily';
 import { birthdaysOn } from '@/domain/birthdays';
 import { generationOf, indexFamily } from '@/domain/genealogy';
 import { relativeInDirection } from '@/domain/navigation';
 import { birthsByPlace, migrations } from '@/domain/origins';
+import { familyOutline } from '@/domain/outline';
 import { searchEntryOf } from '@/domain/search';
 import { censusAt, decadeMarks, lifelines, timelineRange } from '@/domain/timeline';
 import type { PersonId } from '@/domain/types';
@@ -13,8 +12,7 @@ import { buildOriginsMap } from '@/layout/originsMap';
 import type { FamilyTime } from '@/scene/timeline/familyTime';
 import { fruitColorIndex } from '@/scene/tree/fruitColor';
 import type { FamilyDirectory } from '@/ui/family/familyDirectory';
-
-const family = loadFamily(familyJson);
+import { family } from './familyData';
 
 /** The shape of the family's tree, computed once: it only changes when family.json does. */
 export const familyLayout = buildTreeLayout(family);
@@ -73,4 +71,5 @@ export const familyDirectory: FamilyDirectory = {
     births: birthsByPlace(index),
     migrations: migrations(index),
   }),
+  outline: familyOutline(index),
 };

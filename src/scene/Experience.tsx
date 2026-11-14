@@ -1,4 +1,5 @@
 import { Canvas } from '@react-three/fiber';
+import { lazy, Suspense } from 'react';
 import { cssEase } from '@/animation/easings';
 import { CAMERA, TIMING } from '@/config/constants';
 import { QUALITY } from '@/config/quality';
@@ -9,12 +10,19 @@ import { AmbientDirector } from './ambient/AmbientDirector';
 import { livePalette } from './ambient/livePalette';
 import { CanvasControls } from './camera/CanvasControls';
 import { CanvasCursor } from './camera/CanvasCursor';
-import { Effects } from './effects/Effects';
 import { Scenery } from './environment/Scenery';
+import { LoadProgressReporter } from './loading/LoadProgressReporter';
 import { PhotoDirector } from './photo/PhotoDirector';
+import { QualityDirector } from './quality/QualityDirector';
 import type { FamilyTime } from './timeline/familyTime';
 import { Tree } from './tree/Tree';
 import { Wind } from './wind/Wind';
+
+// postprocessing is a third of the scene's code and the lowest tier never uses it: it arrives on
+// its own, after the first frame, and only where it will run.
+const Effects = lazy(() =>
+  import('./effects/Effects').then((module) => ({ default: module.Effects })),
+);
 
 interface ExperienceProps {
   readonly layout: TreeLayout;
@@ -29,6 +37,8 @@ export function Experience({ layout, labels, time }: ExperienceProps) {
   const selectPerson = useAppStore((state) => state.selectPerson);
   // Hidden until the intro decides whether to play: without it, the tree simply fades in.
   const decided = useAppStore((state) => state.introPhase !== 'pending');
+  // The map and the list cover the whole tree: drawing it behind them only drains the battery.
+  const covered = useAppStore((state) => state.mapOpen || state.listOpen);
   const quality = QUALITY[qualityTier];
 
   return (
@@ -37,6 +47,9 @@ export function Experience({ layout, labels, time }: ExperienceProps) {
       // Opaque: the sky covers every pixel, and partial alpha on leaf edges must never let the
       // page show through.
       gl={{ antialias: quality.antialias, alpha: false }}
+      frameloop={covered ? 'never' : 'always'}
+      // Decorative: the same family is in the accessible list ("Ver como lista").
+      aria-hidden="true"
       style={{
         opacity: decided ? 1 : 0,
         transition: `opacity ${TIMING.reducedMotionIntroDuration}s ${cssEase('out')}`,
@@ -62,7 +75,13 @@ export function Experience({ layout, labels, time }: ExperienceProps) {
       <Tree layout={layout} labels={labels} time={time} />
       <CanvasControls bounds={layout.bounds} />
       <CanvasCursor />
-      <Effects />
+      {quality.postprocessing && (
+        <Suspense fallback={null}>
+          <Effects />
+        </Suspense>
+      )}
+      <QualityDirector />
+      <LoadProgressReporter />
       <PhotoDirector />
     </Canvas>
   );

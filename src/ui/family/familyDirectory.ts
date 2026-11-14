@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { FamilyIndex } from '@/domain/genealogy';
 import type { Direction } from '@/domain/navigation';
+import type { OutlineUnion } from '@/domain/outline';
 import type { SearchEntry } from '@/domain/search';
 import type { LifeStage, TimelineRange } from '@/domain/timeline';
 import type { PersonId } from '@/domain/types';
@@ -20,6 +21,8 @@ export interface FamilyDirectory {
   readonly birthdaysOn: (today: Date) => readonly Celebrant[];
   /** Where everyone was born and how the family moved, laid out on the map. */
   readonly originsMap: OriginsMapLayout;
+  /** The whole family as nested lists, from the root couple down, for the accessible list. */
+  readonly outline: OutlineUnion;
 }
 
 export interface Celebrant {

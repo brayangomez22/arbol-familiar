@@ -4,7 +4,6 @@ export interface QualitySettings {
   /** Min and max device pixel ratio passed to the canvas. */
   readonly dpr: readonly [number, number];
   readonly antialias: boolean;
-  readonly shadows: boolean;
   readonly postprocessing: boolean;
   readonly bloom: boolean;
   readonly depthOfField: boolean;
@@ -21,7 +20,6 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
   high: {
     dpr: [1, 2],
     antialias: true,
-    shadows: true,
     postprocessing: true,
     bloom: true,
     depthOfField: true,
@@ -34,7 +32,6 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
   medium: {
     dpr: [1, 1.5],
     antialias: true,
-    shadows: false,
     postprocessing: true,
     bloom: true,
     depthOfField: false,
@@ -47,7 +44,6 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
   low: {
     dpr: [1, 1],
     antialias: false,
-    shadows: false,
     postprocessing: false,
     bloom: false,
     depthOfField: false,
@@ -59,4 +55,32 @@ export const QUALITY: Record<QualityTier, QualitySettings> = {
   },
 };
 
+/** From cheapest to richest: the monitor steps along this list one tier at a time. */
+export const QUALITY_TIERS: readonly QualityTier[] = ['low', 'medium', 'high'];
+
+/** Where a visit starts before any frame is measured (see state/qualityTier.ts). */
 export const DEFAULT_QUALITY_TIER: QualityTier = 'high';
+
+/** What the device says about itself, read once at load. */
+export const DEVICE_HINTS = {
+  /** At or below this many logical cores, a phone starts on low and a desktop on medium. */
+  fewCores: 4,
+  /** At or below this many GB (navigator.deviceMemory), the same. */
+  littleMemory: 4,
+} as const;
+
+/**
+ * drei's PerformanceMonitor: frame rate sampled every `sampleMs`, judged every `iterations`
+ * samples. Below `minFps` the tier steps down; above `upperFps` (or `upperFpsFast` on screens
+ * faster than `fastRefreshRate`) it may step back up. After `flipflops` changes it settles.
+ */
+export const QUALITY_MONITOR = {
+  minFps: 45,
+  upperFps: 57,
+  upperFpsFast: 100,
+  fastRefreshRate: 100,
+  sampleMs: 250,
+  iterations: 10,
+  threshold: 0.75,
+  flipflops: 3,
+} as const;

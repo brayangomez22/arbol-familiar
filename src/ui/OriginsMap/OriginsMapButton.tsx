@@ -1,4 +1,4 @@
-import styles from './OriginsMapButton.module.css';
+import styles from '../Controls/PillButton.module.css';
 
 interface OriginsMapButtonProps {
   readonly onClick: () => void;
