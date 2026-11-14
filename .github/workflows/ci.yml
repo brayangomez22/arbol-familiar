@@ -1,0 +1,32 @@
+name: CI
+
+# Lint, tests, data validation and both builds on every push and pull request.
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      # Version taken from "packageManager" in package.json.
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm exec prettier --check .
+      - run: pnpm test
+      - run: pnpm validate:family
+      - run: pnpm validate:demo
+      - name: Build (familia)
+        run: pnpm build
+      - name: Build (demo)
+        run: pnpm build:demo
